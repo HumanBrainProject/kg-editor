@@ -125,7 +125,7 @@ const InstanceChildrenStatus = observer(({ instanceStatus, classes, darkmode }: 
 });
 
 interface StatusProps {
-  id: string;
+  id?: string;
   darkmode: boolean;
 }
 
@@ -135,11 +135,13 @@ const Status = observer(({ id, darkmode }: StatusProps) => {
   const { statusStore } = useStores();
 
   useEffect(() => {
-    statusStore.fetchStatus(id);
+    if(id) {
+      statusStore.fetchStatus(id);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const instanceStatus: Status|undefined = statusStore.getInstance(id);
+  const instanceStatus: Status|undefined = id ? statusStore.getInstance(id): undefined;
 
   if (!instanceStatus) {
     return null;

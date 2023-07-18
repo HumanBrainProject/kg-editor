@@ -32,7 +32,7 @@ import Label from '../Label';
 import Warning from '../Warning';
 import type { Alternative } from '../../types';
 import type InputTextStore from '../Stores/InputTextStore';
-import type { ChangeEvent} from 'react';
+import type { ChangeEvent, ElementType} from 'react';
 
 const useStyles = createUseStyles({
   alternatives: {
@@ -109,7 +109,7 @@ AlternativeDateValue.displayName = 'AlternativeDateValue';
 interface InputTextProps {
   fieldStore: InputTextStore;
   className: string;
-  as: string;
+  as: any;
   readMode: boolean;
   showIfNoValue: boolean;
 }
@@ -166,7 +166,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
         onSelect={handleSelectAlternative}
         onRemove={handleRemoveMySuggestion}
         parentContainerRef={formGroupRef}
-        ValueRenderer={AlternativeValueComponent}
+        ValueRenderer={AlternativeValueComponent as React.ComponentType}
       />
       {inputType === 'time' ?
         <Form.Control

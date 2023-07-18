@@ -135,7 +135,7 @@ const useStyles = createUseStyles({
 });
 
 interface CompareModalProps {
-  instance: InstanceType;
+  instance?: InstanceType;
   onSave: (i: InstanceType) => void;
   onReset: (i: InstanceType) => void;
   onClose: () => void;
@@ -225,12 +225,12 @@ const SaveBar = observer(() => {
 
   const { appStore, instanceStore } = useStores();
 
-  const [comparedInstance, setComparedInstance] = useState<InstanceType|null>(null);
+  const [comparedInstance, setComparedInstance] = useState<InstanceType|undefined>(undefined);
   const navigate = useNavigate();
 
   useEffect(() => {
 
-    const onUnload = e => {
+    const onUnload = (e: BeforeUnloadEvent) => {
       if (instanceStore.hasUnsavedChanges) {
         e.returnValue = true;
       }
@@ -251,13 +251,15 @@ const SaveBar = observer(() => {
   const handleSave = (instance: InstanceType) => {
     Matomo.trackEvent('Instance', 'InstanceSave', instance.id);
     appStore.saveInstance(instance, navigate);
-    setComparedInstance(null);
+    setComparedInstance(undefined);
   };
 
   const handleReset = (instance: InstanceType) => {
-    Matomo.trackEvent('Instance', 'InstanceReset', instance.id);
-    instanceStore.confirmCancelInstanceChanges(instance.id);
-    setComparedInstance(null);
+    if(instance.id) {
+      Matomo.trackEvent('Instance', 'InstanceReset', instance.id);
+      instanceStore.confirmCancelInstanceChanges(instance.id);
+    }
+    setComparedInstance(undefined);
   };
 
   const handleDismissSaveError = (instance: InstanceType) => instance.cancelSave();
@@ -267,7 +269,7 @@ const SaveBar = observer(() => {
     setComparedInstance(instance);
   };
 
-  const handleCloseCompararison = () => setComparedInstance(null);
+  const handleCloseCompararison = () => setComparedInstance(undefined);
 
   const changedInstances = instanceStore.getUnsavedInstances;
 

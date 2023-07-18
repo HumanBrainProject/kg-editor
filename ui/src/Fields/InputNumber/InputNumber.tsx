@@ -115,7 +115,7 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
         onSelect={handleSelectAlternative}
         onRemove={handleRemoveMySuggestion}
         parentContainerRef={formGroupRef}
-        ValueRenderer={AlternativeValue}
+        ValueRenderer={AlternativeValue as React.ComponentType}
       />
       <Form.Control
         value={value}

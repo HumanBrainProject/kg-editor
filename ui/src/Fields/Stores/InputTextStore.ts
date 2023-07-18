@@ -139,9 +139,8 @@ class InputTextStore extends FieldStore {
 
   get regexWarning() {
     //NOSONAR by design return null when no warning
-    return this.regexRules.reduce(
-      (message, rule) =>
-        message || rule.regex.test(this.value) ? message : rule.errorMessage,
+    return this.regexRules.reduce((message, rule) =>
+        message || rule.regex.test(this.value) ? message : rule.errorMessage, //TODO: What is this code doing ?? It looks like a hack!
       undefined
     );
   }

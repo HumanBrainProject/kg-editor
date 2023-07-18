@@ -163,7 +163,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
   const { userStore } = useStores();
 
   useEffect(() => {
-    const clickOutHandler = e => {
+    const clickOutHandler = (e:MouseEvent | Event) => {
       if(!wrapperRef.current?.contains(e.target as Node)){
         userStore.clearSearch();
       }
@@ -184,7 +184,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
   const handleLoadSearchResults = () => userStore.searchUsers();
 
   const handleSelect = (user: UserSummary, event: KeyboardEvent<HTMLDivElement> |  MouseEvent<HTMLElement>) => {
-    if(event && event.key === "ArrowDown"){ // Down
+    if(event && event instanceof KeyboardEvent &&  event.key === "ArrowDown"){ // Down
       event.preventDefault();
       const users = usersRef.current?.querySelectorAll('.option');
       if (users && users.length) {
@@ -192,9 +192,9 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
         if (index >= users.length) {
           index = 0;
         }
-        users[index].focus();
+        (users[index] as HTMLDivElement).focus();
       }
-    } else if(event && event.key === "ArrowUp"){ // Up
+    } else if(event && event instanceof KeyboardEvent && event.key === "ArrowUp"){ // Up
       event.preventDefault();
       const users = usersRef.current?.querySelectorAll('.option');
       if (users && users.length) {
@@ -202,12 +202,12 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
         if (index < 0) {
           index = users.length - 1;
         }
-        users[index].focus();
+        (users[index] as HTMLDivElement).focus();
       }
-    } else if(event && event.key === "Escape") { //escape
+    } else if(event && event instanceof KeyboardEvent && event.key === "Escape") { //escape
       event.preventDefault();
       userStore.clearSearch();
-    } else if (user && (!event || (event && (!event.key || event.key === "Enter")))) { // enter
+    } else if (user && (!event || (event && event instanceof KeyboardEvent &&  (!event.key || event.key === "Enter")))) { // enter
       event.preventDefault();
       inputRef.current?.focus();
       typeof onSelect === 'function' && onSelect(user.id);
@@ -223,7 +223,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
         if (index >= users.length) {
           index = 0;
         }
-        users[index].focus();
+        (users[index] as HTMLDivElement).focus();
       }
     } else if(event && event.key === "ArrowUp"){ // Up
       event.preventDefault();
@@ -233,7 +233,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
         if (index < 0) {
           index = users.length - 1;
         }
-        users[index].focus();
+        (users[index] as HTMLDivElement).focus();
       }
     } else if(event && event.key === "Escape") { //escape
       event.preventDefault();
@@ -242,7 +242,8 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
   };
 
   const handleSearchFilterChange = (event: ChangeEvent<HTMLInputElement>) => {
-    if (event
+    //TODO: Do we need to check this ? key does not exist on a ChangeEvent! 
+    if (event 
       && event.key !== "ArrowDown"   // Down
       && event.key !== "ArrowUp"   // Up
       && event.key !== "Escape") { //escape

@@ -36,6 +36,7 @@ import InstanceRow from '../Instance/InstanceRow';
 import type { Instance } from '../../Stores/InstanceStore';
 import type { ViewMode } from '../../types';
 import type { ChangeEvent} from 'react';
+import { EventType } from '../../Stores/AppStore';
 
 const useStyles = createUseStyles({
   container: {
@@ -272,14 +273,16 @@ const InstancesHistory = observer(() => {
   }, [appStore.currentSpace?.id]);
 
   const fetchInstances = (space?: string) => {
-    const eventTypes = Object.entries(appStore.historySettings.eventTypes).reduce((acc, [eventType, eventValue]) => {
+    const eventTypes = appStore.historySettings && Object.entries(appStore.historySettings.eventTypes).reduce((acc, [eventType, eventValue]) => {
       if (eventValue) {
         acc.push(eventType);
       }
       return acc;
-    }, []);
-    const history = historyStore.getFileredInstancesHistory(space, eventTypes, appStore.historySettings?.size);
-    historyStore.fetchInstances(history);
+    }, [] as string[]);
+    const history = eventTypes && historyStore.getFileredInstancesHistory(space, eventTypes, appStore.historySettings?.size);
+    if(history) {
+      historyStore.fetchInstances(history);
+    }
   };
 
   const fetch = () => fetchInstances(appStore.currentSpace?.id);

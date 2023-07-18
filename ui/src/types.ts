@@ -180,7 +180,7 @@ export interface StructureOfIncomingLink {
   sourceTypes: SourceType[];
 }
 export interface SourceType {
-  type: SimpleType;
+  type: StructureOfType;
   spaces: string[];
 }
 export interface ValidationRule {
@@ -283,6 +283,7 @@ export interface Scope {
 }
 
 export interface ReleaseScope extends Scope {
+  status?: ReleaseStatus;
   childrenStatus?: ReleaseStatus;
   globalStatus?: ReleaseStatus;
   pending_childrenStatus?: ReleaseStatus;

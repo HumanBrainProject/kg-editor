@@ -231,7 +231,7 @@ export class ReleaseStore {
     this.rootStore = rootStore;
   }
 
-  setComparedInstance(instance: ReleaseScope) {
+  setComparedInstance(instance: ReleaseScope | undefined) {
     this.comparedInstance = instance;
   }
 
@@ -500,7 +500,7 @@ export class ReleaseStore {
     }
   }
 
-  markAllNodeForChange(node: ReleaseScope, newStatus: ReleaseStatus) {
+  markAllNodeForChange(node: ReleaseScope, newStatus?: ReleaseStatus) {
     this.recursiveMarkNodeForChange(node || this.instancesTree, newStatus);
     if(this.instancesTree) {
       populateStatuses(this.instancesTree, true);

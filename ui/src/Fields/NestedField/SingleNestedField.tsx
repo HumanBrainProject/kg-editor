@@ -123,7 +123,7 @@ interface ItemProps {
   itemFieldStores: any;
   readMode: boolean;
   active: boolean;
-  index: number;
+  index?: number;
   onDelete: (v:number) => void;
 }
 
@@ -135,7 +135,7 @@ const Item = ({ itemFieldStores, readMode, active, index, onDelete }: ItemProps)
   const view = React.useContext(ViewContext);
   const pane = React.useContext(PaneContext);
 
-  const handleDelete = () => onDelete(index);
+  const handleDelete = () => index !== undefined && onDelete(index);
 
   const sortedStores = Object.values(itemFieldStores).sort((a, b) => compareField(a, b, true));
 

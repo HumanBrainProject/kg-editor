@@ -70,8 +70,10 @@ const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
         const type = typeStore.typesMap.get(typeName);
         if (type) {
           if (type.canCreate !== false && type.isSupported && !type.embeddedOnly) {
-            instanceStore.createNewInstance(type, instanceId);
-            setReady(true);
+            if(instanceId) {
+              instanceStore.createNewInstance(type, instanceId);
+              setReady(true);  
+            }
           } else {
             setTypeNotSupported(true);
           }
@@ -86,7 +88,9 @@ const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
         viewStore.clearViews();
       } else {
         const instance = instanceStore.createInstanceOrGet(resolvedId);
-        instance.initializeData(api, rootStore, data);
+        if(instance){
+          instance.initializeData(api, rootStore, data);
+        }
       }
       setReady(true);
     }

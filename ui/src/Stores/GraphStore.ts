@@ -25,7 +25,6 @@ import { observable, action, computed, runInAction, set, values, makeObservable 
 import type API from '../Services/API';
 import type { GraphGroup, GraphGroups, GraphLink, GraphLinks, GraphNode, GraphNodes, Neighbor, SimpleType, UUID } from '../types';
 import { APIError } from '../Services/API';
-import { LinkObject } from 'force-graph';
 
 const typeDefaultColor = 'white';
 const typeDefaultName = '-';

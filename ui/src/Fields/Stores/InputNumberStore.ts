@@ -34,9 +34,9 @@ interface Messages {
 }
 
 class InputNumberStore extends FieldStore {
-  value = '';
+  value: string | null = '';
   returnAsNull = false;
-  initialValue = null;
+  initialValue: string | null = null;
   inputType = 'number';
   minValue?: number;
   maxValue?: number;
@@ -75,15 +75,17 @@ class InputNumberStore extends FieldStore {
     const messages: Messages = {};
     if (this.shouldCheckValidation) {
       if(this.minMaxValueWarning && this.value !== '') {
-        const v = parseInt(this.value);
-        if(this.minValue && this.maxValue) {
-          if(v < this.minValue || v > this.maxValue) {
-            messages.minMaxValue = `Value should be between ${this.minValue} and ${this.maxValue}`;
+        if(this.value) {
+          const v = parseInt(this.value);
+          if(this.minValue && this.maxValue) {
+            if(v < this.minValue || v > this.maxValue) {
+              messages.minMaxValue = `Value should be between ${this.minValue} and ${this.maxValue}`;
+            }
+          } else if(this.minValue && v < this.minValue) {
+            messages.minMaxValue = `Value should be bigger than ${this.minValue}`;
+          } else if(this.maxValue && v > this.maxValue) {
+            messages.minMaxValue = `Value should be smaller than ${this.maxValue}`;
           }
-        } else if(this.minValue && v < this.minValue) {
-          messages.minMaxValue = `Value should be bigger than ${this.minValue}`;
-        } else if(this.maxValue && v > this.maxValue) {
-          messages.minMaxValue = `Value should be smaller than ${this.maxValue}`;
         }
       }
     }
@@ -122,7 +124,7 @@ class InputNumberStore extends FieldStore {
     };
   }
 
-  updateValue(value) {
+  updateValue(value: string | null | undefined) {
     this.returnAsNull = false;
     this.initialValue = (value !== null && value !== undefined)?value:null;
     this.value = this.initialValue;
@@ -144,7 +146,7 @@ class InputNumberStore extends FieldStore {
     return this.initialValue !== null || this.hasChanged;
   }
 
-  setValue(value) {
+  setValue(value: string | null | undefined) {
     if (value !== null && value !== undefined) {
       if (value !== '' || !this.returnAsNull) {
         this.returnAsNull = false;

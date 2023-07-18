@@ -31,6 +31,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 import useStores from '../../../Hooks/useStores';
 import type Instance from '../../../Stores/Instance';
+import { ViewMode } from '../../../types';
 
 const useStyles = createUseStyles({
   panel:{
@@ -110,7 +111,9 @@ const FooterPanel = observer(({ className, instance, showOpenActions }: FooterPa
       await appStore.switchSpace(location, navigate, instance.space);
     }
     if(e.metaKey || e.ctrlKey){
-      appStore.openInstance(instance.id, instance.name, instance.primaryType, 'view');
+      if(instance.id) {
+        appStore.openInstance(instance.id, instance.name, instance.primaryType, ViewMode.VIEW);
+      }
     } else {
       navigate(`/instances/${instance.id}`);
     }

@@ -25,7 +25,11 @@ import React from 'react';
 import type RootStore from '../Stores/RootStore';
 import type { ReactNode } from 'react';
 
-class ErrorBoundaryComponent extends React.Component {
+interface ErrorBoundaryComponentProps {
+  stores: RootStore;
+  children: ReactNode;
+}
+class ErrorBoundaryComponent extends React.Component<ErrorBoundaryComponentProps> {
 
   static getDerivedStateFromError() {
     return null;

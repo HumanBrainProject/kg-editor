@@ -21,10 +21,19 @@
  *
  */
 
-import React from 'react';
+import React, { Component, ErrorInfo, ReactNode } from 'react';
+import FieldStore from './Stores/FieldStore';
+interface FieldErrorProps {
+  fieldStore: FieldStore;
+  children: ReactNode;
+}
 
-class FieldError extends React.Component {
-  constructor(props) {
+interface FieldErrorState {
+  hasError: boolean;
+}
+
+class FieldError extends Component<FieldErrorProps, FieldErrorState> {
+  constructor(props: FieldErrorProps) {
     super(props);
     this.state = { hasError: false };
   }
@@ -33,8 +42,8 @@ class FieldError extends React.Component {
     return { hasError: true };
   }
 
-  componentDidCatch(error, info){
-    this.props.fieldStore.setError(error, info);
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    this.props.fieldStore.setError(error.message, info);
   }
 
   render() {

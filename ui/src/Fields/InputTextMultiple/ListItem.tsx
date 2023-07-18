@@ -127,7 +127,7 @@ const ListItem = observer(
         className={`btn btn-xs btn-default ${classes.valueTag} ${
           disabled ? 'disabled' : ''
         }}`}
-        disabled={disabled}
+        disabled={disabled} //TODO: Check if this is needed! We put it as a class and typescript complains for that property in the div
         draggable={!disabled}
         onDragEnd={handleDragEnd}
         onDragOver={handleDragOver}

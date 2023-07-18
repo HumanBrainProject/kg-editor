@@ -82,7 +82,7 @@ const useStyles = createUseStyles({
 interface FetchErrorPanelProps {
   id: string;
   show: boolean;
-  error: string;
+  error?: string;
   inline: boolean;
   onRetry: (e: MouseEvent<HTMLButtonElement>) => void;
 }

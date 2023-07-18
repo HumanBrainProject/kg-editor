@@ -61,7 +61,9 @@ const Types = observer(({ children }: TypesProps) => {
     if (isFetching) {
       typeStore.clear();
     } else if (isSuccess) {
-      typeStore.setTypes(space, types);
+      if(types) {
+        typeStore.setTypes(space, types);
+      }
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [space, isFetching, isSuccess, types]);

@@ -32,7 +32,7 @@ import type InstanceStore from './InstanceStore';
 import type RootStore from './RootStore';
 import type API from '../Services/API';
 import type { APIError } from '../Services/API';
-import type { Space, Permissions, StructureOfType } from '../types';
+import { type Space, type Permissions, type StructureOfType, ViewMode } from '../types';
 import type { Location, NavigateFunction} from 'react-router-dom';
 
 const themes = {
@@ -68,13 +68,15 @@ interface InstanceToMove {
   space: string;
 }
 
+export interface EventType {
+  viewed: boolean,
+  edited: boolean,
+  released: boolean
+}
+
 interface HistorySettings {
   size: number,
-  eventTypes: {
-    viewed: boolean,
-    edited: boolean,
-    released: boolean
-  }
+  eventTypes: EventType
 }
 export class AppStore{
   commit?: string;
@@ -395,7 +397,7 @@ export class AppStore{
     const primaryType = isFetched?instance.primaryType:instancePrimaryType;
     this.rootStore?.viewStore.registerViewByInstanceId(instanceId, name, primaryType, viewMode);
     if(viewMode !== 'create') {
-      this.rootStore?.historyStore.updateInstanceHistory(instanceId, 'viewed');
+      this.rootStore?.historyStore.updateInstanceHistory(instanceId, ViewMode.VIEW);
     }
     this.rootStore?.viewStore.syncStoredViews();
   }
@@ -415,12 +417,15 @@ export class AppStore{
       }
     }
     this.rootStore?.viewStore.unregisterViewByInstanceId(instanceId);
-    const instance = this.rootStore?.instanceStore.instances.get(instanceId);
-    if (instance) {
-      const instanceIdsToBeKept = getLinkedInstanceIds(this.rootStore?.instanceStore, this.rootStore?.viewStore.instancesIds);
-      const instanceIdsToBeRemoved = instance.linkedIds.filter(id => !instanceIdsToBeKept.includes(id));
-      this.rootStore?.instanceStore.removeInstances(instanceIdsToBeRemoved);
+    if(this.rootStore?.instanceStore) {
+      const instance = this.rootStore?.instanceStore.instances.get(instanceId);
+      if (instance) {
+        const instanceIdsToBeKept = getLinkedInstanceIds(this.rootStore.instanceStore, this.rootStore?.viewStore.instancesIds);
+        const instanceIdsToBeRemoved = instance.linkedIds.filter(id => !instanceIdsToBeKept.includes(id));
+        this.rootStore.instanceStore.removeInstances(instanceIdsToBeRemoved);
+      }
     }
+    
   }
 
   async saveInstance(instance, navigate: NavigateFunction) {
@@ -436,7 +441,7 @@ export class AppStore{
             if (newId !== id) {
               this.rootStore?.viewStore.replaceViewByNewInstanceId(id, newId);
             } else {
-              view.mode = 'edit';
+              view.mode = ViewMode.EDIT;
             }
             this.pathsToResolve.set(`/instances/${id}/create`, `/instances/${newId}/edit`);
             this.replaceInstanceResolvedIdPath(`/instances/${id}/create`, navigate);
@@ -445,11 +450,11 @@ export class AppStore{
         this.rootStore?.viewStore.syncStoredViews();
       }
     }
-    this.rootStore?.historyStore.updateInstanceHistory(instance.id, 'edited');
+    this.rootStore?.historyStore.updateInstanceHistory(instance.id, ViewMode.EDIT);
     this.rootStore?.statusStore.flush();
   }
 
-  syncInstancesHistory(instance, mode: string) {
+  syncInstancesHistory(instance, mode: ViewMode) {
     if(instance && this.rootStore?.viewStore.views.has(instance.id)){
       this.rootStore.historyStore.updateInstanceHistory(instance.id, mode);
     }
@@ -472,7 +477,9 @@ export class AppStore{
               const currentInstanceIndex = ids.indexOf(instanceId);
               const newInstanceId = currentInstanceIndex >= ids.length - 1 ? ids[currentInstanceIndex-1]: ids[currentInstanceIndex+1];
               const view = this.rootStore?.viewStore.views.get(newInstanceId);
-              nextLocation = `/instances/${newInstanceId}/${view.mode}`;
+              if(view) {
+                nextLocation = `/instances/${newInstanceId}/${view.mode}`;
+              }
             } else {
               nextLocation = '/browse';
             }

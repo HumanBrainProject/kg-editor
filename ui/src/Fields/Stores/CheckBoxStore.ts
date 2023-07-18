@@ -67,7 +67,7 @@ class CheckBoxStore extends FieldStore {
     };
   }
 
-  updateValue(value) {
+  updateValue(value: boolean | null | undefined) {
     this.initialValue = (value !== null && value !== undefined)?!!value:false;
     this.value = this.initialValue;
   }

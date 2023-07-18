@@ -27,6 +27,7 @@ import React from 'react';
 import { createUseStyles } from 'react-jss';
 
 import useStores from '../../../Hooks/useStores';
+import { ReleaseStatus } from '../../../types';
 
 const useStyles = createUseStyles({
   container: {
@@ -73,12 +74,16 @@ const ReleaseNodeAndChildrenToggle = observer(() => {
 
   const handleMarkAllNodeForRelease = () => {
     const node = releaseStore.instancesTree;
-    releaseStore.markAllNodeForChange(node, 'RELEASED');
+    if(node){
+      releaseStore.markAllNodeForChange(node, ReleaseStatus.RELEASED);
+    }
   };
 
   const handleMarkAllNodeToCurrentState = () => {
     const node = releaseStore.instancesTree;
-    releaseStore.markAllNodeForChange(node, null);
+    if(node) {
+      releaseStore.markAllNodeForChange(node, undefined);
+    }
   };
 
   return (

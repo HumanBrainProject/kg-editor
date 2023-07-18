@@ -28,6 +28,7 @@ import type Instance from '../../Stores/Instance';
 import type RootStore from '../../Stores/RootStore';
 import type { FieldStoreDefinition } from '../../types';
 import type { IconProp } from '@fortawesome/fontawesome-svg-core';
+import { ErrorInfo } from 'react';
 
 class FieldStore {
   value: any;
@@ -39,7 +40,7 @@ class FieldStore {
   alternatives = [];
   warning?: string;
   errorMessage?: string;
-  errorInfo?: string;
+  errorInfo?: ErrorInfo;
   order?: number;
   widget?: string;
   isRequired = false;
@@ -93,7 +94,7 @@ class FieldStore {
   /**
    * @param {any} value field value
    */
-  updateValue(): void {
+  updateValue(value: any): void {
     throw new Error(`update method is not implemented for ${this.widget} store`);
   }
 
@@ -139,7 +140,7 @@ class FieldStore {
     return !!this.warning;
   }
 
-  setError(message?: string, info?: string) {
+  setError(message?: string, info?: ErrorInfo) {
     this.errorMessage = message;
     this.errorInfo = info;
   }

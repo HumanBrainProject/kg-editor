@@ -61,7 +61,7 @@ const CompareInstancesModal = observer(() => {
 
   const handleHideCompare = (e: MouseEvent<HTMLButtonElement>) => {
     e && e.stopPropagation();
-    releaseStore.setComparedInstance(null);
+    releaseStore.setComparedInstance(undefined);
   };
 
   return(
@@ -73,15 +73,15 @@ const CompareInstancesModal = observer(() => {
       <Modal.Header closeButton>
         Compare with the released version of &nbsp;
         <strong>
-          {releaseStore.comparedInstance.type}&nbsp;
-          {releaseStore.comparedInstance.label}
+          {releaseStore.comparedInstance?.type}&nbsp;
+          {releaseStore.comparedInstance?.label}
         </strong>
       </Modal.Header>
       <Modal.Body>
         <Scrollbars autoHide>
           <CompareWithReleasedVersionChanges
-            instanceId={releaseStore.comparedInstance.id}
-            status={releaseStore.comparedInstance.status}
+            instanceId={releaseStore.comparedInstance?.id}
+            status={releaseStore.comparedInstance?.status}
           />
         </Scrollbars>
       </Modal.Body>

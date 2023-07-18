@@ -28,7 +28,7 @@ import { Scrollbars } from 'react-custom-scrollbars-2';
 import { createUseStyles } from 'react-jss';
 
 import { ViewContext, PaneContext } from '../../Stores/ViewStore';
-import type { ReactNode} from 'react';
+import type { CSSProperties, ReactNode} from 'react';
 
 const useStyles = createUseStyles({
   pane: {
@@ -127,9 +127,10 @@ const Pane = observer(({ paneId, children }: PaneProps) => {
   const index = view.getPaneIndex(paneId);
   const mainClass = index === 0?'main':'';
   const activeClass = geActiveClass();
+  const paneIndexStyle: CSSProperties = {'--pane-index':index} as CSSProperties;
   return (
     <PaneContext.Provider value={paneId} >
-      <div ref={paneRef} className={`${classes.pane} ${mainClass} ${activeClass}`} style={{'--pane-index':index}} onFocus={handleFocus} onClick={handleFocus}>
+      <div ref={paneRef} className={`${classes.pane} ${mainClass} ${activeClass}`} style={paneIndexStyle} onFocus={handleFocus} onClick={handleFocus}>
         <Scrollbars autoHide>
           <div className={`${classes.scrolledView} scrolledView`} >
             {children}

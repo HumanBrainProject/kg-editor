@@ -120,11 +120,11 @@ const useStyles = createUseStyles({
 interface PreviewProps {
   instanceId: string;
   instanceName: string;
-  showEmptyFields: boolean;
-  showAction: boolean;
-  showTypes: boolean;
-  showStatus: boolean;
-  showMetaData: boolean;
+  showEmptyFields?: boolean;
+  showAction?: boolean;
+  showTypes?: boolean;
+  showStatus?: boolean;
+  showMetaData?: boolean;
 }
 
 const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, showAction=true, showTypes=false, showStatus=true, showMetaData=true}: PreviewProps) => {
@@ -140,7 +140,9 @@ const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, sho
 
   const fetchInstance = (forceFetch=false) =>  {
     const inst = instanceStore.createInstanceOrGet(instanceId);
-    inst.fetch(forceFetch);
+    if(inst) {
+      inst.fetch(forceFetch);
+    }
   };
 
   const handleRetry = () => fetchInstance(true);
@@ -246,7 +248,7 @@ const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, sho
                 );
               })}
               <IncomingLinks links={instance.incomingLinks} readMode={true} />
-              {showMetaData && instance.metadata && instance.metadata.length > 0 && (
+              {showMetaData && instance.metadata && Object.keys(instance.metadata).length > 0 && (
                 <div>
                   <hr />
                   <span className={`${classes.title} ${classes.metadataTitle}`}>

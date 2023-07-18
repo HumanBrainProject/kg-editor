@@ -142,7 +142,7 @@ interface InstanceFormProps {
   id: string;
   view: View;
   pane: string;
-  provenance: string;
+  provenance?: string;
 }
 
 const InstanceForm = observer(({ id, view, pane, provenance }: InstanceFormProps) => {
@@ -159,7 +159,9 @@ const InstanceForm = observer(({ id, view, pane, provenance }: InstanceFormProps
 
   const fetchInstance = (forceFetch = false) => {
     const inst = instanceStore.createInstanceOrGet(id);
-    inst.fetch(forceFetch);
+    if(inst) {
+      inst.fetch(forceFetch);
+    }
   };
 
   const instance = instanceStore.instances.get(id);
@@ -239,7 +241,7 @@ const InstanceForm = observer(({ id, view, pane, provenance }: InstanceFormProps
         <div
           onFocus={handleFocus}
           onClick={handleFocus}
-          onDoubleClick={isReadMode && !isMainInstance && (appStore.currentSpace.id === instance.space)? handleOpenInstance : undefined}
+          onDoubleClick={isReadMode && !isMainInstance && (appStore.currentSpace?.id === instance.space)? handleOpenInstance : undefined}
         >
           <HeaderPanel
             className={classes.panelHeader}
@@ -257,7 +259,7 @@ const InstanceForm = observer(({ id, view, pane, provenance }: InstanceFormProps
             instance={instance}
             showOpenActions={isCurrentInstance && !isMainInstance} />
           <ConfirmCancelEditPanel
-            show={instance.cancelChangesPending}
+            show={!!instance.cancelChangesPending}
             text={'There are some unsaved changes. Are you sure you want to cancel the changes of this instance?'}
             onConfirm={handleConfirmCancelEdit}
             onCancel={handleContinueEditing}

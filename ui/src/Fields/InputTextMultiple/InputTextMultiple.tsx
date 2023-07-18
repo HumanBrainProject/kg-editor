@@ -209,7 +209,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
         onSelect={handleSelectAlternative}
         onRemove={handleRemoveMySuggestion}
         parentContainerRef={formGroupRef}
-        ValueRenderer={getAlternativeValue()}
+        ValueRenderer={getAlternativeValue() as React.ComponentType}
       />
       <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''}`} disabled={isDisabled} >
         <List

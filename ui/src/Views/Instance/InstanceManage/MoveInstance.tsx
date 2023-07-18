@@ -23,7 +23,7 @@
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, ChangeEvent } from 'react';
 import Button from 'react-bootstrap/Button';
 import { createUseStyles } from 'react-jss';
 
@@ -35,6 +35,7 @@ import useStores from '../../../Hooks/useStores';
 import Matomo from '../../../Services/Matomo';
 import { Status } from '../../../Stores/StatusStore';
 import type Instance from '../../../Stores/Instance';
+import { ReleaseStatus } from '../../../types';
 
 const useStyles = createUseStyles({
   title: {
@@ -138,7 +139,7 @@ const Status = observer(({
   }
   return (
     <>
-      {status.data !== 'UNRELEASED' && (
+      {status.data !== ReleaseStatus.UNRELEASED && (
         <ul>
           <li>
             This instance has been released and therefore cannot be moved.
@@ -177,12 +178,16 @@ const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instance.id]);
 
-  const fetchStatus = () => statusStore.fetchStatus(instance.id);
+  const fetchStatus = () => {
+    if(instance.id) {
+      statusStore.fetchStatus(instance.id);
+    }
+  }
 
   const [spaceId, setSpaceId] = useState(appStore.currentSpace?.id);
 
   const permissions = instance.permissions;
-  const status = statusStore.getInstance(instance.id);
+  const status = instance.id ? statusStore.getInstance(instance.id): undefined;
 
   if (!status) {
     return null;
@@ -202,18 +207,20 @@ const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
     return false;
   });
 
-  const handleSetSpaceId = e => setSpaceId(e.target.value);
+  const handleSetSpaceId = (e: ChangeEvent<HTMLSelectElement>) => setSpaceId(e.target.value);
 
   const handleMoveInstance = () => {
-    Matomo.trackEvent('Instance', 'Move', instance.id);
-    appStore.moveInstance(instance.id, spaceId, location, navigate);
+    if(instance.id && spaceId) {
+      Matomo.trackEvent('Instance', 'Move', instance.id);
+      appStore.moveInstance(instance.id, spaceId, location, navigate);
+    }
   };
 
   const handleCancelMoveInstance = () => appStore.retryMoveInstance(location, navigate);
 
   const handleRetryMoveInstance = () => appStore.cancelMoveInstance();
   const variant = spaceId === appStore.currentSpace?.id ? 'secondary' : 'warning';
-  const isDisabled = status.data !== 'UNRELEASED' || spaceId === appStore.currentSpace?.id;
+  const isDisabled = status.data !== ReleaseStatus.UNRELEASED || spaceId === appStore.currentSpace?.id;
 
   return (
     <>
@@ -225,7 +232,7 @@ const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
               <select
                 value={spaceId}
                 onChange={handleSetSpaceId}
-                disabled={!status || status.data !== 'UNRELEASED'}
+                disabled={!status || status.data !== ReleaseStatus.UNRELEASED}
               >
                 {spaces.map((s) => (
                   <option key={s.id} value={s.id}>

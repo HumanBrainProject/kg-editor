@@ -90,7 +90,7 @@ interface AlternativeValueProps {
   alternative: Alternative;
 }
 
-const AlternativeValue = observer(({alternative}: AlternativeValueProps) => getDateTimeValue(alternative.value));
+const AlternativeValue = observer(({alternative}: AlternativeValueProps) => getDateTimeValue(alternative.value)) ;
 AlternativeValue.displayName = 'AlternativeValue';
 
 interface InputDateTimeProps {
@@ -104,7 +104,7 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
 
   const classes = useStyles();
 
-  const formGroupRef = useRef<HTMLDivElement>(null);
+  const formGroupRef = useRef<HTMLInputElement>(null);
 
   const {
     value,
@@ -118,7 +118,7 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
     isReadOnly
   } = fieldStore;
 
-  const handleChange = val => fieldStore.setValue(val);
+  const handleChange = (val: Date) => fieldStore.setValue(val.toDateString()); //TODO: check if toDateString is correct! 
 
   const handleSelectAlternative = val => fieldStore.setValue(val);
 
@@ -149,7 +149,7 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
         onSelect={handleSelectAlternative}
         onRemove={handleRemoveMySuggestion}
         parentContainerRef={formGroupRef}
-        ValueRenderer={AlternativeValue}
+        ValueRenderer={AlternativeValue as React.ComponentType}
       />
       <DatePicker
         className={`${classes.datePicker} ${checkValidationWarnings?classes.warning:''}`}

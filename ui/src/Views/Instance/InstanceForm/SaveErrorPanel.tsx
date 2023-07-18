@@ -71,7 +71,7 @@ const useStyles = createUseStyles({
 
 interface SaveErrorPanelProps {
   show: boolean;
-  error: string;
+  error?: string;
   inline: boolean;
   onRetry: (e: MouseEvent<HTMLButtonElement>) => void;
   onCancel: (e: MouseEvent<HTMLButtonElement>) => void;

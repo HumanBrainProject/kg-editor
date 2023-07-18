@@ -31,6 +31,7 @@ import useStores from '../Hooks/useStores';
 
 import type { Alternative as AlternativeType } from '../types';
 import type { MouseEvent, KeyboardEvent } from 'react';
+import { ValueRendererProps } from './Alternatives';
 
 const useStyles = createUseStyles({
   container: {
@@ -61,9 +62,10 @@ const useStyles = createUseStyles({
   }
 });
 
+
 interface AlternativeProps {
   alternative: AlternativeType;
-  ValueRenderer: React.ComponentType;
+  ValueRenderer: React.ComponentType<ValueRendererProps>;
   className: string;
   hasFocus: boolean;
   onSelect: (v:any) => void;

@@ -156,6 +156,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     isReadOnly
   } = fieldStore;
 
+  const id = value && value[mappingValue];
 
   const handleDropdownReset = () => {
     fieldStore.resetOptionsSearch();
@@ -224,7 +225,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     instanceStore.togglePreviewInstance();
   };
 
-  const handleSelectTargetType = (eventKey: string | null, e: SyntheticEvent<Dropdown.Item>) => {
+  const handleSelectTargetType = (eventKey: string | null, e: SyntheticEvent<unknown>) => {
     e.preventDefault();
     const type = targetTypes.find(t => t.name === eventKey);
     if (type) {
@@ -279,7 +280,6 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     }
   };
 
-  const id = value && value[mappingValue];
   const fetchLabel = !!(!view || (view.selectedPane && (pane !== view.selectedPane)));
 
   if (readMode && !id && !showIfNoValue) {
@@ -306,7 +306,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
   const hasValidationWarnings = !isDisabled && fieldStore.hasValidationWarnings;
   const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.hasWarning;
   const hasMultipleTypes = canAddValues && targetTypes.length > 1;
-  const sortedTargetTypes = hasMultipleTypes && [...targetTypes].sort((a, b) => a.label.localeCompare(b.label));
+  const sortedTargetTypes = hasMultipleTypes ? [...targetTypes].sort((a, b) => a.label.localeCompare(b.label)): targetTypes;
   return (
     <Form.Group className={className} ref={formGroupRef}>
       <div className={classes.labelContainer}>

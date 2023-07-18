@@ -60,7 +60,7 @@ const getStoredViews = (): StoredViews => {
 
 interface InstanceHighlight {
   pane?: string;
-  instanceId?: string;
+  instanceId?: string | null;
   provenance?: string;
 }
 
@@ -116,7 +116,7 @@ export class View {
     return this.panes[this.instancePath.length];
   }
 
-  getPaneByInstanceId(instanceId: UUID) {
+  getPaneByInstanceId(instanceId?: UUID | null) {
     const index = this.instancePath.findIndex(id => id === instanceId);
     if (index != -1) {
       return this.panes[index];
@@ -129,7 +129,7 @@ export class View {
     this.instancePath.splice(start, this.instancePath.length-start, instanceId);
   }
 
-  setInstanceHighlight(pane?: string, instanceId?: UUID, provenance?: string) {
+  setInstanceHighlight(pane?: string, instanceId?: UUID|null, provenance?: string) {
     this.instanceHighlight.pane = pane;
     this.instanceHighlight.instanceId = instanceId;
     this.instanceHighlight.provenance = provenance;

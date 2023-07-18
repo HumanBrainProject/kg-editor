@@ -26,10 +26,9 @@ import { observable, action, runInAction, makeObservable } from 'mobx';
 
 import Instance from './Instance';
 import type RootStore from './RootStore';
-import type Type from './TypeStore';
 import type API from '../Services/API';
 import type { APIError } from '../Services/API';
-import { InstanceSummary, SimpleType } from '../types';
+import { InstanceSummary, StructureOfType } from '../types';
 
 const normalizeInstancesData = (api: API, rootStore: RootStore, data:InstanceSummary[]) => (Array.isArray(data))?data.map(rowData => {
   Object.values(rowData.fields).forEach(d => {
@@ -47,7 +46,7 @@ export class BrowseStore {
   isFetching = false;
   isFetched = false;
   fetchError?: string;
-  selectedType?: SimpleType;
+  selectedType?: StructureOfType;
   selectedInstance?: Instance;
 
   instances: Instance[] = [];
@@ -91,7 +90,7 @@ export class BrowseStore {
     this.rootStore = rootStore;
   }
 
-  selectType(type: SimpleType) {
+  selectType(type: StructureOfType) {
     this.clearInstancesFilter();
     this.selectedType = type;
     this.fetchInstances();

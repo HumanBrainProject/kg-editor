@@ -208,7 +208,7 @@ const InstanceRow = observer(
 
     const { permissions } = instance;
 
-    const timeout = useRef(null);
+    const timeout = useRef<NodeJS.Timeout | undefined>(undefined)
 
     const handleClick = (e: MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
@@ -223,7 +223,7 @@ const InstanceRow = observer(
         if (action) {
           timeout.current = setTimeout(
             (i, act) => {
-              timeout.current = null;
+              timeout.current = undefined;
               act(i);
             },
             300,
@@ -237,7 +237,7 @@ const InstanceRow = observer(
     const handleDoubleClick = (e: MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
       clearTimeout(timeout.current);
-      timeout.current = null;
+      timeout.current = undefined;
       if (!e.currentTarget.contains(e.target as Node)) {
         return;
       }

@@ -29,7 +29,7 @@ import { createUseStyles } from 'react-jss';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import useStores from '../../../Hooks/useStores';
-import type { SimpleType } from '../../../types';
+import type { SimpleType, StructureOfType } from '../../../types';
 
 const useStyles = createUseStyles({
   btn: {
@@ -46,7 +46,7 @@ const useStyles = createUseStyles({
 });
 
 interface PossibleIncomingLinkProps {
-  type: SimpleType;
+  type: StructureOfType;
   spaces: string[];
 }
 

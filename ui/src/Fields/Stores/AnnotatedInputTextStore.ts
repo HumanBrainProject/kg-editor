@@ -155,7 +155,7 @@ class AnnotatedInputTextStore extends FieldStore {
     return Object.keys(this.validationWarnings).length > 0;
   }
 
-  updateValue(value) {
+  updateValue(value: Value[] | null | undefined) {
     this.returnAsNull = false;
     const values = normalizeValues(value);
     this.initialValue = [...values];

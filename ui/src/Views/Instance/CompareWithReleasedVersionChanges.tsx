@@ -30,9 +30,10 @@ import { createUseStyles } from 'react-jss';
 import BGMessage from '../../Components/BGMessage';
 import Spinner from '../../Components/Spinner';
 import useStores from '../../Hooks/useStores';
-import { createInstanceStore } from '../../Stores/InstanceStore';
+import InstanceStore, { createInstanceStore } from '../../Stores/InstanceStore';
 
 import CompareFieldsChanges from './CompareFieldsChanges';
+import { ReleaseStatus } from '../../types';
 
 const useStyles = createUseStyles({
   container: {
@@ -54,18 +55,18 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }: Comp
 
   const { instanceStore, releaseStore } = useStores();
 
-  const [releasedInstanceStore, setReleasedInstanceStore] = useState(null);
+  const [releasedInstanceStore, setReleasedInstanceStore] = useState<InstanceStore|null>(null);
 
   useEffect(() => {
     if(!releasedInstanceStore) {
-      const store = createInstanceStore(instanceStore.api, instanceStore.rootStore, 'RELEASED');
+      const store = createInstanceStore(instanceStore.api, instanceStore.rootStore, ReleaseStatus.RELEASED);
       setReleasedInstanceStore(store);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if (instanceId && status !== 'UNRELEASED' && releasedInstanceStore) {
+    if (instanceId && status !== ReleaseStatus.UNRELEASED && releasedInstanceStore) {
       fetchReleasedInstance(true);
       fetchInstance();
     }
@@ -76,18 +77,22 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }: Comp
   }, [instanceId, status, releasedInstanceStore]);
 
   const fetchReleasedInstance = (forceFetch=false) => {
-    if (status !== 'UNRELEASED') {
+    if (status !== ReleaseStatus.UNRELEASED && releasedInstanceStore) {
       const inst = releasedInstanceStore.createInstanceOrGet(instanceId);
-      inst.fetch(forceFetch);
+      if(inst){
+        inst.fetch(forceFetch);
+      }
     }
   };
 
   const fetchInstance = (forceFetch=false) => {
     const inst = instanceStore.createInstanceOrGet(instanceId);
-    inst.fetch(forceFetch);
+    if(inst){
+      inst.fetch(forceFetch);
+    }
   };
 
-  const handleCloseComparison = () => releaseStore.setComparedInstance(null);
+  const handleCloseComparison = () => releaseStore.setComparedInstance(undefined);
 
   const handleRetryFetchInstance = () => fetchInstance(true);
 
@@ -96,7 +101,7 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }: Comp
   if (!instanceId) {
     return null;
   }
-  const releasedInstance = (releasedInstanceStore && status !== 'UNRELEASED')?releasedInstanceStore.instances.get(instanceId):null;
+  const releasedInstance = (releasedInstanceStore && status !== ReleaseStatus.UNRELEASED)?releasedInstanceStore.instances.get(instanceId):null;
   const instance = instanceStore.instances.get(instanceId);
 
   if (!instance) {

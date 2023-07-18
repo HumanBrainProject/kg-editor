@@ -49,7 +49,7 @@ export interface Option {
 }
 
 class LinkStore extends FieldStore {
-  value?: Value | null;
+  value: Value | null | undefined;
   initialValue?: Value | null;
   options: Option[] = [];
   optionsResult = [];
@@ -234,8 +234,10 @@ class LinkStore extends FieldStore {
     }
     this.optionsFrom = from;
     this.optionsPreviousSearchTerm = this.optionsSearchTerm;
-    const payload = this.instance.payload;
-    payload['@type'] = this.instance.types.map(t => t.name);
+    const payload = this.instance ? this.instance.payload: undefined;
+    if(this.instance && payload) {
+      payload['@type'] = this.instance.types.map(t => t.name);
+    } 
     try{
       const { data: { suggestions: { data: values, total }, types }} = await this.api.getSuggestions(this.instance.id, this.fullyQualifiedName, this.sourceType?this.sourceType:null, this.targetType?this.targetType.name:null, this.optionsFrom, this.optionsPageSize, this.optionsSearchTerm, payload);
       const newOptions = Array.isArray(values)?values:[];

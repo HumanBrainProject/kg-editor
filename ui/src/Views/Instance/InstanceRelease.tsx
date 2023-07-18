@@ -98,7 +98,9 @@ const InstanceRelease = observer(({ instance }: InstanceReleaseProps) => {
   const { releaseStore } = useStores();
 
   useEffect(() => {
-    releaseStore.setTopInstanceId(instance.id);
+    if(instance.id){
+      releaseStore.setTopInstanceId(instance.id);
+    }
     releaseStore.fetchReleaseData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instance.id]);

@@ -179,7 +179,7 @@ const ReleaseAction = observer(() => {
         </div>
       </div>
       <div className={classes.invite}>
-        {(permissions && permissions.canInviteForSuggestion) && (
+        {(permissions && permissions.canInviteForSuggestion && releaseStore.topInstanceId) && (
           <Reviewers id={releaseStore.topInstanceId} />
         )}
       </div>

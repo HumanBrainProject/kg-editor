@@ -181,10 +181,7 @@ const ReleaseNode = observer(({ node, level = 0 }: ReleaseNodeProps) => {
         </div>
         <span className={'node-type'}>({node.typesName})</span>
         <span className={classes.label}>{node.label}</span>
-        <ReleaseNodeToggle key={`${node.pending_status}-${node.pending_childrenStatus}-${node.pending_globalStatus}`}
-          node={node}
-          classes={classes}
-        />
+        <ReleaseNodeToggle key={`${node.pending_status}-${node.pending_childrenStatus}-${node.pending_globalStatus}`} node={node} />
       </div>
       {node.status !== null && (
         <div className="node-actions">

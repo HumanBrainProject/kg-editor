@@ -57,12 +57,17 @@ const useStyles = createUseStyles({
   }
 });
 
+export interface ValueRendererProps {
+  alternative: any; //TODO: Check if this is actually any !
+}
+
+
 interface AlternativesProps {
   className: string;
   list: AlternativeType[];
   disabled?: boolean;
   parentContainerRef: RefObject<HTMLInputElement>;
-  ValueRenderer: React.ComponentType;
+  ValueRenderer: React.ComponentType<ValueRendererProps>;
   onSelect: (value: any) => void;
   onRemove: () => void;
 }

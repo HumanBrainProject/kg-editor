@@ -76,7 +76,9 @@ const ExternalCreateModal = observer(() => {
         appStore.updateExternalInstanceModal();
       }
     }));
-    appStore.createExternalInstance(appStore.externalCreateModal.space, appStore.externalCreateModal.type, appStore.externalCreateModal.value, location, navigate);
+    if(appStore.externalCreateModal) {
+      appStore.createExternalInstance(appStore.externalCreateModal.space, appStore.externalCreateModal.type, appStore.externalCreateModal.value, location, navigate);
+    }
   };
 
   const handleCancel = () => appStore.clearExternalCreateModal();

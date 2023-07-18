@@ -28,7 +28,7 @@ import { createUseStyles } from 'react-jss';
 import MultiToggle from '../../../Components/MultiToggle';
 
 import useStores from '../../../Hooks/useStores';
-import { ReleaseScope } from '../../../types';
+import { ReleaseScope, ReleaseStatus } from '../../../types';
 
 const useStyles = createUseStyles({
   container: {
@@ -60,9 +60,9 @@ const ReleaseNodeToggle = observer(({ node }: ReleaseNodeToggleProps) => {
 
   const { instanceStore, releaseStore } = useStores();
 
-  const handleChange = (status: string) => {
+  const handleChange = (status: string | boolean) => {
     instanceStore.togglePreviewInstance();
-    releaseStore.markNodeForChange(node, status);
+    releaseStore.markNodeForChange(node, status as ReleaseStatus);
   };
 
   const handleStopClick = (e: MouseEvent<HTMLDivElement>) => {
@@ -82,25 +82,25 @@ const ReleaseNodeToggle = observer(({ node }: ReleaseNodeToggleProps) => {
   }
 
   return(
-    <div className={`${classes.container} ${node.status === 'RELEASED' ? 'no-release' : ''} ${node.status === 'UNRELEASED' ? 'no-unrelease' : ''}`} onClick={handleStopClick}>
-      <MultiToggle selectedValue={node.pending_status} onChange={handleChange}>
-        {node.status !== 'RELEASED' && (
+    <div className={`${classes.container} ${node.status === ReleaseStatus.RELEASED ? 'no-release' : ''} ${node.status === ReleaseStatus.UNRELEASED ? 'no-unrelease' : ''}`} onClick={handleStopClick}>
+      <MultiToggle selectedValue={node.pending_status as string} onChange={handleChange}>
+        {node.status !== ReleaseStatus.RELEASED && (
           <MultiToggle.Toggle
             color={'#3498db'}
-            value={'RELEASED'}
+            value={ReleaseStatus.RELEASED}
             icon="check"
           />
         )}
         <MultiToggle.Toggle
           color={'#999'}
-          value={node.status}
+          value={node.status as string}
           icon="dot-circle"
           noscale
         />
-        {node.status !== 'UNRELEASED' && (
+        {node.status !== ReleaseStatus.UNRELEASED && (
           <MultiToggle.Toggle
             color={'#e74c3c'}
-            value={'UNRELEASED'}
+            value={ReleaseStatus.UNRELEASED}
             icon="unlink"
           />
         )}

@@ -75,7 +75,12 @@ const InstanceGraph = observer(({ instance }: InstanceGraphProps) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instance.id]);
 
-  const fetch = () => graphStore.fetch(instance.id);
+  const fetch = () => { 
+    if(instance.id) {
+      graphStore.fetch(instance.id);
+    }
+  }
+  
   if (graphStore.fetchError) {
     return (
       <ErrorPanel>

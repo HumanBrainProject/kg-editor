@@ -217,7 +217,7 @@ class InputTextMultipleStore extends FieldStore {
     return !!this.value.length || this.hasChanged;
   }
 
-  getValues(value) {
+  getValues(value: string[] | null | undefined) {
     if (Array.isArray(value)) {
       return value;
     }
@@ -227,7 +227,7 @@ class InputTextMultipleStore extends FieldStore {
     return [];
   }
 
-  updateValue(value: string) {
+  updateValue(value: string[] | null | undefined) {
     this.returnAsNull = false;
     const values = this.getValues(value);
     this.initialValue = [...values];

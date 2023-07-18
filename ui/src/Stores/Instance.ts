@@ -191,7 +191,7 @@ export const normalizeInstanceData = (data, typeFromStore: StructureOfType) => {
     labelField: undefined,
     promotedFields: [],
     alternatives: {},
-    metadata: {},
+    metadata: [],
     permissions: {},
     incomingLinks: [],
     possibleIncomingLinks: []
@@ -407,7 +407,7 @@ export class Instance {
   _promotedFields = [];
   primaryType: SimpleType = { name: '', color: '', label: '', description: '' };
   space = '';
-  metadata = {};
+  metadata = [];
   permissions?: Permissions;
   fields: InstanceFields = {};
   incomingLinks: InstanceIncomingLinkFull[] = [];
@@ -502,7 +502,7 @@ export class Instance {
       }, {}),
       labelField: this.labelField,
       promotedFields: [...this._promotedFields],
-      metadata: {},
+      metadata: [],
       permissions: {...this.permissions}
     };
   }

@@ -206,7 +206,7 @@ class InputNumberMultipleStore extends FieldStore {
     this.insertValue(value);
   }
 
-  setValues(values) {
+  setValues(values: string[]|null|undefined) {
     if (values !== null && values !== undefined) {
       if (values.length  || !this.returnAsNull) {
         this.returnAsNull = false;

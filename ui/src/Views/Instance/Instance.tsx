@@ -39,6 +39,8 @@ import InstanceRelease from './InstanceRelease';
 import InstanceView from './InstanceView';
 import SaveBar from './SaveBar';
 import Tabs from './Tabs';
+import { ViewMode } from '../../types';
+import {Instance as InstanceType} from '../../Stores/Instance';
 
 const useStyles = createUseStyles({
   container: {
@@ -102,8 +104,8 @@ const useStyles = createUseStyles({
 });
 
 interface InstanceProps {
-  instance: any;
-  mode:string;
+  instance: InstanceType;
+  mode: ViewMode;
 }
 
 
@@ -114,50 +116,50 @@ const View = observer(({instance, mode}: InstanceProps) => {
   const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
 
   switch (mode) {
-  case 'create':
-    if(instance.permissions.canCreate && isTypesSupported) {
+  case ViewMode.CREATE:
+    if(instance.permissions?.canCreate && isTypesSupported) {
       return (
         <InstanceView instance={instance} />
       );
     }
     break;
-  case 'edit':
-    if(instance.permissions.canWrite && isTypesSupported) {
+  case ViewMode.EDIT:
+    if(instance.permissions?.canWrite && isTypesSupported) {
       return (
         <InstanceView instance={instance} />
       );
     }
     break;
-  case 'view':
-    if(instance.permissions.canRead && isTypesSupported) {
+  case ViewMode.VIEW:
+    if(instance.permissions?.canRead && isTypesSupported) {
       return (
         <InstanceView instance={instance} />
       );
     }
     break;
-  case 'graph':
-    if(instance.permissions.canRead) {
+  case ViewMode.GRAPH:
+    if(instance.permissions?.canRead) {
       return (
         <InstanceGraph instance={instance} />
       );
     }
     break;
-  case 'release':
-    if(instance.permissions.canRelease && isTypesSupported) {
+  case ViewMode.RELEASE:
+    if(instance.permissions?.canRelease && isTypesSupported) {
       return (
         <InstanceRelease instance={instance} />
       );
     }
     break;
-  case 'manage':
-    if(instance.permissions.canRead) {
+  case ViewMode.MANAGE:
+    if(instance.permissions?.canRead) {
       return (
         <InstanceManage instance={instance} />
       );
     }
     break;
-  case 'raw':
-    if(instance.permissions.canRead) {
+  case ViewMode.RAW:
+    if(instance.permissions?.canRead) {
       return (
         <InstanceRaw instance={instance} />
       );
@@ -172,17 +174,22 @@ const View = observer(({instance, mode}: InstanceProps) => {
 });
 View.displayName = 'View';
 
-const getActionLabel = mode => {
-  if (mode === 'raw') {
+const getActionLabel = (mode: ViewMode) => {
+  if (mode === ViewMode.RAW) {
     return 'view';
   }
-  if (mode === 'graph') {
+  if (mode === ViewMode.GRAPH) {
     return 'visualize';
   }
   return mode;
 };
 
-const NoPermissionForView = observer(({instance, mode}) => {
+interface NoPermissionForViewProps {
+  instance: InstanceType;
+  mode: ViewMode;
+}
+
+const NoPermissionForView = observer(({instance, mode}: NoPermissionForViewProps) => {
 
   const classes = useStyles();
 
@@ -190,7 +197,7 @@ const NoPermissionForView = observer(({instance, mode}) => {
     <div className={classes.errorMessage} >
       <BGMessage icon={'ban'}>
       You do not have permission to {getActionLabel(mode)} the instance &quot;<i>{instance.id}&quot;</i>.<br /><br />
-        {instance.permissions.canRead?
+        {instance.permissions?.canRead?
           <Link className="btn btn-primary" to={`/instances/${instance.id}`}>Go to view</Link>:
           <Link className="btn btn-primary" to={'/browse'}>Go to browse</Link>}
       </BGMessage>

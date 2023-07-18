@@ -35,6 +35,7 @@ import useStores from '../../../Hooks/useStores';
 import Matomo from '../../../Services/Matomo';
 import type Instance from '../../../Stores/Instance';
 import type { Status } from '../../../Stores/StatusStore';
+import { ReleaseStatus } from '../../../types';
 
 const useStyles = createUseStyles({
   error: {
@@ -92,7 +93,7 @@ const Delete = observer(({ status, onClick, classes, fetchStatus }: DeleteProps)
 
   return (
     <>
-      {status.data !== 'UNRELEASED' ? (
+      {status.data !== ReleaseStatus.UNRELEASED ? (
         <ul>
           <li>
             This instance has been released and therefore cannot be deleted.
@@ -107,10 +108,10 @@ const Delete = observer(({ status, onClick, classes, fetchStatus }: DeleteProps)
         </p>
       )}
       <Button
-        variant={status.data !== 'UNRELEASED' ? 'secondary' : 'danger'}
+        variant={status.data !== ReleaseStatus.UNRELEASED ? 'secondary' : 'danger'}
         onClick={onClick}
         className={classes.btn}
-        disabled={status.data !== 'UNRELEASED'}
+        disabled={status.data !== ReleaseStatus.UNRELEASED}
       >
         <FontAwesomeIcon icon={'trash-alt'} />
         &nbsp;&nbsp; Delete this instance
@@ -138,19 +139,25 @@ const DeleteInstance = observer(({ instance, className }: DeleteInstanceProps) =
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instance]);
 
-  const fetchStatus = () => statusStore.fetchStatus(instance.id);
+  const fetchStatus = () => {
+    if(instance.id){
+      statusStore.fetchStatus(instance.id);
+    }
+  }
 
   const handleDeleteInstance = () => {
-    Matomo.trackEvent('Instance', 'Delete', instance.id);
-    appStore.deleteInstance(instance.id, location, navigate);
+    if(instance.id) {
+      Matomo.trackEvent('Instance', 'Delete', instance.id);
+      appStore.deleteInstance(instance.id, location, navigate);
+    }
   };
 
   const handleRetryDeleteInstance = () => appStore.retryDeleteInstance(location, navigate);
 
   const handleCancelDeleteInstance = () => appStore.cancelDeleteInstance();
 
-  const permissions = instance.permissions;
-  const status = statusStore.getInstance(instance.id);
+  const permissions = instance.permissions; 
+  const status = instance.id ? statusStore.getInstance(instance.id): undefined;
 
   return (
     <>

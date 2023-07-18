@@ -32,6 +32,7 @@ import MultiToggle from '../../../Components/MultiToggle';
 
 import useStores from '../../../Hooks/useStores';
 import { GraphGroup, GraphNode, SimpleType } from '../../../types';
+import { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 const useStyles = createUseStyles({
   container: {
@@ -293,7 +294,7 @@ const Actions = observer(({ className, group }:ActionsProps) => {
     <div className={className}>
       <MultiToggle selectedValue={value} onChange={handleChange}>
         {actions.map(action => (
-          <MultiToggle.Toggle key={action.value} color={'var(--ft-color-loud)'} value={action.value} icon={action.icon} />
+          <MultiToggle.Toggle key={action.value} color={'var(--ft-color-loud)'} value={action.value} icon={action.icon as IconProp} />
         ))}
       </MultiToggle>
     </div>

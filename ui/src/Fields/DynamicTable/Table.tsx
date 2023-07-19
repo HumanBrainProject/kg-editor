@@ -30,7 +30,6 @@ import { createUseStyles } from 'react-jss';
 import { Column, Table as TableComponent } from 'react-virtualized';
 
 import useStores from '../../Hooks/useStores';
-import type LinksStore from '../Stores/LinksStore';
 import type { MouseEvent } from 'react';
 
 const useStyles = createUseStyles({
@@ -168,7 +167,6 @@ ActionsCellRenderer.displayName = 'ActionsCellRenderer';
 interface TableProps {
   mainInstanceId?: string;
   list: any;
-  fieldStore: LinksStore;
   readOnly: boolean;
   enablePointerEvents: boolean;
   onRowDelete?: (index: number) => void;
@@ -177,7 +175,7 @@ interface TableProps {
   onRowMouseOut?: (index: number) => void;
 }
 
-const Table = ({ mainInstanceId, list, fieldStore, readOnly, enablePointerEvents, onRowDelete, onRowClick, onRowMouseOver, onRowMouseOut }: TableProps) => {
+const Table = ({ mainInstanceId, list, readOnly, enablePointerEvents, onRowDelete, onRowClick, onRowMouseOver, onRowMouseOut }: TableProps) => {
 
   const classes = useStyles();
   const scrollToIndex = -1;
@@ -199,8 +197,8 @@ const Table = ({ mainInstanceId, list, fieldStore, readOnly, enablePointerEvents
   const handleDeleteRow = (index: number) => onRowDelete && onRowDelete(index);
 
   const handleRetry = (id: string) => {
-   const instance = instanceStore.instances.get(id);
-   instance?.fetch();
+    const instance = instanceStore.instances.get(id);
+    instance?.fetch();
   };
 
   const handleRowClick = ({index}: {index:number}) => onRowClick && onRowClick(index);

@@ -59,7 +59,7 @@ const CheckBox = observer(({ className, fieldStore, readMode, showIfNoValue }: C
   };
 
   if(readMode) {
-    if(value ===null && !showIfNoValue){
+    if(value === null && !showIfNoValue){
       return null;
     }
 

@@ -115,7 +115,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
 
   const handleOnAddValue = (value: string) => fieldStore.addValue(value);
 
-  const handleSelectAlternative = values => fieldStore.setValues([...values]);
+  const handleSelectAlternative = (values: any) => fieldStore.setValues([...values]); //TODO: Check if this can be typed!
 
   const handleRemoveMySuggestion = () => fieldStore.removeAllValues();
 
@@ -209,7 +209,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
         onSelect={handleSelectAlternative}
         onRemove={handleRemoveMySuggestion}
         parentContainerRef={formGroupRef}
-        ValueRenderer={getAlternativeValue() as React.ComponentType}
+        ValueRenderer={getAlternativeValue()}
       />
       <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''}`} disabled={isDisabled} >
         <List
@@ -224,7 +224,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
         />
         <input type="text" className={classes.userInput}
           disabled={isDisabled}
-          onDrop={handleDrop}
+          onDrop={handleDrop} //TODO: Again! This is currently not working! Fix or drop ?
           onDragOver={e => e.preventDefault()}
           onKeyDown={handleKeyStrokes}
           onBlur={handleBlur}

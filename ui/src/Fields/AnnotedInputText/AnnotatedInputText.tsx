@@ -82,10 +82,10 @@ interface AlternativeValueProps {
   alternative: Alternative;
 }
 
-const getAlternativeValue = (mappingValue: string): React.ComponentType => {
+const getAlternativeValue = (mappingValue: string) => {
   const AlternativeValue = observer(({alternative}: AlternativeValueProps) => Array.isArray(alternative.value)?alternative.value.map(value => (value && value[mappingValue])?value[mappingValue]:'Unknown resource').join('; '):JSON.stringify(alternative.value));
   AlternativeValue.displayName = 'AlternativeValue';
-  return AlternativeValue as React.ComponentType;
+  return AlternativeValue;
 };
 
 interface AnnotatedInputTextProps {

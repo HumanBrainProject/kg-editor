@@ -118,9 +118,9 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
     isReadOnly
   } = fieldStore;
 
-  const handleChange = (val: Date) => fieldStore.setValue(val.toDateString()); //TODO: check if toDateString is correct! 
+  const handleChange = (val: Date) => fieldStore.setValue(val.toDateString()); //TODO: check if toDateString is correct!
 
-  const handleSelectAlternative = val => fieldStore.setValue(val);
+  const handleSelectAlternative = (val: any) => fieldStore.setValue(val);
 
   const handleRemoveMySuggestion = () => fieldStore.setValue(null);
 
@@ -149,7 +149,7 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
         onSelect={handleSelectAlternative}
         onRemove={handleRemoveMySuggestion}
         parentContainerRef={formGroupRef}
-        ValueRenderer={AlternativeValue as React.ComponentType}
+        ValueRenderer={AlternativeValue}
       />
       <DatePicker
         className={`${classes.datePicker} ${checkValidationWarnings?classes.warning:''}`}

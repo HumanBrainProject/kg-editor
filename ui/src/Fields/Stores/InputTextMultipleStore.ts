@@ -143,7 +143,7 @@ class InputTextMultipleStore extends FieldStore {
       !message &&
         Array.isArray(this.value) &&
         this.value.some(val => {
-          if (!rule.regex.test(val)) {
+          if (rule.regex instanceof RegExp && !rule.regex.test(val)) {
             message = rule.errorMessage;
             return true;
           }

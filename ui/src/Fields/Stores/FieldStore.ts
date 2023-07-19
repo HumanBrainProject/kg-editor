@@ -28,7 +28,7 @@ import type Instance from '../../Stores/Instance';
 import type RootStore from '../../Stores/RootStore';
 import type { FieldStoreDefinition } from '../../types';
 import type { IconProp } from '@fortawesome/fontawesome-svg-core';
-import { ErrorInfo } from 'react';
+import type { ErrorInfo } from 'react';
 
 class FieldStore {
   value: any;

@@ -27,7 +27,7 @@ import React from 'react';
 import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { createUseStyles } from 'react-jss';
-import { ReleaseStatus, ReleaseStatus as Status } from '../types';
+import { ReleaseStatus as Status } from '../types';
 
 const useStyles = createUseStyles({
   status: {
@@ -100,7 +100,7 @@ const MessageStatus = ({status}: MessageStatusProps) => {
 };
 
 interface ReleaseStatusProps {
-  instanceStatus?: ReleaseStatus;
+  instanceStatus?: Status;
   darkmode?: boolean;
 }
 

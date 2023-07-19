@@ -32,7 +32,6 @@ import DropdownComponent  from '../../Components/DynamicDropdown/Dropdown';
 import useStores from '../../Hooks/useStores';
 
 import Matomo from '../../Services/Matomo';
-import DynamicOption  from '../DynamicOption/DynamicOption';
 import Invalid from '../Invalid';
 import Label from '../Label';
 import LinksAlternatives from '../LinksAlternatives';
@@ -43,9 +42,8 @@ import List from './List';
 import type { View } from '../../Stores/ViewStore';
 import type { Suggestion } from '../../types';
 import type LinksStore from '../Stores/LinksStore';
-
 import type { KeyboardEvent, MouseEvent, SyntheticEvent} from 'react';
-import { Value } from '../Stores/LinksStore';
+
 
 const useStyles = createUseStyles({
   labelContainer: {

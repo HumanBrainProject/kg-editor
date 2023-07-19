@@ -66,7 +66,7 @@ class InputTextStore extends FieldStore {
   initialValue = '';
   maxLength?: number;
   regexRules: FieldStoreRegexRule[] = [DEFAULT_REGEX];
-  markdown: boolean = false;
+  markdown = false;
 
   constructor(
     definition: FieldStoreDefinition,

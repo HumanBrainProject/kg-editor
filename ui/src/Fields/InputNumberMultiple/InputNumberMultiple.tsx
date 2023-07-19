@@ -122,7 +122,7 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
     }
   };
 
-  const handleSelectAlternative = values => fieldStore.setValues([...values]);
+  const handleSelectAlternative = (values: any) => fieldStore.setValues([...values]); //TODO: check if this can be typed!
 
   const handleRemoveMySuggestion = () => fieldStore.removeAllValues();
 
@@ -216,7 +216,7 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
         onSelect={handleSelectAlternative}
         onRemove={handleRemoveMySuggestion}
         parentContainerRef={formGroupRef}
-        ValueRenderer={getAlternativeValue() as React.ComponentType}
+        ValueRenderer={getAlternativeValue()}
       />
       <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''}`} disabled={isDisabled} >
         <List
@@ -227,11 +227,11 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
           onDragEnd={handleDragEnd}
           onDragStart={handleDragStart}
           onDrop={handleDrop}
-          onKeyDown={handleKeyDown}
+          onKeyDown={handleKeyDown} // TODO: Again! Check if this is still needed! It is currently not working!
         />
         <input type="number" className={classes.userInput}
           disabled={isDisabled}
-          onDrop={handleDrop}
+          onDrop={handleDrop} // TODO: Again! Check if this is still needed! It is currently not working!
           onDragOver={e => e.preventDefault()}
           onKeyDown={handleKeyStrokes}
           onBlur={handleBlur}

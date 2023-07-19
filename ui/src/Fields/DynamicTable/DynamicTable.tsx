@@ -34,16 +34,15 @@ import DropdownComponent from '../../Components/DynamicDropdown/Dropdown';
 import useStores from '../../Hooks/useStores';
 
 import Matomo from '../../Services/Matomo';
-import DynamicOption  from '../DynamicOption/DynamicOption';
 import Invalid from '../Invalid';
 import Label from '../Label';
 import TargetTypeSelection from '../TargetTypeSelection';
 import Warning from '../Warning';
 import Table from './Table';
 import type { View } from '../../Stores/ViewStore';
+import type { Suggestion } from '../../types';
 import type LinksStore from '../Stores/LinksStore';
 import type { MouseEvent, SyntheticEvent} from 'react';
-import { Suggestion } from '../../types';
 
 const useStyles = createUseStyles({
   container: {
@@ -323,7 +322,6 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
           <Table
             mainInstanceId={instance.id}
             list={links}
-            fieldStore={fieldStore}
             readOnly={isDisabled}
             enablePointerEvents={true}
             onRowDelete={handleRowDelete}
@@ -334,7 +332,6 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
           :
           <Table
             list={links}
-            fieldStore={fieldStore}
             readOnly={isDisabled}
             enablePointerEvents={false}
           />

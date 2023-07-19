@@ -96,7 +96,7 @@ const getLabel = (instance?: Instance, hasError?: boolean, isFetching?: boolean)
 
 interface ListItemProps {
   index?: number;
-  instanceId: string;
+  instanceId?: string | null;
   readOnly: boolean;
   disabled: boolean;
   isCircular: boolean;
@@ -119,7 +119,7 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
   const { instanceStore } = useStores();
 
   useEffect(() => {
-    if (fetchLabel) {
+    if (fetchLabel && instanceId) {
       instanceStore.createInstanceOrGet(instanceId)?.fetchLabel();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -180,7 +180,7 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
   };
 
 
-  const instance = instanceStore.instances.get(instanceId);
+  const instance = instanceId ? instanceStore.instances.get(instanceId): undefined;
 
   const hasError = !instance || instance.fetchError || instance.fetchLabelError;
   const isFetching = instance && (instance.isFetching || instance.isLabelFetching);

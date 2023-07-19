@@ -32,7 +32,7 @@ import Label from '../Label';
 import Warning from '../Warning';
 import type { Alternative } from '../../types';
 import type InputTextStore from '../Stores/InputTextStore';
-import type { ChangeEvent, ElementType} from 'react';
+import type { ChangeEvent } from 'react';
 
 const useStyles = createUseStyles({
   alternatives: {
@@ -135,7 +135,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => fieldStore.setValue(e.target.value);
 
-  const handleSelectAlternative = val => fieldStore.setValue(val);
+  const handleSelectAlternative = (val: any) => fieldStore.setValue(val); //TODO: Check if this can be typed!
 
   const handleRemoveMySuggestion = () => fieldStore.setValue(null);
 
@@ -166,7 +166,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
         onSelect={handleSelectAlternative}
         onRemove={handleRemoveMySuggestion}
         parentContainerRef={formGroupRef}
-        ValueRenderer={AlternativeValueComponent as React.ComponentType}
+        ValueRenderer={AlternativeValueComponent}
       />
       {inputType === 'time' ?
         <Form.Control

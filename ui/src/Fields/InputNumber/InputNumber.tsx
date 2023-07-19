@@ -84,7 +84,7 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => fieldStore.setValue(e.target.value);
 
-  const handleSelectAlternative = val => fieldStore.setValue(val);
+  const handleSelectAlternative = (val: any) => fieldStore.setValue(val); //TODO: check if this is correct and if it can be typed
 
   const handleRemoveMySuggestion = () => fieldStore.setValue(null);
 
@@ -115,10 +115,10 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
         onSelect={handleSelectAlternative}
         onRemove={handleRemoveMySuggestion}
         parentContainerRef={formGroupRef}
-        ValueRenderer={AlternativeValue as React.ComponentType}
+        ValueRenderer={AlternativeValue}
       />
       <Form.Control
-        value={value}
+        value={value ? value: undefined}
         type={inputType}
         onChange={handleChange}
         disabled={isDisabled}

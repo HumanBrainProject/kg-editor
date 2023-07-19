@@ -26,7 +26,7 @@ import React from 'react';
 import { createUseStyles } from 'react-jss';
 import Label from '../../../Fields/Label';
 import PossibleIncomingLink from './PossibleIncomingLink';
-import type { SimpleType, SourceType, StructureOfType } from '../../../types';
+import type {  SourceType, StructureOfType } from '../../../types';
 
 const useStyles = createUseStyles({
   container: {

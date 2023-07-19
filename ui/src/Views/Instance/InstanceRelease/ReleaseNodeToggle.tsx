@@ -23,12 +23,14 @@
 
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
-import React, { MouseEvent } from 'react';
+import React from 'react';
 import { createUseStyles } from 'react-jss';
 import MultiToggle from '../../../Components/MultiToggle';
 
 import useStores from '../../../Hooks/useStores';
-import { ReleaseScope, ReleaseStatus } from '../../../types';
+import { ReleaseStatus } from '../../../types';
+import type { ReleaseScope} from '../../../types';
+import type { MouseEvent } from 'react';
 
 const useStyles = createUseStyles({
   container: {

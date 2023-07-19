@@ -20,17 +20,18 @@
  * (Human Brain Project SGA1, SGA2 and SGA3).
  *
  */
-import React, { MouseEvent } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
+import React from 'react';
 import { createUseStyles } from 'react-jss';
 
 import ReleaseStatus from '../../../Components/ReleaseStatus';
 import useStores from '../../../Hooks/useStores';
 
 import ReleaseNodeToggle from './ReleaseNodeToggle';
-import { ReleaseScope } from '../../../types';
+import type { ReleaseScope } from '../../../types';
+import type { MouseEvent } from 'react';
 
 const useStyles = createUseStyles({
   container: {

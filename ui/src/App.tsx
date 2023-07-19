@@ -42,10 +42,10 @@ import Settings from './Views/Settings';
 import Shortcuts from './Views/Shortcuts';
 import StoresProvider from './Views/StoresProvider';
 import Styles from './Views/Styles';
+import { ViewMode, type Space as SpaceType } from './types';
 import type API from './Services/API';
 import type AuthAdapter from './Services/AuthAdapter';
 import type RootStore from './Stores/RootStore';
-import { ViewMode, type Space as SpaceType } from './types';
 
 const AuthProvider = React.lazy(() => import('./Views/AuthProvider'));
 const UserProfile = React.lazy(() => import('./Views/UserProfile'));

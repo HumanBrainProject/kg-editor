@@ -41,7 +41,7 @@ const useStyles = createUseStyles({
   }
 });
 
-const getLabel = (instance: Instance, view: View) => {
+const getLabel = (instance: Instance | undefined, view: View) => {
   if(instance && (instance.isFetched || instance.isLabelFetched)) {
     return instance.name;
   }
@@ -51,7 +51,7 @@ const getLabel = (instance: Instance, view: View) => {
   return view.instanceId;
 };
 
-const getColor = (instance: Instance, view: View) => {
+const getColor = (instance: Instance | undefined, view: View) => {
   if(instance && (instance.isFetched || instance.isLabelFetched)) {
     return instance.primaryType.color;
   }
@@ -61,7 +61,7 @@ const getColor = (instance: Instance, view: View) => {
   return '';
 };
 
-const getDescription = (instance: Instance, view: View) => {
+const getDescription = (instance: Instance | undefined, view: View) => {
   if(instance && (instance.isFetched || instance.isLabelFetched)) {
     if(instance.primaryType.description && instance.primaryType.name) {
       return `${instance.primaryType.name} - ${instance.primaryType.description}`;
@@ -77,11 +77,13 @@ const getDescription = (instance: Instance, view: View) => {
   return '';
 };
 
-const getInstanceTabPath = (instanceId: string, mode: ViewMode, space: string, type: string) => {
+const getInstanceTabPath = (instanceId: string, mode: ViewMode, space: string, type?: string) => {
   if(mode === 'view') {
     return `/instances/${instanceId}`;
   } else if (mode === 'create') {
-    return `/instances/${instanceId}/create?space=${space}&type=${encodeURIComponent(type)}`;
+    if(type){
+      return `/instances/${instanceId}/create?space=${space}&type=${encodeURIComponent(type)}`;
+    }
   }
   return `/instances/${instanceId}/${mode}`;
 };
@@ -136,7 +138,7 @@ const InstanceTab = observer(({view, pathname}: InstanceTabProps) => {
       icon={instance?.isFetching ? 'circle-notch' : 'circle'}
       iconSpin={instance?.isFetching}
       iconColor={color}
-      active={isCurrent(view.instanceId, view.mode)}
+      active={!!isCurrent(view.instanceId, view.mode)}
       path={getInstanceTabPath(view.instanceId, view.mode, appStore.currentSpaceName, view.type)}
       onClose={handleClose}
       label={label}

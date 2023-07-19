@@ -42,8 +42,10 @@ const DuplicateInstance = observer(({ instance, className }: DuplicateInstancePr
   const navigate = useNavigate();
 
   const handleDuplicateInstance = () => {
-    Matomo.trackEvent('Instance', 'Duplicate', instance.id);
-    appStore.duplicateInstance(instance.id, navigate);
+    if(instance.id) {
+      Matomo.trackEvent('Instance', 'Duplicate', instance.id);
+      appStore.duplicateInstance(instance.id, navigate);
+    }
   };
 
   const permissions = instance.permissions;

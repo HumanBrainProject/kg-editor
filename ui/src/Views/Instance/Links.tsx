@@ -86,20 +86,20 @@ const Links = observer(({ instanceId }: LinksProps) => {
   };
 
   const view = viewStore.selectedView;
+  //TODO: Check this logic still works with the current changes made!
+  const path = view?.instancePath;
+  const index = path?.findIndex(id => id === instanceId);
+  const instancePath = index !== undefined && index > 0?path?.slice(0, index):[instanceId];
 
-  const path = view.instancePath;
-  const index = path.findIndex(id => id === instanceId);
-  const instancePath = index > 0?path.slice(0, index):[instanceId];
-
-  const groups = getGroups(instance, instancePath);
-  if (!groups.length) {
+  const groups = instancePath && getGroups(instance, instancePath);
+  if (!groups || !groups.length) {
     return null;
   }
 
   const paneId = `ChildrenOf${instanceId}`;
-  const childInstanceId = (index >=0 && path.length>index+1)?path[index+1]:null;
-  const childPaneIndex = childInstanceId?view.getPaneIndex(`ChildrenOf${childInstanceId}`):-1;
-  const showChildInstance = !!childInstanceId && (childPaneIndex == -1 || childPaneIndex > index);
+  const childInstanceId = (index !== undefined && path !== undefined && index >=0 && path.length>index+1)?path[index+1]:null;
+  const childPaneIndex = childInstanceId?view?.getPaneIndex(`ChildrenOf${childInstanceId}`):-1;
+  const showChildInstance = !!childInstanceId && (childPaneIndex === -1 || (childPaneIndex !== undefined && index !== undefined && childPaneIndex > index));
   return (
     <>
       <Pane className={classes.pane} paneId={paneId}>

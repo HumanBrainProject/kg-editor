@@ -28,7 +28,7 @@ import Instance from './Instance';
 import type RootStore from './RootStore';
 import type API from '../Services/API';
 import type { APIError } from '../Services/API';
-import { InstanceSummary, StructureOfType } from '../types';
+import type { InstanceSummary, StructureOfType } from '../types';
 
 const normalizeInstancesData = (api: API, rootStore: RootStore, data:InstanceSummary[]) => (Array.isArray(data))?data.map(rowData => {
   Object.values(rowData.fields).forEach(d => {

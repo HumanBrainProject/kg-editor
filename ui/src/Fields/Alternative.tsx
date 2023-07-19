@@ -29,9 +29,9 @@ import { createUseStyles } from 'react-jss';
 import User from '../Components/User';
 import useStores from '../Hooks/useStores';
 
+import type { ValueRendererProps } from './Alternatives';
 import type { Alternative as AlternativeType } from '../types';
 import type { MouseEvent, KeyboardEvent } from 'react';
-import { ValueRendererProps } from './Alternatives';
 
 const useStyles = createUseStyles({
   container: {

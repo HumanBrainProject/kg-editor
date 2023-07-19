@@ -59,7 +59,7 @@ const CompareInstancesModal = observer(() => {
 
   const { releaseStore } = useStores();
 
-  const handleHideCompare = (e: MouseEvent<HTMLButtonElement>) => {
+  const handleHideCompare = (e: MouseEvent<HTMLButtonElement>) => { //TODO: Check this! onHide does NOT accept an event in Modal. Do we really need to stopPropagation ?
     e && e.stopPropagation();
     releaseStore.setComparedInstance(undefined);
   };

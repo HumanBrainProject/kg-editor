@@ -29,7 +29,7 @@ import { createUseStyles } from 'react-jss';
 
 import { useLocation, useNavigate } from 'react-router-dom';
 import useStores from '../../../Hooks/useStores';
-import type { SimpleType, StructureOfType } from '../../../types';
+import type { StructureOfType } from '../../../types';
 
 const useStyles = createUseStyles({
   btn: {

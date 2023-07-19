@@ -21,17 +21,17 @@
  *
  */
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { observer } from "mobx-react-lite";
-import React from "react";
-import { createUseStyles } from "react-jss";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
 
-import { useNavigate } from "react-router-dom";
-import useStores from "../../Hooks/useStores";
-import type Instance from "../../Stores/Instance";
-import { ViewMode } from "../../types";
-import type { IconProp } from "@fortawesome/fontawesome-svg-core";
-import type { MouseEvent } from "react";
+import { useNavigate } from 'react-router-dom';
+import useStores from '../../Hooks/useStores';
+import { ViewMode } from '../../types';
+import type Instance from '../../Stores/Instance';
+import type { IconProp } from '@fortawesome/fontawesome-svg-core';
+import type { MouseEvent } from 'react';
 
 interface ActionProps {
   className: string;
@@ -54,9 +54,9 @@ const Action = ({
 }: ActionProps) => {
   const handleClick = (event: MouseEvent<HTMLDivElement>) => {
     if (event.metaKey || event.ctrlKey) {
-      typeof onCtrlClick === "function" && onCtrlClick(mode);
+      typeof onCtrlClick === 'function' && onCtrlClick(mode);
     } else {
-      typeof onClick === "function" && onClick(mode);
+      typeof onClick === 'function' && onClick(mode);
     }
   };
 
@@ -74,22 +74,22 @@ const Action = ({
 
 const useStyles = createUseStyles({
   actions: {
-    display: "grid",
-    gridTemplateColumns: "repeat(6, 1fr)",
-    gridGap: "10px",
-    marginBottom: "20px"
+    display: 'grid',
+    gridTemplateColumns: 'repeat(6, 1fr)',
+    gridGap: '10px',
+    marginBottom: '20px'
   },
   action: {
-    height: "34px",
-    cursor: "pointer",
-    overflow: "hidden",
-    lineHeight: "34px",
-    textAlign: "center",
-    borderRadius: "2px",
-    backgroundColor: "var(--bg-color-blend-contrast1)",
-    color: "var(--ft-color-normal)",
-    "&:hover": {
-      color: "var(--ft-color-loud)"
+    height: '34px',
+    cursor: 'pointer',
+    overflow: 'hidden',
+    lineHeight: '34px',
+    textAlign: 'center',
+    borderRadius: '2px',
+    backgroundColor: 'var(--bg-color-blend-contrast1)',
+    color: 'var(--ft-color-normal)',
+    '&:hover': {
+      color: 'var(--ft-color-loud)'
     }
   }
 });
@@ -178,6 +178,6 @@ const Actions = observer(({ instance }: ActionsProps) => {
     </div>
   );
 });
-Actions.displayName = "Actions";
+Actions.displayName = 'Actions';
 
 export default Actions;

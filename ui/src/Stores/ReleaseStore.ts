@@ -28,13 +28,14 @@ import {
   computed,
   makeObservable
 } from 'mobx';
+import { ReleaseStatus, ViewMode } from '../types';
 import type RootStore from './RootStore';
 import type API from '../Services/API';
-import { ReleaseScope, ReleaseStatus, UUID, ViewMode } from '../types';
-import { APIError } from '../Services/API';
+import type { APIError } from '../Services/API';
+import type { ReleaseScope, UUID} from '../types';
 
-interface  ReleaseResult { 
-  node: ReleaseScope; 
+interface  ReleaseResult {
+  node: ReleaseScope;
   level: number;
 }
 
@@ -92,21 +93,13 @@ const removeDuplicates = (node: ReleaseScope, ids?: Set<UUID>) => {
   }
 };
 
-const setReleaseScopeStatus = (node: ReleaseScope, pending: boolean, status?: ReleaseStatus) => {
-  if (pending) {
-    node.pending_status = status??undefined;
-  } else {
-    node.status = status??undefined;
-  }
-}
-
 const setReleaseScopeChildrenStatus = (node: ReleaseScope, pending: boolean, status?: ReleaseStatus) => {
   if (pending) {
     node.pending_childrenStatus = status??undefined;
   } else {
     node.childrenStatus = status??undefined;
   }
-}
+};
 
 const setReleaseScopeGlobalStatus = (node: ReleaseScope, pending: boolean, status?: ReleaseStatus) => {
   if (pending) {
@@ -114,21 +107,21 @@ const setReleaseScopeGlobalStatus = (node: ReleaseScope, pending: boolean, statu
   } else {
     node.globalStatus = status??undefined;
   }
-}
+};
 
 const getReleaseScopeStatus = (node: ReleaseScope, pending: boolean) : ReleaseStatus|undefined => {
   if (pending) {
     return node.pending_status;
   }
   return node.status;
-}
+};
 
 const getReleaseScopeGlobalStatus = (node: ReleaseScope, pending: boolean) : ReleaseStatus|undefined => {
   if (pending) {
     return node.pending_globalStatus;
   }
   return node.globalStatus;
-}
+};
 
 const populateStatuses = (node: ReleaseScope, pending: boolean) => {
   if (node.permissions.canRelease) {
@@ -292,7 +285,7 @@ export class ReleaseStore {
 
     if(this.instancesTree) {
       getStatsFromNode(this.instancesTree);
-    } 
+    }
 
     return count;
   }

@@ -31,8 +31,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import MultiToggle from '../../../Components/MultiToggle';
 
 import useStores from '../../../Hooks/useStores';
-import { GraphGroup, GraphNode, SimpleType } from '../../../types';
-import { IconProp } from '@fortawesome/fontawesome-svg-core';
+import type { GraphGroup, GraphNode, SimpleType } from '../../../types';
+import type { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 const useStyles = createUseStyles({
   container: {
@@ -168,7 +168,7 @@ const Node = ({ node, isGrouped }:NodeProps) => {
   const actions: ActionFunctions = {onClick: handleClick};
   if(!isGrouped) {
     actions.onMouseOver = handelMouseOver;
-    actions.onMouseOut = handelMouseOut; 
+    actions.onMouseOut = handelMouseOut;
   };
 
   return (

@@ -142,7 +142,7 @@ const Reviewers = observer(({ id }: ReviewersProps) => {
           <ul>
             {invitedUsersStore.users.map(review => (
               <li key={review.id}>
-                <Reviewer review={review} onRemoveInvitation={handleRemoveUserInvitation} onInvite={handleInviteUser} />
+                <Reviewer review={review} onRemoveInvitation={handleRemoveUserInvitation} />
               </li>
             ))}
           </ul>

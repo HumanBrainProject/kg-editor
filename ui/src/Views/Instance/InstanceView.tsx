@@ -22,7 +22,7 @@
  */
 
 import {observer} from 'mobx-react-lite';
-import React, { CSSProperties } from 'react';
+import React from 'react';
 import { createUseStyles } from 'react-jss';
 
 import useStores from '../../Hooks/useStores';
@@ -31,6 +31,7 @@ import { ViewContext} from '../../Stores/ViewStore';
 import InstanceForm from './InstanceForm';
 import Links from './Links';
 import Pane from './Pane';
+import type { CSSProperties } from 'react';
 
 const useStyles = createUseStyles({
   container: {
@@ -55,7 +56,7 @@ const InstanceView = observer(({ instance }: { instance: any}) => {
 
   const indexStyle: CSSProperties = {
     '--selected-index': viewStore.selectedView.selectedPaneIndex,
-  } as CSSProperties
+  } as CSSProperties;
 
   return (
     <ViewContext.Provider value={viewStore.selectedView} >

@@ -30,8 +30,8 @@ import { createUseStyles } from 'react-jss';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import useStores from '../../../Hooks/useStores';
-import type Instance from '../../../Stores/Instance';
 import { ViewMode } from '../../../types';
+import type Instance from '../../../Stores/Instance';
 
 const useStyles = createUseStyles({
   panel:{

@@ -22,9 +22,9 @@
  */
 
 import { observable, action, computed, runInAction, set, values, makeObservable } from 'mobx';
+import type { APIError } from '../Services/API';
 import type API from '../Services/API';
 import type { GraphGroup, GraphGroups, GraphLink, GraphLinks, GraphNode, GraphNodes, Neighbor, SimpleType, UUID } from '../types';
-import { APIError } from '../Services/API';
 
 const typeDefaultColor = 'white';
 const typeDefaultName = '-';

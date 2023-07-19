@@ -28,7 +28,7 @@ import { createUseStyles } from 'react-jss';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import useStores from '../../../Hooks/useStores';
-import type { IncomingLink, InstanceLabel } from '../../../types';
+import type { IncomingLink } from '../../../types';
 
 const useStyles = createUseStyles({
   pill: {

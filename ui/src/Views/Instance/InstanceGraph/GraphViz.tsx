@@ -25,14 +25,15 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Color from 'color';
 import debounce from 'lodash/debounce';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect, useState, useRef, MouseEvent } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ForceGraph2D } from 'react-force-graph';
 import { createUseStyles } from 'react-jss';
 import { useLocation, useNavigate } from 'react-router-dom';
-
 import useStores from '../../../Hooks/useStores';
-import { GraphGroup, GraphLink, GraphNode } from '../../../types';
-import { ForceGraphInstance, LinkObject, NodeObject } from 'force-graph';
+
+import type { GraphGroup, GraphLink, GraphNode } from '../../../types';
+import type { ForceGraphInstance, LinkObject, NodeObject } from 'force-graph';
+import type { MouseEvent } from 'react';
 
 const useStyles = createUseStyles({
   graph: {
@@ -137,14 +138,14 @@ const GraphViz = observer(() => {
 
   const wrapText = (context: any, text: string, x: number, y: number, maxWidth: number, lineHeight: number, node: GraphNode) => {
     if (node.labelLines === undefined) {
-      let words = text.split(/( |_|-|\.)/gi); //NOSONAR
+      const words = text.split(/( |_|-|\.)/gi); //NOSONAR
       let line = '';
-      let lines = [];
+      const lines = [];
 
       for (let n = 0; n < words.length; n++) {
-        let testLine = line + words[n];
-        let metrics = context.measureText(testLine);
-        let testWidth = metrics.width;
+        const testLine = line + words[n];
+        const metrics = context.measureText(testLine);
+        const testWidth = metrics.width;
         if (testWidth > maxWidth && n > 0) {
           lines.push(line);
           line = words[n];
@@ -200,7 +201,7 @@ const GraphViz = observer(() => {
       const label = getNodeName(graphNode);
       if(graphNode.x && graphNode.y) {
         wrapText(ctx, label, graphNode.x, graphNode.y, 10, 1.3, graphNode);
-      }       
+      }
     }
 
     ctx.globalAlpha = 1;

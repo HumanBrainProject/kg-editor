@@ -33,7 +33,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 import useStores from '../../Hooks/useStores';
 import Matomo from '../../Services/Matomo';
-import type { Type } from '../../Stores/TypeStore';
+import type { StructureOfType } from '../../types';
 import type { MouseEvent } from 'react';
 
 const useStyles = createUseStyles({
@@ -214,7 +214,7 @@ const CreateInstance = observer(({
 });
 
 interface TypesItemProps {
-  type: Type;
+  type: StructureOfType;
 }
 
 const TypesItem = observer(({ type }: TypesItemProps) => {
@@ -271,7 +271,7 @@ const TypesItem = observer(({ type }: TypesItemProps) => {
         )}
       </span>
       <CreateInstance
-        canCreate={canCreate}
+        canCreate={!!canCreate}
         isCreatingNewInstance={appStore.isCreatingNewInstance}
         classes={classes}
         onClick={handleCreateInstance}

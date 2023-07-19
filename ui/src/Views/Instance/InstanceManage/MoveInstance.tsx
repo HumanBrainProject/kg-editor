@@ -23,7 +23,7 @@
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
-import React, { useState, useEffect, ChangeEvent } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import { createUseStyles } from 'react-jss';
 
@@ -34,8 +34,9 @@ import useStores from '../../../Hooks/useStores';
 
 import Matomo from '../../../Services/Matomo';
 import { Status } from '../../../Stores/StatusStore';
-import type Instance from '../../../Stores/Instance';
 import { ReleaseStatus } from '../../../types';
+import type Instance from '../../../Stores/Instance';
+import type { ChangeEvent } from 'react';
 
 const useStyles = createUseStyles({
   title: {
@@ -182,7 +183,7 @@ const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
     if(instance.id) {
       statusStore.fetchStatus(instance.id);
     }
-  }
+  };
 
   const [spaceId, setSpaceId] = useState(appStore.currentSpace?.id);
 

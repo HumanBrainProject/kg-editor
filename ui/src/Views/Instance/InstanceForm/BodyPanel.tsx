@@ -30,10 +30,10 @@ import { createUseStyles } from 'react-jss';
 import Field from '../../../Fields/Field';
 import Label from '../../../Fields/Label';
 import { ViewContext, PaneContext } from '../../../Stores/ViewStore';
+import { ViewMode } from '../../../types';
 import IncomingLinks from '../IncomingLinks/IncomingLinks';
 import PossibleIncomingLinks from '../IncomingLinks/PossibleIncomingLinks';
 import type Instance from '../../../Stores/Instance';
-import { ViewMode } from '../../../types';
 
 const useStyles = createUseStyles({
   container: {

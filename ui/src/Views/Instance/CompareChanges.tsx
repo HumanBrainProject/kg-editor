@@ -37,7 +37,7 @@ const useStyles = createUseStyles({
 });
 
 interface CompareChangesProps {
-  instanceId: string;
+  instanceId?: string;
   onClose: () => void;
 }
 
@@ -59,10 +59,10 @@ const CompareChanges = observer(({ instanceId, onClose }: CompareChangesProps) =
 
   useEffect(() => {
     if(savedInstanceStore) {
-      const savedInst = savedInstanceStore.createInstanceOrGet(instanceId);
-      const inst = instanceStore.instances.get(instanceId);
+      const savedInst = instanceId ? savedInstanceStore.createInstanceOrGet(instanceId): undefined;
+      const inst = instanceId ? instanceStore.instances.get(instanceId): undefined;
       const data = inst?.cloneInitialData;
-      savedInst?.initializeData(savedInstanceStore.api, inst.store.rootStore, data);
+      savedInst && inst && savedInst.initializeData(savedInstanceStore.api, inst.store.rootStore, data);
     }
     return () => {
       savedInstanceStore && savedInstanceStore.flush();
@@ -70,8 +70,8 @@ const CompareChanges = observer(({ instanceId, onClose }: CompareChangesProps) =
   }, [instanceStore.api, instanceStore.instances, savedInstanceStore, instanceId]);
 
 
-  const instance = instanceStore.instances.get(instanceId);
-  const savedInstance = savedInstanceStore && savedInstanceStore.instances.get(instanceId);
+  const instance = instanceId ? instanceStore.instances.get(instanceId): undefined;
+  const savedInstance = savedInstanceStore && instanceId && savedInstanceStore.instances.get(instanceId);
   if (!instance || !savedInstance) {
     return null;
   }

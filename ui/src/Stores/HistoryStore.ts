@@ -27,7 +27,7 @@ import Instance from './Instance';
 import type RootStore from './RootStore';
 import type { APIError } from '../Services/API';
 import type API from '../Services/API';
-import { UUID, ViewMode } from '../types';
+import type { UUID, ViewMode } from '../types';
 
 const maxItems = 100;
 

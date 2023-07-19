@@ -36,7 +36,6 @@ import InstanceRow from '../Instance/InstanceRow';
 import type { Instance } from '../../Stores/InstanceStore';
 import type { ViewMode } from '../../types';
 import type { ChangeEvent} from 'react';
-import { EventType } from '../../Stores/AppStore';
 
 const useStyles = createUseStyles({
   container: {

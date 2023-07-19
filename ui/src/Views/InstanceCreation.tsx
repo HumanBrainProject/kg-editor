@@ -72,7 +72,7 @@ const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
           if (type.canCreate !== false && type.isSupported && !type.embeddedOnly) {
             if(instanceId) {
               instanceStore.createNewInstance(type, instanceId);
-              setReady(true);  
+              setReady(true);
             }
           } else {
             setTypeNotSupported(true);

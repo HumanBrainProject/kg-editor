@@ -21,48 +21,49 @@
  *
  */
 
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { observer } from "mobx-react-lite";
-import React from "react";
-import { createUseStyles } from "react-jss";
-import { useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React from 'react';
+import { createUseStyles } from 'react-jss';
+import { useNavigate } from 'react-router-dom';
 
-import useStores from "../../Hooks/useStores";
-import Matomo from "../../Services/Matomo";
-import type Instance from "../../Stores/Instance";
-import { Permissions, ViewMode } from "../../types";
-import type { IconProp } from "@fortawesome/fontawesome-svg-core";
+import useStores from '../../Hooks/useStores';
+import Matomo from '../../Services/Matomo';
+import { ViewMode } from '../../types';
+import type Instance from '../../Stores/Instance';
+import type { Permissions} from '../../types';
+import type { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 const useStyles = createUseStyles({
   tabs: {
-    borderRight: "1px solid var(--border-color-ui-contrast1)",
-    background: "var(--bg-color-ui-contrast2)"
+    borderRight: '1px solid var(--border-color-ui-contrast1)',
+    background: 'var(--bg-color-ui-contrast2)'
   },
   tab: {
-    color: "var(--ft-color-normal)",
-    borderLeft: "2px solid transparent",
-    opacity: "0.7",
-    cursor: "pointer",
-    height: "50px",
-    lineHeight: "50px",
-    fontSize: "1.75em",
-    textAlign: "center",
-    "&:hover": {
-      background: "var(--list-bg-hover)",
-      borderColor: "var(--list-border-hover)",
-      color: "var(--ft-color-loud)",
-      opacity: "1"
+    color: 'var(--ft-color-normal)',
+    borderLeft: '2px solid transparent',
+    opacity: '0.7',
+    cursor: 'pointer',
+    height: '50px',
+    lineHeight: '50px',
+    fontSize: '1.75em',
+    textAlign: 'center',
+    '&:hover': {
+      background: 'var(--list-bg-hover)',
+      borderColor: 'var(--list-border-hover)',
+      color: 'var(--ft-color-loud)',
+      opacity: '1'
     },
-    "&.active": {
-      background: "var(--list-bg-selected)",
-      borderColor: "var(--list-border-selected)",
-      color: "var(--ft-color-loud)",
-      opacity: "1"
+    '&.active': {
+      background: 'var(--list-bg-selected)',
+      borderColor: 'var(--list-border-selected)',
+      color: 'var(--ft-color-loud)',
+      opacity: '1'
     },
-    "&.disabled, &.disabled:hover": {
-      color: "var(--ft-color-normal)",
-      opacity: "0.2",
-      cursor: "not-allowed"
+    '&.disabled, &.disabled:hover': {
+      color: 'var(--ft-color-normal)',
+      opacity: '0.2',
+      cursor: 'not-allowed'
     }
   }
 });
@@ -95,15 +96,15 @@ const Tab = ({
   const props =
     disabled || active
       ? {
-          className: `${className} ${disabled ? "disabled" : ""} ${
-            active ? "active" : ""
-          }`
-        }
+        className: `${className} ${disabled ? 'disabled' : ''} ${
+          active ? 'active' : ''
+        }`
+      }
       : {
-          className: className,
-          title: label,
-          onClick: () => typeof onClick === "function" && onClick(mode)
-        };
+        className: className,
+        title: label,
+        onClick: () => typeof onClick === 'function' && onClick(mode)
+      };
 
   return (
     <div {...props}>
@@ -128,7 +129,7 @@ const Tabs = observer(({ instance, mode }: TabsProps) => {
 
   const handleClick = (instanceMode: ViewMode) => {
     Matomo.trackEvent(
-      "Instance",
+      'Instance',
       `Select${instanceMode[0].toUpperCase() + instanceMode.substr(1)}Mode`,
       instance.id
     );
@@ -210,6 +211,6 @@ const Tabs = observer(({ instance, mode }: TabsProps) => {
     </div>
   );
 });
-Tabs.displayName = "Tabs";
+Tabs.displayName = 'Tabs';
 
 export default Tabs;

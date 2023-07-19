@@ -33,9 +33,9 @@ import SpinnerModal from '../../../Components/SpinnerModal';
 import useStores from '../../../Hooks/useStores';
 
 import Matomo from '../../../Services/Matomo';
+import { ReleaseStatus } from '../../../types';
 import type Instance from '../../../Stores/Instance';
 import type { Status } from '../../../Stores/StatusStore';
-import { ReleaseStatus } from '../../../types';
 
 const useStyles = createUseStyles({
   error: {
@@ -143,7 +143,7 @@ const DeleteInstance = observer(({ instance, className }: DeleteInstanceProps) =
     if(instance.id){
       statusStore.fetchStatus(instance.id);
     }
-  }
+  };
 
   const handleDeleteInstance = () => {
     if(instance.id) {
@@ -156,7 +156,7 @@ const DeleteInstance = observer(({ instance, className }: DeleteInstanceProps) =
 
   const handleCancelDeleteInstance = () => appStore.cancelDeleteInstance();
 
-  const permissions = instance.permissions; 
+  const permissions = instance.permissions;
   const status = instance.id ? statusStore.getInstance(instance.id): undefined;
 
   return (

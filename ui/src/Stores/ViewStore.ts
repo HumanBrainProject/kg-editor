@@ -23,9 +23,10 @@
 
 import { observable, action, computed, makeObservable } from 'mobx';
 import React from 'react';
+import { ViewMode } from '../types';
 import type RootStore from './RootStore';
 import type API from '../Services/API';
-import { StructureOfType, UUID, ViewMode } from '../types';
+import type { StructureOfType, UUID} from '../types';
 
 interface StoredSpaceView {
   id: UUID;

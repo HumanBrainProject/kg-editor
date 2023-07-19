@@ -21,8 +21,9 @@
  *
  */
 
-import React, { Component, ErrorInfo, ReactNode } from 'react';
-import FieldStore from './Stores/FieldStore';
+import  { Component } from 'react';
+import type FieldStore from './Stores/FieldStore';
+import type { ErrorInfo, ReactNode } from 'react';
 interface FieldErrorProps {
   fieldStore: FieldStore;
   children: ReactNode;

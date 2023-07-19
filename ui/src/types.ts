@@ -32,31 +32,31 @@
  *   limitations under the License.
  *
  */
-import type { IconProp } from "@fortawesome/fontawesome-svg-core";
-import type { BrowserOptions } from "@sentry/browser";
-import { LinkObject, NodeObject } from "force-graph";
-import type { KeycloakConfig } from "keycloak-js";
-import type { PiwikOptions } from "react-piwik";
+import type { IconProp } from '@fortawesome/fontawesome-svg-core';
+import type { BrowserOptions } from '@sentry/browser';
+import type { LinkObject, NodeObject } from 'force-graph';
+import type { KeycloakConfig } from 'keycloak-js';
+import type { PiwikOptions } from 'react-piwik';
 
 export type UUID = string;
 
 export enum ViewMode {
-  VIEW = "view",
-  EDIT = "edit",
-  GRAPH = "graph",
-  MANAGE = "manage",
-  RELEASE = "release",
-  CREATE = "create",
-  RAW = "raw"
+  VIEW = 'view',
+  EDIT = 'edit',
+  GRAPH = 'graph',
+  MANAGE = 'manage',
+  RELEASE = 'release',
+  CREATE = 'create',
+  RAW = 'raw'
 }
 
 export enum ReleaseStatus {
-  UNRELEASED = "UNRELEASED",
-  HAS_CHANGED = "HAS_CHANGED",
-  RELEASED = "RELEASED"
+  UNRELEASED = 'UNRELEASED',
+  HAS_CHANGED = 'HAS_CHANGED',
+  RELEASED = 'RELEASED'
 }
 
-export type Stage = "IN_PROGRESS" | "RELEASED"; //TODO: change this to Enum
+export type Stage = 'IN_PROGRESS' | 'RELEASED'; //TODO: change this to Enum
 export interface Settings {
   commit: string;
   keycloak: KeycloakConfig;

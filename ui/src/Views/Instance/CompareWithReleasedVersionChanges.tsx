@@ -30,10 +30,11 @@ import { createUseStyles } from 'react-jss';
 import BGMessage from '../../Components/BGMessage';
 import Spinner from '../../Components/Spinner';
 import useStores from '../../Hooks/useStores';
-import InstanceStore, { createInstanceStore } from '../../Stores/InstanceStore';
+import { createInstanceStore } from '../../Stores/InstanceStore';
 
-import CompareFieldsChanges from './CompareFieldsChanges';
 import { ReleaseStatus } from '../../types';
+import CompareFieldsChanges from './CompareFieldsChanges';
+import type InstanceStore from '../../Stores/InstanceStore';
 
 const useStyles = createUseStyles({
   container: {

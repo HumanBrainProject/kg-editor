@@ -30,6 +30,7 @@ import { Link } from 'react-router-dom';
 import BGMessage from '../../Components/BGMessage';
 import useStores from '../../Hooks/useStores';
 
+import { ViewMode } from '../../types';
 import ExternalCreateModal from '../ExternalCreateModal';
 import Preview from '../Preview';
 import InstanceGraph from './InstanceGraph';
@@ -39,8 +40,7 @@ import InstanceRelease from './InstanceRelease';
 import InstanceView from './InstanceView';
 import SaveBar from './SaveBar';
 import Tabs from './Tabs';
-import { ViewMode } from '../../types';
-import {Instance as InstanceType} from '../../Stores/Instance';
+import type {Instance as InstanceType} from '../../Stores/Instance';
 
 const useStyles = createUseStyles({
   container: {

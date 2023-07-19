@@ -28,11 +28,11 @@ import { v4 as uuidv4 } from 'uuid';
 import BrightTheme from '../Themes/Bright';
 import CupcakeTheme from '../Themes/Cupcake';
 import DefaultTheme from '../Themes/Default';
+import { type Space, type Permissions, type StructureOfType, ViewMode } from '../types';
 import type InstanceStore from './InstanceStore';
 import type RootStore from './RootStore';
 import type API from '../Services/API';
 import type { APIError } from '../Services/API';
-import { type Space, type Permissions, type StructureOfType, ViewMode } from '../types';
 import type { Location, NavigateFunction} from 'react-router-dom';
 
 const themes = {
@@ -193,9 +193,9 @@ export class AppStore{
     }
   }
 
-  updateExternalInstanceModal(toSave=null) {
+  updateExternalInstanceModal(toSave:number|null=null) {
     if(this.externalCreateModal) {
-      if (toSave) {
+      if (toSave !== null) {
         this.externalCreateModal.toSave = toSave;
         this.externalCreateModal.saved = 0;
       } else {
@@ -425,7 +425,7 @@ export class AppStore{
         this.rootStore.instanceStore.removeInstances(instanceIdsToBeRemoved);
       }
     }
-    
+
   }
 
   async saveInstance(instance, navigate: NavigateFunction) {

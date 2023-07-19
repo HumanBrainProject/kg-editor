@@ -211,7 +211,7 @@ const Instance = observer(({ instance, onSave, onReset, onCompare, onDismissSave
       </div>
       {instance.hasSaveError && (
         <div className={classes.errors}>
-          {instance.saveError} <Button size="sm" variant={'link'} onClick={handleDismissSaveError.bind(this, instance.id)}><FontAwesomeIcon icon="check"/></Button>
+          {instance.saveError} <Button size="sm" variant={'link'} onClick={handleDismissSaveError}><FontAwesomeIcon icon="check"/></Button>
         </div>
       )}
     </div>

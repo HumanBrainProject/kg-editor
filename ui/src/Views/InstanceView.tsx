@@ -61,7 +61,7 @@ const InstanceView = observer(({ mode }: InstanceViewProps) => {
 
   const instance = instanceStore.instances.get(instanceId);
   const isTypesSupported = typeStore.isTypesSupported(instance?.typeNames);
-  if (instance?.space !== typeStore.space || (!isTypesSupported && !['raw', 'graph', 'manage'].includes(mode))) {
+  if (!instance || (instance?.space !== typeStore.space) || (!isTypesSupported && !['raw', 'graph', 'manage'].includes(mode))) {
     return null;
   }
 

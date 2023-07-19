@@ -42,7 +42,9 @@ import List from './List';
 import type { View } from '../../Stores/ViewStore';
 import type { Suggestion } from '../../types';
 import type LinksStore from '../Stores/LinksStore';
+import type { Value } from '../Stores/LinksStore';
 import type { KeyboardEvent, MouseEvent, SyntheticEvent} from 'react';
+
 
 
 const useStyles = createUseStyles({
@@ -234,7 +236,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
       if(droppedIndex !== undefined) {
         const afterValue = values[droppedIndex];
         fieldStore.moveValueAfter(value, afterValue);
-      } 
+      }
     }
     draggedIndex.current = null;
     instanceStore.togglePreviewInstance();

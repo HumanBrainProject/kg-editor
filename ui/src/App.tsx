@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /*
  * Copyright 2018 - 2021 Swiss Federal Institute of Technology Lausanne (EPFL)
  *
@@ -113,6 +114,7 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
                                           <Space space={spaceParam} skipHistory={skipHistory} >
                                             <Types>
                                               <InstanceCreation>
+                                                {/* @ts-ignore */ }
                                                 <InstanceView mode="create" />
                                               </InstanceCreation>
                                             </Types>
@@ -130,6 +132,7 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
                                       {(_, space) => (
                                         <Space space={space} skipHistory={skipHistory} >
                                           <Types>
+                                            {/* @ts-ignore */ }
                                             <InstanceView mode="raw" />
                                           </Types>
                                         </Space>
@@ -145,10 +148,15 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
                                         <Space space={space} skipHistory={skipHistory} >
                                           <Types>
                                             <Routes>
+                                              {/* @ts-ignore */ }
                                               <Route path="" element={<InstanceView mode="view" />} />
+                                              {/* @ts-ignore */ }
                                               <Route path="edit" element={<InstanceView mode="edit" />} />
+                                              {/* @ts-ignore */ }
                                               <Route path="graph" element={<InstanceView mode="graph" />} />
+                                              {/* @ts-ignore */ }
                                               <Route path="release" element={<InstanceView mode="release" />} />
+                                              {/* @ts-ignore */ }
                                               <Route path="manage"  element={<InstanceView mode="manage" />} />
                                               <Route path="*" element={<Navigate to={`/instances/${instanceId}`} />} />
                                             </Routes>

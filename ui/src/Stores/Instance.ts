@@ -24,16 +24,26 @@
 import { observable, action, computed, makeObservable } from 'mobx';
 
 import { fieldsMapping } from '../Fields';
+import LinkStore from '../Fields/Stores/LinkStore';
 import LinksStore from '../Fields/Stores/LinksStore';
 import type RootStore from './RootStore';
 import type FieldStore from '../Fields/Stores/FieldStore';
 import type NestedFieldStore from '../Fields/Stores/NestedFieldStore';
 import type SingleNestedFieldStore from '../Fields/Stores/SingleNestedFieldStore';
+import type { NestedInstanceStores } from '../Fields/Stores/SingleNestedFieldStore';
 import type API from '../Services/API';
 import type { APIError } from '../Services/API';
-import type { Alternative, Alternatives, InstanceIncomingLinkFull, InstanceRawData, Permissions, SimpleType, StructureOfField, StructureOfType, UUID } from '../types';
-import LinkStore from '../Fields/Stores/LinkStore';
-import { NestedFieldStores, NestedInstanceStores } from '../Fields/Stores/SingleNestedFieldStore';
+import type {
+  Alternative,
+  Alternatives,
+  InstanceIncomingLinkFull,
+  InstanceRawData,
+  Permissions,
+  SimpleType,
+  StructureOfField,
+  StructureOfType,
+  UUID
+} from '../types';
 
 const compareAlternatives = (a: Alternative, b: Alternative) => {
   if (a.selected === b.selected) {
@@ -45,27 +55,40 @@ const compareAlternatives = (a: Alternative, b: Alternative) => {
   return 1;
 };
 
-const normalizeAlternative = (name: string, field: StructureOfField, alternatives?: Alternatives) => {
-  field.alternatives = ((alternatives && alternatives[name])?alternatives[name]:[])
+const normalizeAlternative = (
+  name: string,
+  alternatives?: Alternatives
+): Alternative[] =>
+  (alternatives && alternatives[name] ? alternatives[name] : [])
     .sort(compareAlternatives)
-    .map((alternative: Alternative) => ({
-      value: alternative.value === undefined ? null : alternative.value,
-      users: alternative.users,
-      selected: !!alternative.selected
-    }));
-};
+    .map(
+      (alternative: Alternative) =>
+        ({
+          value: alternative.value === undefined ? null : alternative.value,
+          users: alternative.users,
+          selected: !!alternative.selected
+        } as Alternative)
+    );
 
 const normalizeField = (field: StructureOfField, instanceId: UUID) => {
-  if (field instanceof Object && !Array.isArray(field) && (field.widget === 'Nested' || field.widget === 'SingleNested')) {
+  if (
+    field instanceof Object &&
+    !Array.isArray(field) &&
+    (field.widget === 'Nested' || field.widget === 'SingleNested')
+  ) {
     normalizeFields(field.fields, instanceId);
   }
 };
 
-const normalizeFields = (fields: Map<string, StructureOfField>, instanceId: UUID, alternatives?: Alternatives) => {
+const normalizeFields = (
+  fields: Map<string, StructureOfField>,
+  instanceId: UUID,
+  alternatives?: Alternatives
+) => {
   if (fields instanceof Object && !Array.isArray(fields)) {
     Object.entries(fields).forEach(([name, field]) => {
       normalizeField(field, instanceId);
-      normalizeAlternative(name, field, alternatives);
+      field.alternatives = normalizeAlternative(name, alternatives);
     });
   }
 };
@@ -78,18 +101,26 @@ const getChildrenIds = (fields: InstanceFields): Set<UUID> => {
     if (field.widget === 'SingleNested') {
       //const singleNestedField = field as fieldsMapping["SingleNested"].Store;
       const singleNestedField = field as SingleNestedFieldStore;
-      const idsOfNestedFields = getChildrenIdsOfSingleNestedFields(singleNestedField.nestedFieldsStores);
+      const idsOfNestedFields = getChildrenIdsOfSingleNestedFields(
+        singleNestedField.nestedFieldsStores
+      );
       idsOfNestedFields.forEach(id => acc.add(id));
     } else if (field.widget === 'Nested') {
       //const nestedField = field as fieldsMapping["Nested"].Store;
       const nestedField = field as NestedFieldStore;
-      const idsOfNestedFields = getChildrenIdsOfNestedFields(nestedField.nestedFieldsStores);
+      const idsOfNestedFields = getChildrenIdsOfNestedFields(
+        nestedField.nestedFieldsStores
+      );
       idsOfNestedFields.forEach(id => acc.add(id));
     } else if (field instanceof LinksStore && field.isLink) {
       const values = field.returnValue;
       if (Array.isArray(values)) {
-        values.map(obj => obj && obj[field.mappingValue]).filter(id => !!id).forEach(id => acc.add(id));
-      } else if (values instanceof Object && !Array.isArray(values)) { // field.widget === "SimpleDropdown"
+        values
+          .map(obj => obj && obj[field.mappingValue])
+          .filter(id => !!id)
+          .forEach(id => acc.add(id));
+      } else if (values instanceof Object && !Array.isArray(values)) {
+        // field.widget === "SimpleDropdown"
         const id = values[field.mappingValue];
         if (id) {
           acc.add(id);
@@ -111,14 +142,16 @@ const getChildrenIdsOfNestedFields = (fields: InstanceFields): Set<UUID> => {
   }, new Set<UUID>());
 };
 
-const getChildrenIdsOfSingleNestedFields = (fields:InstanceFields): Set<UUID> => {
+const getChildrenIdsOfSingleNestedFields = (
+  fields: InstanceFields
+): Set<UUID> => {
   if (!(fields instanceof Object) || Array.isArray(fields)) {
     return new Set();
   }
   return getChildrenIds(fields.stores);
 };
 
-export const compareField = (a, b, ignoreName=false) => {
+export const compareField = (a, b, ignoreName = false) => {
   if (!a && !b) {
     return 0;
   }
@@ -188,7 +221,6 @@ export const normalizeLabelInstanceData = data => {
 };
 
 export const normalizeInstanceData = (data, typeFromStore: StructureOfType) => {
-
   const instance = {
     ...normalizeLabelInstanceData(data),
     fields: {} as InstanceFields,
@@ -222,40 +254,48 @@ export const normalizeInstanceData = (data, typeFromStore: StructureOfType) => {
   if (data.labelField) {
     instance.labelField = data.labelField;
   }
-  if(data.incomingLinks) {
-    const incomingLinks = Object.entries(data.incomingLinks).map(([property, field])=> {
-      let label = '';
-      const links = Object.entries(field).map(([typeName, type]) => {
-        label = type.nameForReverseLink;
+  if (data.incomingLinks) {
+    const incomingLinks = Object.entries(data.incomingLinks).map(
+      ([property, field]) => {
+        let label = '';
+        const links = Object.entries(field).map(([typeName, type]) => {
+          label = type.nameForReverseLink;
+          return {
+            instanceId: instance.id,
+            property: property,
+            type: {
+              name: typeName,
+              label: type.label,
+              color: type.color
+            },
+            instances: type.data,
+            from: type.from,
+            size: type.size,
+            total: type.total,
+            isFetching: false,
+            fetchError: null
+          };
+        });
         return {
-          instanceId: instance.id,
           property: property,
-          type: {
-            name: typeName,
-            label: type.label,
-            color: type.color
-          },
-          instances: type.data,
-          from: type.from,
-          size: type.size,
-          total: type.total,
-          isFetching: false,
-          fetchError: null
+          label: label,
+          links: links
         };
-      });
-      return {
-        property: property,
-        label: label,
-        links: links
-      };
-    });
+      }
+    );
     instance.incomingLinks = incomingLinks;
   }
-  if(typeFromStore?.incomingLinks) {
+  if (typeFromStore?.incomingLinks) {
     instance.possibleIncomingLinks = Object.values(typeFromStore.incomingLinks)
       .flatMap(link => link.sourceTypes)
       .reduce((acc, current) => {
-        if(!acc.some(obj => obj.type.name === current.type.name && JSON.stringify(obj.spaces) === JSON.stringify(current.spaces))) {
+        if (
+          !acc.some(
+            obj =>
+              obj.type.name === current.type.name &&
+              JSON.stringify(obj.spaces) === JSON.stringify(current.spaces)
+          )
+        ) {
           acc.push(current);
         }
         return acc;
@@ -289,7 +329,7 @@ interface Pagination {
   total: number;
 }
 
-const getPagination = (field: FieldStore): Pagination|undefined => {
+const getPagination = (field: FieldStore): Pagination | undefined => {
   if (field instanceof LinksStore && field.lazyShowLinks) {
     const total = field.numberOfValues;
     if (total) {
@@ -314,11 +354,20 @@ const showId = (field: FieldStore, id: string) => {
 
 const getIds = (field: FieldStore) => {
   const values = field.returnValue;
-  if (field instanceof LinksStore || field instanceof LinksStore ) {
+  if (field instanceof LinksStore || field instanceof LinksStore) {
     const mappingValue = field.mappingValue;
-    if(Array.isArray(values)) {
-      return values.filter(obj => obj && obj[mappingValue]).map(obj => obj[mappingValue]).filter(id => id !== field.instance?.id).filter(id => showId(field, id));
-    } else if (typeof values === 'object' && values && values[mappingValue] && showId(field, values[mappingValue])) {
+    if (Array.isArray(values)) {
+      return values
+        .filter(obj => obj && obj[mappingValue])
+        .map(obj => obj[mappingValue])
+        .filter(id => id !== field.instance?.id)
+        .filter(id => showId(field, id));
+    } else if (
+      typeof values === 'object' &&
+      values &&
+      values[mappingValue] &&
+      showId(field, values[mappingValue])
+    ) {
       return [values[mappingValue]];
     }
   }
@@ -327,7 +376,7 @@ const getIds = (field: FieldStore) => {
 
 interface Group {
   label: string;
-  ids: UUID[],
+  ids: UUID[];
   pagination?: Pagination;
 }
 
@@ -362,12 +411,19 @@ const getGroupsForFields = (fields: FieldStore[]) => {
 const getGroupsForField = (field: FieldStore): Group[] => {
   const groups = [];
   if (field.widget === 'Nested') {
-    const nestedGroups = getNestedFields((field as NestedFieldStore).nestedFieldsStores);
+    const nestedGroups = getNestedFields(
+      (field as NestedFieldStore).nestedFieldsStores
+    );
     groups.push(...nestedGroups);
   } else if (field.widget === 'SingleNested') {
-    const nestedGroups = getSingleNestedFields((field as SingleNestedFieldStore).nestedFieldsStores);
+    const nestedGroups = getSingleNestedFields(
+      (field as SingleNestedFieldStore).nestedFieldsStores
+    );
     groups.push(...nestedGroups);
-  } else if ((field instanceof LinksStore || field instanceof LinkStore) && field.isLink) {
+  } else if (
+    (field instanceof LinksStore || field instanceof LinkStore) &&
+    field.isLink
+  ) {
     const group = getGroup(field);
     if (group) {
       groups.push(group);
@@ -396,17 +452,18 @@ const getNestedFields = (fields: NestedInstanceStores[]): Group[] => {
   }, [] as Group[]);
 };
 
-
-const getChildrenIdsGroupedByField = (fields:FieldStore[]):Group[] => {
+const getChildrenIdsGroupedByField = (fields: FieldStore[]): Group[] => {
   const list = getGroupsForFields(fields);
-  return Object.entries(list.reduce((acc, group) => {
-    if (!acc[group.label]) {
-      acc[group.label] = [];
-    }
-    acc[group.label].push(...group.ids);
-    return acc;
-  }, {} as {[key:string]: string[]}))
-    .map(([label, ids]) => ({label: label, ids: ids}))
+  return Object.entries(
+    list.reduce((acc, group) => {
+      if (!acc[group.label]) {
+        acc[group.label] = [];
+      }
+      acc[group.label].push(...group.ids);
+      return acc;
+    }, {} as { [key: string]: string[] })
+  )
+    .map(([label, ids]) => ({ label: label, ids: ids }))
     .sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
 };
 
@@ -414,38 +471,36 @@ interface InstanceFields {
   [name: string]: FieldStore;
 }
 
-
-//TODO: FIX me!
-// export interface StatelessInstance {
-//   id: UUID;
-//   _name?: string;
-//   types: StructureOfType[];
-//   primaryType: SimpleType;
-//   space: string;
-//   fields: InstanceFields;
-//   promotedFields: string[];
-//   alternatives: {},
-//   metadata: {},
-//   permissions?: Permissions;
-//   possibleIncomingLinks: type.incomingLinks,
-//   labelField?: string;
-// }
-
-export class Instance {
+export interface StatelessInstance {
   id: UUID;
-  _name?: string;
+  name?: string;
+  types: StructureOfType[];
+  primaryType: SimpleType;
+  space: string;
+  fields: InstanceFields;
+  promotedFields: string[];
+  alternatives?: Alternatives;
+  metadata: {};
+  permissions?: Permissions;
+  possibleIncomingLinks: type.incomingLinks;
+  labelField?: string;
+}
+
+export class Instance implements StatelessInstance {
+  id: UUID;
+  _name?: string; // name is computed from _name
   types: StructureOfType[] = [];
   isNew = false;
   labelField?: string;
-  _promotedFields = [];
+  _promotedFields = [];  // promotedFields is computed from _promotedFields
   primaryType: SimpleType = { name: '', color: '', label: '', description: '' };
   space = '';
   metadata = [];
   permissions?: Permissions;
   fields: InstanceFields = {};
   incomingLinks: InstanceIncomingLinkFull[] = [];
-  possibleIncomingLinks=[];
-  alternatives = {};
+  possibleIncomingLinks = [];
+  alternatives: Alternatives = {};
 
   isLabelFetching = false;
   isLabelFetched = false;
@@ -455,7 +510,7 @@ export class Instance {
 
   isFetching = false;
   isFetched = false;
-  fetchError?:string;
+  fetchError?: string;
   isNotFound = false;
   hasFetchError = false;
 
@@ -519,12 +574,12 @@ export class Instance {
     this.id = id;
   }
 
-  get cloneInitialData() {
+  get cloneInitialData(): StatelessInstance {
     return {
       id: this.id,
       name: this.name,
-      types: this.types.map(t => ({...t})),
-      primaryType: {...this.primaryType},
+      types: this.types.map(t => ({ ...t })),
+      primaryType: { ...this.primaryType },
       space: this.space,
       fields: Object.entries(this.fields).reduce((acc, [name, field]) => {
         acc[name] = field.cloneWithInitialValue;
@@ -533,14 +588,14 @@ export class Instance {
       labelField: this.labelField,
       promotedFields: [...this._promotedFields],
       metadata: [],
-      permissions: {...this.permissions}
+      permissions: this.permissions?{ ...this.permissions }:undefined
     };
   }
 
-  get returnValue(): {[key:string]:any} {
+  get returnValue(): { [key: string]: any } {
     const obj = {
       '@type': this.types.map(t => t.name)
-    } as {[key:string]:any};
+    } as { [key: string]: any };
     return Object.entries(this.fields).reduce((acc, [name, field]) => {
       if (field.hasChanged) {
         acc[name] = field.returnValue;
@@ -549,10 +604,10 @@ export class Instance {
     }, obj);
   }
 
-  get payload(): {[key:string]:any} {
+  get payload(): { [key: string]: any } {
     const payload = {
       '@type': this.types.map(t => t.name)
-    } as {[key:string]:any};
+    } as { [key: string]: any };
     return Object.entries(this.fields).reduce((acc, [name, field]) => {
       if (Array.isArray(field.returnValue)) {
         if (field.returnValue.length) {
@@ -562,7 +617,10 @@ export class Instance {
         if (field.returnValue !== '') {
           acc[name] = field.returnValue;
         }
-      } else if (field.returnValue !== null && field.returnValue !== undefined) {
+      } else if (
+        field.returnValue !== null &&
+        field.returnValue !== undefined
+      ) {
         acc[name] = field.returnValue;
       }
       return acc;
@@ -570,7 +628,9 @@ export class Instance {
   }
 
   get hasChanged(): boolean {
-    return this.isNew || Object.values(this.fields).some(field => field.hasChanged);
+    return (
+      this.isNew || Object.values(this.fields).some(field => field.hasChanged)
+    );
   }
 
   get hasFieldErrors(): boolean {
@@ -589,16 +649,22 @@ export class Instance {
   }
 
   get name() {
-    const field = (this.isFetched && this.labelField)?this.fields[this.labelField]:undefined;
+    const field =
+      this.isFetched && this.labelField
+        ? this.fields[this.labelField]
+        : undefined;
     if (field) {
-      return (this.isNew && !field.value) ? `<New ${this.primaryType.label}>` : field.value;
+      return this.isNew && !field.value
+        ? `<New ${this.primaryType.label}>`
+        : field.value;
     }
     return this._name ? this._name : this.id;
   }
 
   get promotedFields() {
     if (this.isFetched && !this.fetchError) {
-      return this._promotedFields.map(name => [name, this.fields[name]])
+      return this._promotedFields
+        .map(name => [name, this.fields[name]])
         .sort(([, a], [, b]) => compareField(a, b, true))
         .map(([key]) => key);
     }
@@ -641,49 +707,71 @@ export class Instance {
     this.hasLabelFetchError = false;
   }
 
-
   initializeRawData(data: InstanceRawData, permissions?: Permissions) {
     this.rawData = data;
     this.rawFetchError = undefined;
     this.hasRawFetchError = false;
     this.isRawFetched = true;
     this.isRawFetching = false;
-    this.permissions = (permissions instanceof Object) ? permissions:undefined;
+    this.permissions = permissions instanceof Object ? permissions : undefined;
     this.space = data['https://core.kg.ebrains.eu/vocab/meta/space'] as string;
   }
 
   get typeNames() {
     if (this.isFetched || this.isLabelFetched) {
-      return this.types
-        .map(t => t.name)
-        .filter(t => t !== null);
+      return this.types.map(t => t.name).filter(t => t !== null);
     }
-    if (this.isRawFetched && this.rawData && Array.isArray(this.rawData?.['@type'])) {
+    if (
+      this.isRawFetched &&
+      this.rawData &&
+      Array.isArray(this.rawData?.['@type'])
+    ) {
       return this.rawData['@type'];
     }
     return [];
   }
 
   initializeData(api: API, rootStore: RootStore, data, isNew = false) {
-    const _initializeFields = _fields => {
+    const _initializeFields = (_fields: InstanceFields) => {
       Object.entries(_fields).forEach(([name, field]) => {
         let warning = null;
         field.isPublic = name === this.labelField;
-        if (field.widget === 'DynamicDropdown' && Array.isArray(field.value) && field.value.length > 30) {
+        if (
+          field.widget === 'DynamicDropdown' &&
+          Array.isArray(field.value) &&
+          field.value.length > 30
+        ) {
           field.widget = 'DynamicTable';
         }
         //TODO: temporary fix to support invalid array value
-        if ((field.widget === 'SimpleDropdown' || field.widget === 'SingleNested') && Array.isArray(field.value)) {
+        if (
+          (field.widget === 'SimpleDropdown' ||
+            field.widget === 'SingleNested') &&
+          Array.isArray(field.value)
+        ) {
           if (field.value.length >= 1) {
             field.value = field.value[0];
           } else {
             delete field.value;
           }
-          window.console.warn(`the field ${field.name} of instance ${this.id}  is a ${field.widget} which require an object as value but received an array.`, field.value);
+          window.console.warn(
+            `the field ${field.name} of instance ${this.id}  is a ${field.widget} which require an object as value but received an array.`,
+            field.value
+          );
         }
         //TODO: temporary fix to support invalid object value
-        if ((field.widget === 'DynamicDropdown' || field.widget === 'DynamicTable' || field.widget === 'Nested') && !Array.isArray(field.value) && field.value !== undefined && field.value !== null ) {
-          window.console.warn(`The field ${field.name} of instance ${this.id} is a ${field.widget} which require an array as value but received an object.`, field.value);
+        if (
+          (field.widget === 'DynamicDropdown' ||
+            field.widget === 'DynamicTable' ||
+            field.widget === 'Nested') &&
+          !Array.isArray(field.value) &&
+          field.value !== undefined &&
+          field.value !== null
+        ) {
+          window.console.warn(
+            `The field ${field.name} of instance ${this.id} is a ${field.widget} which require an array as value but received an object.`,
+            field.value
+          );
           field.value = [field.value];
         }
         // TO TEST regexRules RULES
@@ -707,7 +795,13 @@ export class Instance {
             field.widget = 'UnsupportedField';
           }
           const fieldMapping = fieldsMapping[field.widget];
-          this.fields[name] = new fieldMapping.Store(field, fieldMapping.options, this, api, rootStore) as FieldStore;
+          this.fields[name] = new fieldMapping.Store(
+            field,
+            fieldMapping.options,
+            this,
+            api,
+            rootStore
+          ) as FieldStore;
         }
         const store = this.fields[name];
         store.updateValue(field.value);
@@ -718,7 +812,10 @@ export class Instance {
       });
     };
 
-    const typeFromStore = (Array.isArray(data.types) && data.types.length) ? rootStore.typeStore.typesMap.get(data.types[0].name):undefined;
+    const typeFromStore =
+      Array.isArray(data.types) && data.types.length
+        ? rootStore.typeStore.typesMap.get(data.types[0].name)
+        : undefined;
 
     const normalizedData = normalizeInstanceData(data, typeFromStore);
     this._name = normalizedData.name;
@@ -743,7 +840,8 @@ export class Instance {
 
   buildErrorMessage(e: APIError) {
     const message = e.message ? e.message : e;
-    const errorMessage = e.response && e.response.status !== 500 ? e.response.data : '';
+    const errorMessage =
+      e.response && e.response.status !== 500 ? e.response.data : '';
     if (e.response && e.response.status === 404) {
       return `The instance "${this.id}" can not be found - it either could have been removed or it is not accessible by your user account.`;
     }
@@ -754,23 +852,29 @@ export class Instance {
     return `Error while retrieving instance "${this.id}" (${message})}`;
   }
 
-  errorLabelInstance(e: APIError|string, isNotFound=false) {
+  errorLabelInstance(e: APIError | string, isNotFound = false) {
     this.isLabelNotFound = isNotFound;
-    this.fetchError = typeof e === 'string' ? this.buildErrorMessageFromString(e):this.buildErrorMessage(e);
+    this.fetchError =
+      typeof e === 'string'
+        ? this.buildErrorMessageFromString(e)
+        : this.buildErrorMessage(e);
     this.hasLabelFetchError = true;
     this.isLabelFetched = false;
     this.isLabelFetching = false;
   }
 
-  errorInstance(e: APIError|string, isNotFound=false) {
+  errorInstance(e: APIError | string, isNotFound = false) {
     this.isNotFound = isNotFound;
-    this.fetchError = typeof e === 'string' ? this.buildErrorMessageFromString(e):this.buildErrorMessage(e);
+    this.fetchError =
+      typeof e === 'string'
+        ? this.buildErrorMessageFromString(e)
+        : this.buildErrorMessage(e);
     this.hasFetchError = true;
     this.isFetched = false;
     this.isFetching = false;
   }
 
-  errorRawInstance(e: APIError, isNotFound=false) {
+  errorRawInstance(e: APIError, isNotFound = false) {
     this.rawData = undefined;
     this.isNotFound = isNotFound;
     this.rawFetchError = this.buildErrorMessage(e);

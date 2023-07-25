@@ -196,9 +196,12 @@ export interface InstanceLabel {
   error: Error;
 }
 
+export interface Fields {
+  [fieldName: string]: StructureOfField
+}
 export interface InstanceSummary extends InstanceLabel {
   permissions: Permissions;
-  fields: Map<string, StructureOfField>;
+  fields: Fields;
 }
 
 export interface InstanceFull extends InstanceSummary {
@@ -210,7 +213,7 @@ export interface InstanceFull extends InstanceSummary {
 }
 
 export interface Alternatives {
-  [key: string]: Alternative[];
+  [fieldName: string]: Alternative[];
 }
 
 export interface Alternative {

@@ -264,6 +264,40 @@ export interface SuggestionStructure {
   types: Map<string, SimpleTypeWithSpaces>;
 }
 
+export type InstanceRawData = {
+  [key:string]: unknown;
+}
+
+export type InstanceLabelData = {
+  [key:UUID]: InstanceLabel;
+}
+
+export type InstanceSummaryData = {
+  [key:UUID]: InstanceLabel;
+}
+
+export type InstanceFullData = {
+  [key:UUID]: InstanceLabel;
+}
+
+export interface InstanceRawStructure {
+  data: InstanceRawData;
+  permissions?: Permissions;
+}
+
+export interface PreviewInstance {
+  id?: string;
+  name?: string;
+  options?: PreviewInstanceOptions;
+}
+
+export interface PreviewInstanceOptions {
+  showEmptyFields: boolean;
+  showAction: boolean;
+  showType: boolean;
+  showStatus: boolean;
+}
+
 export interface Neighbor {
   id: UUID;
   name: string;

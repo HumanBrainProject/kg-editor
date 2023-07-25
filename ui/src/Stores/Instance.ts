@@ -30,7 +30,7 @@ import type NestedFieldStore from '../Fields/Stores/NestedFieldStore';
 import type SingleNestedFieldStore from '../Fields/Stores/SingleNestedFieldStore';
 import type API from '../Services/API';
 import type { APIError } from '../Services/API';
-import type { Alternative, Alternatives, InstanceIncomingLinkFull, Permissions, SimpleType, StructureOfField, StructureOfType, UUID } from '../types';
+import type { Alternative, Alternatives, InstanceIncomingLinkFull, InstanceRawData, Permissions, SimpleType, StructureOfField, StructureOfType, UUID } from '../types';
 
 const compareAlternatives = (a: Alternative, b: Alternative) => {
   if (a.selected === b.selected) {
@@ -398,9 +398,26 @@ interface InstanceFields {
   [name: string]: FieldStore;
 }
 
+
+//TODO: FIX me! 
+// export interface StatelessInstance {
+//   id: UUID;
+//   _name?: string;
+//   types: StructureOfType[];
+//   primaryType: SimpleType;
+//   space: string;
+//   fields: InstanceFields;
+//   promotedFields: string[];
+//   alternatives: {},
+//   metadata: {},
+//   permissions?: Permissions;
+//   possibleIncomingLinks: type.incomingLinks,
+//   labelField?: string;
+// }
+
 export class Instance {
-  id?: UUID;
-  _name = null;
+  id: UUID;
+  _name?: string;
   types: StructureOfType[] = [];
   isNew = false;
   labelField?: string;
@@ -426,15 +443,13 @@ export class Instance {
   isNotFound = false;
   hasFetchError = false;
 
-  rawData = null;
+  rawData?: InstanceRawData;
   rawFetchError?: string;
   hasRawFetchError = false;
   isRawFetched = false;
   isRawFetching = false;
 
-  api: API;
-
-  constructor(id: UUID, api: API) {
+  constructor(id: UUID) {
     makeObservable(this, {
       id: observable,
       alternatives: observable,
@@ -486,7 +501,6 @@ export class Instance {
     });
 
     this.id = id;
-    this.api = api;
   }
 
   get cloneInitialData() {
@@ -612,7 +626,7 @@ export class Instance {
   }
 
 
-  initializeRawData(data, permissions: Permissions) {
+  initializeRawData(data: InstanceRawData, permissions?: Permissions) {
     this.rawData = data;
     this.rawFetchError = undefined;
     this.hasRawFetchError = false;

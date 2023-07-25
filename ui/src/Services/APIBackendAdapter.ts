@@ -33,7 +33,7 @@
  *
  */
 import type API from './API';
-import type { UUID, Stage, Settings, UserProfile, KGCoreResult, StructureOfType, InstanceLabel, InstanceFull, InstanceSummary, SuggestionStructure, Neighbor, Scope, UserSummary, IncomingLink } from '../types';
+import type { UUID, Stage, Settings, UserProfile, KGCoreResult, StructureOfType, InstanceLabel, InstanceFull, InstanceSummary, SuggestionStructure, Neighbor, Scope, UserSummary, IncomingLink, InstanceRawStructure, InstanceSummaryData, InstanceLabelData, InstanceFullData } from '../types';
 import type { AxiosInstance } from 'axios';
 
 const RELATIVE_ROOT_PATH = '/editor/api';
@@ -102,7 +102,7 @@ class APIBackendAdapter implements API {
     return data;
   }
 
-  async getRawInstance(instanceId: UUID): Promise<Map<string, unknown>> {
+  async getRawInstance(instanceId: UUID): Promise<InstanceRawStructure> {
     const { data } = await this._axios.get(endpoints.rawInstance(instanceId));
     return data;
   }
@@ -145,17 +145,17 @@ class APIBackendAdapter implements API {
     return data;
   }
 
-  async getInstancesLabel(stage: Stage, instanceIds: UUID[]): Promise<KGCoreResult<Map<string, InstanceLabel>>> {
+  async getInstancesLabel(stage: Stage, instanceIds: UUID[]): Promise<KGCoreResult<InstanceLabelData>> {
     const { data } = await this._axios.post(endpoints.instancesLabel(stage), instanceIds);
     return data;
   }
 
-  async getInstancesSummary(stage: Stage | undefined, instanceIds: UUID[]): Promise<KGCoreResult<Map<string, InstanceSummary>>> {
+  async getInstancesSummary(stage: Stage | undefined, instanceIds: UUID[]): Promise<KGCoreResult<InstanceSummaryData>> {
     const { data } = await this._axios.post(endpoints.instancesSummary(stage), instanceIds);
     return data;
   }
 
-  async getInstancesList(stage: Stage, instanceIds: UUID[]): Promise<KGCoreResult<Map<string, InstanceFull>>> {
+  async getInstancesList(stage: Stage, instanceIds: UUID[]): Promise<KGCoreResult<InstanceFullData>> {
     const { data } = await this._axios.post(endpoints.instancesList(stage), instanceIds);
     return data;
   }

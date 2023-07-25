@@ -209,7 +209,7 @@ export interface InstanceFull extends InstanceSummary {
   labelField: string;
   promotedFields: string[];
   incomingLinks: Map<string, Map<string, IncomingLinksByType>>;
-  possibleIncomingLinks: Map<string, StructureOfIncomingLink>;
+  possibleIncomingLinks: PossibleIncomingLinks;
 }
 
 export interface Alternatives {
@@ -220,6 +220,10 @@ export interface Alternative {
   value: any;
   selected: boolean;
   users: UserSummary[];
+}
+
+export interface PossibleIncomingLinks {
+  [type: string]: StructureOfIncomingLink;
 }
 
 export interface IncomingLinksByType {

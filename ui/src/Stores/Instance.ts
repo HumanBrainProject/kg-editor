@@ -24,6 +24,7 @@
 import { observable, action, computed, makeObservable } from 'mobx';
 
 import { fieldsMapping } from '../Fields';
+import LinksStore from '../Fields/Stores/LinksStore';
 import type RootStore from './RootStore';
 import type FieldStore from '../Fields/Stores/FieldStore';
 import type NestedFieldStore from '../Fields/Stores/NestedFieldStore';
@@ -31,6 +32,8 @@ import type SingleNestedFieldStore from '../Fields/Stores/SingleNestedFieldStore
 import type API from '../Services/API';
 import type { APIError } from '../Services/API';
 import type { Alternative, Alternatives, InstanceIncomingLinkFull, InstanceRawData, Permissions, SimpleType, StructureOfField, StructureOfType, UUID } from '../types';
+import LinkStore from '../Fields/Stores/LinkStore';
+import { NestedFieldStores, NestedInstanceStores } from '../Fields/Stores/SingleNestedFieldStore';
 
 const compareAlternatives = (a: Alternative, b: Alternative) => {
   if (a.selected === b.selected) {
@@ -82,7 +85,7 @@ const getChildrenIds = (fields: InstanceFields): Set<UUID> => {
       const nestedField = field as NestedFieldStore;
       const idsOfNestedFields = getChildrenIdsOfNestedFields(nestedField.nestedFieldsStores);
       idsOfNestedFields.forEach(id => acc.add(id));
-    } else if (field.isLink) {
+    } else if (field instanceof LinksStore && field.isLink) {
       const values = field.returnValue;
       if (Array.isArray(values)) {
         values.map(obj => obj && obj[field.mappingValue]).filter(id => !!id).forEach(id => acc.add(id));
@@ -151,10 +154,10 @@ export const compareField = (a, b, ignoreName=false) => {
 
 export const normalizeLabelInstanceData = data => {
   const instance = {
-    id: null,
-    name: null,
+    id: undefined,
+    name: undefined,
     types: [],
-    primaryType: { name: '', color: '', label: '' },
+    primaryType: { name: '', color: '', label: '' } as SimpleType,
     space: '',
     error: null
   };
@@ -162,6 +165,7 @@ export const normalizeLabelInstanceData = data => {
   if (!data) {
     return instance;
   }
+
   if (data.id) {
     instance.id = data.id;
   }
@@ -187,7 +191,7 @@ export const normalizeInstanceData = (data, typeFromStore: StructureOfType) => {
 
   const instance = {
     ...normalizeLabelInstanceData(data),
-    fields: {},
+    fields: {} as InstanceFields,
     labelField: undefined,
     promotedFields: [],
     alternatives: {},
@@ -280,22 +284,27 @@ export const normalizeInstanceData = (data, typeFromStore: StructureOfType) => {
   return instance;
 };
 
-const getPagination = field => {
-  if (field.lazyShowLinks) {
+interface Pagination {
+  count: number;
+  total: number;
+}
+
+const getPagination = (field: FieldStore): Pagination|undefined => {
+  if (field instanceof LinksStore && field.lazyShowLinks) {
     const total = field.numberOfValues;
     if (total) {
       return {
         count: field.numberOfVisibleLinks,
         total: total
-      };
+      } as Pagination;
     }
   }
-  return null;
+  return undefined;
 };
 
-const showId = (field, id: string) => {
+const showId = (field: FieldStore, id: string) => {
   if (id) {
-    if (field.lazyShowLinks) {
+    if (field instanceof LinksStore && field.lazyShowLinks) {
       return field.isLinkVisible(id);
     }
     return true;
@@ -303,25 +312,33 @@ const showId = (field, id: string) => {
   return false;
 };
 
-const getIds = field => {
+const getIds = (field: FieldStore) => {
   const values = field.returnValue;
-  const mappingValue = field.mappingValue;
-  if(Array.isArray(values)) {
-    return values.filter(obj => obj && obj[mappingValue]).map(obj => obj[mappingValue]).filter(id => id !== field.instance.id).filter(id => showId(field, id));
-  } else if (typeof values === 'object' && values && values[mappingValue] && showId(field, values[mappingValue])) {
-    return [values[mappingValue]];
+  if (field instanceof LinksStore || field instanceof LinksStore ) {
+    const mappingValue = field.mappingValue;
+    if(Array.isArray(values)) {
+      return values.filter(obj => obj && obj[mappingValue]).map(obj => obj[mappingValue]).filter(id => id !== field.instance?.id).filter(id => showId(field, id));
+    } else if (typeof values === 'object' && values && values[mappingValue] && showId(field, values[mappingValue])) {
+      return [values[mappingValue]];
+    }
   }
   return [];
 };
 
-const getGroup = field => {
+interface Group {
+  label: string;
+  ids: UUID[],
+  pagination?: Pagination;
+}
+
+const getGroup = (field: FieldStore) => {
   const ids = getIds(field);
   if (ids.length) {
     const group = {
-      //name: field.name,
       label: field.label,
-      ids: ids
-    };
+      ids: ids,
+      pagination: undefined
+    } as Group;
     const pagination = getPagination(field);
     if (pagination) {
       group.pagination = pagination;
@@ -331,7 +348,7 @@ const getGroup = field => {
   return null;
 };
 
-const getGroupsForFields = fields => {
+const getGroupsForFields = (fields: FieldStore[]) => {
   if (!Array.isArray(fields)) {
     return [];
   }
@@ -339,18 +356,18 @@ const getGroupsForFields = fields => {
     const groups = getGroupsForField(field);
     acc.push(...groups);
     return acc;
-  }, []);
+  }, [] as Group[]);
 };
 
-const getGroupsForField = field => {
+const getGroupsForField = (field: FieldStore): Group[] => {
   const groups = [];
   if (field.widget === 'Nested') {
-    const nestedGroups = getNestedFields(field.nestedFieldsStores);
+    const nestedGroups = getNestedFields((field as NestedFieldStore).nestedFieldsStores);
     groups.push(...nestedGroups);
   } else if (field.widget === 'SingleNested') {
-    const nestedGroups = getSingleNestedFields(field.nestedFieldsStores);
+    const nestedGroups = getSingleNestedFields((field as SingleNestedFieldStore).nestedFieldsStores);
     groups.push(...nestedGroups);
-  } else if (field.isLink) {
+  } else if ((field instanceof LinksStore || field instanceof LinkStore) && field.isLink) {
     const group = getGroup(field);
     if (group) {
       groups.push(group);
@@ -359,7 +376,7 @@ const getGroupsForField = field => {
   return groups;
 };
 
-const getSingleNestedFields = fields => {
+const getSingleNestedFields = (fields?: NestedInstanceStores): Group[] => {
   if (!fields) {
     return [];
   }
@@ -367,7 +384,7 @@ const getSingleNestedFields = fields => {
   return getGroupsForFields(nestedFields);
 };
 
-const getNestedFields = fields => {
+const getNestedFields = (fields: NestedInstanceStores[]): Group[] => {
   if (!Array.isArray(fields)) {
     return [];
   }
@@ -376,10 +393,11 @@ const getNestedFields = fields => {
     const groups = getGroupsForFields(nestedFields);
     acc.push(...groups);
     return acc;
-  }, []);
+  }, [] as Group[]);
 };
 
-const getUniqueGroups = fields => {
+
+const getChildrenIdsGroupedByField = (fields:FieldStore[]):Group[] => {
   const list = getGroupsForFields(fields);
   return Object.entries(list.reduce((acc, group) => {
     if (!acc[group.label]) {
@@ -387,19 +405,17 @@ const getUniqueGroups = fields => {
     }
     acc[group.label].push(...group.ids);
     return acc;
-  }, {}))
+  }, {} as {[key:string]: string[]}))
     .map(([label, ids]) => ({label: label, ids: ids}))
     .sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
 };
-
-const getChildrenIdsGroupedByField = fields => getUniqueGroups(fields);
 
 interface InstanceFields {
   [name: string]: FieldStore;
 }
 
 
-//TODO: FIX me! 
+//TODO: FIX me!
 // export interface StatelessInstance {
 //   id: UUID;
 //   _name?: string;
@@ -513,7 +529,7 @@ export class Instance {
       fields: Object.entries(this.fields).reduce((acc, [name, field]) => {
         acc[name] = field.cloneWithInitialValue;
         return acc;
-      }, {}),
+      }, {} as InstanceFields),
       labelField: this.labelField,
       promotedFields: [...this._promotedFields],
       metadata: [],
@@ -521,22 +537,22 @@ export class Instance {
     };
   }
 
-  get returnValue() {
-    const payload = {
+  get returnValue(): {[key:string]:any} {
+    const obj = {
       '@type': this.types.map(t => t.name)
-    };
+    } as {[key:string]:any};
     return Object.entries(this.fields).reduce((acc, [name, field]) => {
       if (field.hasChanged) {
         acc[name] = field.returnValue;
       }
       return acc;
-    }, payload);
+    }, obj);
   }
 
-  get payload() {
+  get payload(): {[key:string]:any} {
     const payload = {
       '@type': this.types.map(t => t.name)
-    };
+    } as {[key:string]:any};
     return Object.entries(this.fields).reduce((acc, [name, field]) => {
       if (Array.isArray(field.returnValue)) {
         if (field.returnValue.length) {
@@ -553,11 +569,11 @@ export class Instance {
     }, payload);
   }
 
-  get hasChanged() {
+  get hasChanged(): boolean {
     return this.isNew || Object.values(this.fields).some(field => field.hasChanged);
   }
 
-  get hasFieldErrors() {
+  get hasFieldErrors(): boolean {
     return Object.values(this.fields).some(field => field.hasError);
   }
 
@@ -633,7 +649,7 @@ export class Instance {
     this.isRawFetched = true;
     this.isRawFetching = false;
     this.permissions = (permissions instanceof Object) ? permissions:undefined;
-    this.space = data['https://core.kg.ebrains.eu/vocab/meta/space'];
+    this.space = data['https://core.kg.ebrains.eu/vocab/meta/space'] as string;
   }
 
   get typeNames() {
@@ -642,7 +658,7 @@ export class Instance {
         .map(t => t.name)
         .filter(t => t !== null);
     }
-    if (this.isRawFetched && Array.isArray(this.rawData?.['@type'])) {
+    if (this.isRawFetched && this.rawData && Array.isArray(this.rawData?.['@type'])) {
       return this.rawData['@type'];
     }
     return [];
@@ -755,7 +771,7 @@ export class Instance {
   }
 
   errorRawInstance(e: APIError, isNotFound=false) {
-    this.rawData = null;
+    this.rawData = undefined;
     this.isNotFound = isNotFound;
     this.rawFetchError = this.buildErrorMessage(e);
     this.hasRawFetchError = true;

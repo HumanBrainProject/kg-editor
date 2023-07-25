@@ -34,16 +34,19 @@ interface Value {
   [key: string]: string[];
 }
 
-interface NestedFieldStores {
-  stores: any;
-  [key: string]: string[];
+interface NestedInstanceFieldStores {
+  [key:string]: FieldStore;
+}
+export interface NestedInstanceStores {
+  stores: NestedInstanceFieldStores;
+  '@type': string[];
 }
 
 class SingleNestedFieldStore extends FieldStore {
   fieldsTemplate = {};
   initialValue = null;
   returnAsNull = false;
-  nestedFieldsStores?: NestedFieldStores;
+  nestedFieldsStores?: NestedInstanceStores;
   targetTypes?: SimpleType[] = [];
   labelField?: string;
 

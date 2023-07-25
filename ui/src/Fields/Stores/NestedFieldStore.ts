@@ -24,6 +24,7 @@
 import { observable, action, computed, makeObservable, toJS } from 'mobx';
 import { fieldsMapping } from '..';
 import FieldStore from './FieldStore';
+import type { NestedInstanceStores } from './SingleNestedFieldStore';
 import type { WidgetOptions} from '..';
 import type API from '../../Services/API';
 import type Instance from '../../Stores/Instance';
@@ -42,7 +43,7 @@ class NestedFieldStore extends FieldStore {
   fieldsTemplate = {};
   initialValue = [];
   returnAsNull = false;
-  nestedFieldsStores = [];
+  nestedFieldsStores: NestedInstanceStores[] = [];
   targetTypes?: SimpleType[] = [];
   minItems?: number;
   maxItems?: number;
@@ -174,7 +175,7 @@ class NestedFieldStore extends FieldStore {
     this.nestedFieldsStores = [];
     if(values) {
       values.forEach(value => {
-        const rowFieldStores = {stores: {}, '@type': value['@type']};
+        const rowFieldStores = {stores: {}, '@type': value['@type']} as NestedInstanceStores;
         const type = this.getType(value['@type']);
         if (type) {
           const fieldsTemplate = type.fields;

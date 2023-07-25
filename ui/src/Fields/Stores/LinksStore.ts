@@ -40,12 +40,12 @@ interface Messages {
 }
 
 export interface Value {
-  [key: string]: string;
+  '@id': string;
 }
 
 
 class LinksStore extends FieldStore {
-  value = [];
+  value: Value[] = [];
   options = [];
   optionsResult = [];
   allowCustomValues = true;
@@ -160,7 +160,7 @@ class LinksStore extends FieldStore {
     };
   }
 
-  get returnValue() { //NOSONAR, by design spec it can return that specific string constant or a value
+  get returnValue(): string | null | undefined | Value[] { //NOSONAR, by design spec it can return that specific string constant or a value
     if (!this.value.length && this.returnAsNull) {
       return 'https://core.kg.ebrains.eu/vocab/resetValue';
     }

@@ -34,7 +34,7 @@ interface Value {
   [key: string]: string[];
 }
 
-interface NestedInstanceFieldStores {
+export interface NestedInstanceFieldStores {
   [key:string]: FieldStore;
 }
 export interface NestedInstanceStores {

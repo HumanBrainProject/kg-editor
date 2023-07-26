@@ -180,6 +180,7 @@ public class InstanceController {
     }
 
     private void enrichInstanceWithPossibleIncomingLinks(InstanceFull instance, Map<String, StructureOfType> typesByName) {
+        //TODO: check why it is not working
         List<String> types = getTypesNamesFromInstance(instance);
         Map<String, StructureOfIncomingLink> possibleIncomingLinks = new HashMap<>();
         types.forEach(type -> {

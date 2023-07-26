@@ -61,14 +61,13 @@ public class InstanceClient {
 
     public <T extends HasError> Map<String, ResultWithOriginalMap<T>> getInstances(List<String> ids,
                                                                                    String stage,
-                                                                                   boolean metadata,
                                                                                    boolean returnAlternatives,
                                                                                    boolean returnPermissions,
                                                                                    boolean returnEmbedded,
                                                                                    boolean returnIncomingLinks,
                                                                                    Class<T> clazz) {
         String incomingLinksPageSizeParam = returnIncomingLinks?String.format("&incomingLinksPageSize=%d", INCOMING_LINKS_PAGE_SIZE):"";
-        String relativeUrl = String.format("instancesByIds?stage=%s&metadata=%b&returnAlternatives=%b&returnPermissions=%b&returnEmbedded=%b&returnIncomingLinks=%b%s", stage, metadata, returnAlternatives, returnPermissions, returnEmbedded, returnIncomingLinks, incomingLinksPageSizeParam);
+        String relativeUrl = String.format("instancesByIds?stage=%s&returnAlternatives=%b&returnPermissions=%b&returnEmbedded=%b&returnIncomingLinks=%b%s", stage, returnAlternatives, returnPermissions, returnEmbedded, returnIncomingLinks, incomingLinksPageSizeParam);
         KGCoreResult.Single originalMap = kg.client(true).post().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(ids))
                 .retrieve()

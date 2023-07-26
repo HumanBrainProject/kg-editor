@@ -576,7 +576,6 @@ export class InstanceStore {
       fields: toJS(fields),
       promotedFields: toJS(type.promotedFields),
       alternatives: {},
-      metadata: {},
       permissions: toJS(this.rootStore.appStore.currentSpacePermissions),
       possibleIncomingLinks: type.incomingLinks,
       labelField: ''

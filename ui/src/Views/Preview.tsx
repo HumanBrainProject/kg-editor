@@ -81,10 +81,6 @@ const useStyles = createUseStyles({
     fontSize: '1.5em',
     fontWeight: '300'
   },
-  metadataTitle: {
-    display: 'inline-block',
-    marginBottom: '10px'
-  },
   info: {
     fontSize: '0.75em',
     color: 'var(--ft-color-normal)',
@@ -124,10 +120,9 @@ interface PreviewProps {
   showAction?: boolean;
   showTypes?: boolean;
   showStatus?: boolean;
-  showMetaData?: boolean;
 }
 
-const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, showAction=true, showTypes=false, showStatus=true, showMetaData=true}: PreviewProps) => {
+const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, showAction=true, showTypes=false, showStatus=true}: PreviewProps) => {
 
   const classes = useStyles();
 
@@ -248,20 +243,6 @@ const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, sho
                 );
               })}
               <IncomingLinks links={instance.incomingLinks} readMode={true} />
-              {showMetaData && instance.metadata && Object.keys(instance.metadata).length > 0 && (
-                <div>
-                  <hr />
-                  <span className={`${classes.title} ${classes.metadataTitle}`}>
-                    {' '}
-                      Metadata{' '}
-                  </span>
-                  {instance.metadata.map(field => (
-                    <div key={instanceId + field.label} className={classes.field}>
-                      <label>{field.label}: </label> {field.value}
-                    </div>
-                  ))}
-                </div>
-              )}
             </Form>}
         </Scrollbars>
       </div>

@@ -143,11 +143,15 @@ export interface Suggestion {
 export interface StructureOfType extends SimpleType {
   labelField: string;
   embeddedOnly: boolean;
-  fields: Map<string, StructureOfField>;
+  fields: Fields;
   promotedFields: string[];
-  incomingLinks: Map<string, StructureOfIncomingLink>;
+  incomingLinks: StructureOfIncomingLinkByFieldName;
   canCreate: boolean;
   isSupported?: boolean;
+}
+
+export interface StructureOfIncomingLinkByFieldName { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+  [fieldName: string]: StructureOfIncomingLink;
 }
 
 export interface StructureOfField {
@@ -168,13 +172,14 @@ export interface StructureOfField {
   searchable: boolean;
   required: boolean;
   readOnly: boolean;
-  fields: Map<string, StructureOfField>;
+  fields: Fields;
   value: object; // or array?
   defaultTargetType: string;
   targetTypes: SimpleType[];
   validation: ValidationRule[];
   warning: string;
 }
+
 export interface StructureOfIncomingLink {
   fullyQualifiedName: string;
   sourceTypes: SourceType[];
@@ -188,6 +193,7 @@ export interface ValidationRule {
   errorMessage: string;
 }
 
+
 export interface InstanceLabel {
   space: string;
   types: SimpleType[];
@@ -196,7 +202,7 @@ export interface InstanceLabel {
   error: Error;
 }
 
-export interface Fields {
+export interface Fields { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
   [fieldName: string]: StructureOfField
 }
 export interface InstanceSummary extends InstanceLabel {
@@ -205,14 +211,14 @@ export interface InstanceSummary extends InstanceLabel {
 }
 
 export interface InstanceFull extends InstanceSummary {
-  alternatives: Map<string, Alternative[]>;
+  alternatives: Alternatives;
   labelField: string;
   promotedFields: string[];
-  incomingLinks: Map<string, Map<string, IncomingLinksByType>>;
-  possibleIncomingLinks: PossibleIncomingLinks;
+  incomingLinks: IncomingLinksByField;
+  possibleIncomingLinks: StructureOfIncomingLink[];
 }
 
-export interface Alternatives {
+export interface Alternatives { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
   [fieldName: string]: Alternative[];
 }
 
@@ -222,11 +228,15 @@ export interface Alternative {
   users: UserSummary[];
 }
 
-export interface PossibleIncomingLinks {
-  [type: string]: StructureOfIncomingLink;
+export interface IncomingLinksByField { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+  [fieldName: string]: IncomingLinksByType;
 }
 
-export interface IncomingLinksByType {
+export interface IncomingLinksByType { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+  [type: string]: InstanceIncomingLinkFull;
+}
+
+export interface IncomingLinks {
   label: string;
   color: string;
   data: IncomingLink[];
@@ -268,23 +278,27 @@ export interface Error {
 
 export interface SuggestionStructure {
   suggestions: KGCoreResult<Suggestion[]>;
-  types: Map<string, SimpleTypeWithSpaces>;
+  types: SuggestionsTypes;
 }
 
-export type InstanceRawData = {
-  [key:string]: unknown;
+export type SuggestionsTypes = { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+  [typeName:string]: SimpleTypeWithSpaces;
 }
 
-export type InstanceLabelData = {
-  [key:UUID]: InstanceLabel;
+export type InstanceRawData = { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+  [fieldName:string]: unknown;
 }
 
-export type InstanceSummaryData = {
-  [key:UUID]: InstanceLabel;
+export type InstanceLabelData = { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+  [uuid:UUID]: InstanceLabel;
 }
 
-export type InstanceFullData = {
-  [key:UUID]: InstanceLabel;
+export type InstanceSummaryData = { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+  [uuid:UUID]: InstanceSummary;
+}
+
+export type InstanceFullData = { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+  [uuid:UUID]: InstanceFull;
 }
 
 export interface InstanceRawStructure {
@@ -350,11 +364,11 @@ export interface GraphNode extends NodeObject {
   labelLines: string[];
 }
 
-export interface GraphNodes {
+export interface GraphNodes { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
   [key: string]: GraphNode;
 }
 
-export interface GraphGroups {
+export interface GraphGroups { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
   [key: string]: GraphGroup;
 }
 export interface GraphLink extends LinkObject {
@@ -364,7 +378,7 @@ export interface GraphLink extends LinkObject {
   target: GraphNode;
 }
 
-export interface GraphLinks {
+export interface GraphLinks { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
   [key: string]: GraphLink;
 }
 
@@ -407,6 +421,6 @@ export interface FieldStoreDefinition {
   allowCustomValues?: boolean;
   lazyShowLinks?: boolean;
   targetTypes?: SimpleType[];
-  fields: Map<string, StructureOfField>;
+  fields: Fields;
   markdown?: boolean;
 }

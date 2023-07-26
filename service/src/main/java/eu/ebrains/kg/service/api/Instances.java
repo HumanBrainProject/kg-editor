@@ -115,27 +115,24 @@ public class Instances {
 
     @PostMapping("/instancesBulk/list")
     public KGCoreResult<Map<String, InstanceFull>> getInstancesList(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
-                                                                    @RequestParam(required = false, defaultValue = "false") boolean metadata,
                                                                     @RequestBody List<String> ids) {
-        Map<String, ResultWithOriginalMap<InstanceFull>> result = instanceClient.getInstances(ids, stage, metadata, true, true, true, true, InstanceFull.class);
+        Map<String, ResultWithOriginalMap<InstanceFull>> result = instanceClient.getInstances(ids, stage, true, true, true, true, InstanceFull.class);
         Map<String, InstanceFull> enrichedInstances = instanceController.enrichInstances(result, stage);
         return new KGCoreResult<Map<String, InstanceFull>>().setData(enrichedInstances);
     }
 
     @PostMapping("/instancesBulk/summary")
     public KGCoreResult<Map<String, InstanceSummary>> getInstancesSummary(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
-                                    @RequestParam(required = false, defaultValue = "false") boolean metadata,
                                     @RequestBody List<String> ids) {
-        Map<String, ResultWithOriginalMap<InstanceSummary>> result = instanceClient.getInstances(ids, stage, metadata, false, true, false, false, InstanceSummary.class);
+        Map<String, ResultWithOriginalMap<InstanceSummary>> result = instanceClient.getInstances(ids, stage, false, true, false, false, InstanceSummary.class);
         Map<String, InstanceSummary> enrichedInstances = instanceController.enrichInstancesSummary(result);
         return new KGCoreResult<Map<String, InstanceSummary>>().setData(enrichedInstances);
     }
 
     @PostMapping("/instancesBulk/label")
     public KGCoreResult<Map<String, InstanceLabel>> getInstancesLabel(@RequestParam(value = "stage", defaultValue = "IN_PROGRESS", required = false) String stage,
-                                  @RequestParam(required = false, defaultValue = "false") boolean metadata,
                                   @RequestBody List<String> ids) {
-        Map<String, ResultWithOriginalMap<InstanceLabel>> result = instanceClient.getInstances(ids, stage, metadata, false, false, false, false, InstanceLabel.class);
+        Map<String, ResultWithOriginalMap<InstanceLabel>> result = instanceClient.getInstances(ids, stage, false, false, false, false, InstanceLabel.class);
         Map<String, InstanceLabel> enrichedInstances = instanceController.enrichInstancesLabel(result);
         return new KGCoreResult<Map<String, InstanceLabel>>().setData(enrichedInstances);
     }

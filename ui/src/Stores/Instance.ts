@@ -30,17 +30,24 @@ import type RootStore from './RootStore';
 import type FieldStore from '../Fields/Stores/FieldStore';
 import type NestedFieldStore from '../Fields/Stores/NestedFieldStore';
 import type SingleNestedFieldStore from '../Fields/Stores/SingleNestedFieldStore';
-import type { NestedInstanceStores } from '../Fields/Stores/SingleNestedFieldStore';
+import type { NestedInstanceFieldStores, NestedInstanceStores } from '../Fields/Stores/SingleNestedFieldStore';
 import type API from '../Services/API';
 import type { APIError } from '../Services/API';
 import type {
   Alternative,
   Alternatives,
+  Fields,
+  IncomingLink,
+  InstanceFull,
+  InstanceIncomingLink,
   InstanceIncomingLinkFull,
   InstanceRawData,
   Permissions,
   SimpleType,
+  SourceType,
   StructureOfField,
+  StructureOfIncomingLink,
+  StructureOfIncomingLinkByFieldName,
   StructureOfType,
   UUID
 } from '../types';
@@ -81,7 +88,7 @@ const normalizeField = (field: StructureOfField, instanceId: UUID) => {
 };
 
 const normalizeFields = (
-  fields: Map<string, StructureOfField>,
+  fields: Fields,
   instanceId: UUID,
   alternatives?: Alternatives
 ) => {
@@ -93,7 +100,7 @@ const normalizeFields = (
   }
 };
 
-const getChildrenIds = (fields: InstanceFields): Set<UUID> => {
+const getChildrenIds = (fields: NestedInstanceFieldStores): Set<UUID> => {
   if (!(fields instanceof Object) || Array.isArray(fields)) {
     return new Set();
   }
@@ -112,7 +119,7 @@ const getChildrenIds = (fields: InstanceFields): Set<UUID> => {
         nestedField.nestedFieldsStores
       );
       idsOfNestedFields.forEach(id => acc.add(id));
-    } else if (field instanceof LinksStore && field.isLink) {
+    } else if (field instanceof LinksStore && field.isLink) { // TODO: Check this one here -> LinksStore/LinkStore
       const values = field.returnValue;
       if (Array.isArray(values)) {
         values
@@ -131,7 +138,7 @@ const getChildrenIds = (fields: InstanceFields): Set<UUID> => {
   }, new Set<UUID>());
 };
 
-const getChildrenIdsOfNestedFields = (fields: InstanceFields): Set<UUID> => {
+const getChildrenIdsOfNestedFields = (fields: NestedInstanceStores[]): Set<UUID> => {
   if (!Array.isArray(fields)) {
     return new Set();
   }
@@ -143,7 +150,7 @@ const getChildrenIdsOfNestedFields = (fields: InstanceFields): Set<UUID> => {
 };
 
 const getChildrenIdsOfSingleNestedFields = (
-  fields: InstanceFields
+  fields?: NestedInstanceStores
 ): Set<UUID> => {
   if (!(fields instanceof Object) || Array.isArray(fields)) {
     return new Set();
@@ -185,11 +192,11 @@ export const compareField = (a, b, ignoreName = false) => {
   return a.order - b.order;
 };
 
-export const normalizeLabelInstanceData = data => {
+export const normalizeLabelInstanceData = (data: StatelessInstance): StatelessInstance => {
   const instance = {
     id: undefined,
     name: undefined,
-    types: [],
+    types: Array.isArray(data.types)?data.types:[],
     primaryType: { name: '', color: '', label: '' } as SimpleType,
     space: '',
     error: null
@@ -220,106 +227,101 @@ export const normalizeLabelInstanceData = data => {
   return instance;
 };
 
-export const normalizeInstanceData = (data, typeFromStore: StructureOfType) => {
+interface NonNormalizedIncomingLinksByType {
+  color: string;
+  label: string;
+  nameForReverseLink: string;
+  data: IncomingLink[];
+  from: number;
+  size: number;
+  total: number;
+}
+
+interface NonNormalizedIncomingLinksForField {
+  [typeName: string]: NonNormalizedIncomingLinksByType;
+}
+
+interface NonNormalizedIncomingLinks {
+  [fieldName: string]: NonNormalizedIncomingLinksForField;
+}
+
+
+const normalizeIncomingLinksForField = (instanceId: UUID, fieldName: string, typeName: string, type: NonNormalizedIncomingLinksByType): InstanceIncomingLink => ({
+  instanceId: instanceId,
+  property: fieldName,
+  type: {
+    name: typeName,
+    label: type.label,
+    color: type.color
+  } as SimpleType,
+  instances: type.data,
+  from: type.from,
+  size: type.size,
+  total: type.total,
+  isFetching: false,
+  fetchError: undefined
+});
+
+const normalizeIncomingLinksFieldLabel = (field: NonNormalizedIncomingLinksForField): string => {
+  const type = Object.values(field).find(type => !!type.nameForReverseLink);
+  return type?type.nameForReverseLink:'';
+};
+
+const normalizeIncomingLinks = (instanceId?: UUID, nonNormalizedIncomingLinks?: unknown): InstanceIncomingLinkFull[] => {
+  if (!instanceId || !(nonNormalizedIncomingLinks instanceof Object)) {
+    return [];
+  }
+  return Object.entries(nonNormalizedIncomingLinks as NonNormalizedIncomingLinks).map(
+    ([fieldName, field]) => ({
+      property: fieldName,
+      label: normalizeIncomingLinksFieldLabel(field),
+      links:  Object.entries(field).map(([typeName, type]) => normalizeIncomingLinksForField(instanceId, fieldName, typeName, type))
+    }));
+};
+
+const normalizePossibleIncomingLinks = (incomingLinksFromType?: StructureOfIncomingLinkByFieldName): SourceType[]|undefined => {
+  if (!incomingLinksFromType) {
+    return undefined;
+  }
+
+  return (Object.values(incomingLinksFromType.incomingLinks)
+    .flatMap((link: StructureOfIncomingLink) => link.sourceTypes)
+    .reduce((acc, current) => {
+      if (
+        !acc.some(
+          (obj: SourceType) =>
+            obj.type.name === current.type.name &&
+            JSON.stringify(obj.spaces) === JSON.stringify(current.spaces)
+        )
+      ) {
+        acc.push(current);
+      }
+      return acc;
+    }, [] as SourceType[]));
+};
+
+export const normalizeInstanceData = (data: any, typeFromStore: StructureOfType): StatelessInstance => {
+  const labelInstance = normalizeLabelInstanceData(data);
   const instance = {
-    ...normalizeLabelInstanceData(data),
+    ...labelInstance,
     fields: {} as InstanceFields,
     labelField: undefined,
     promotedFields: [],
     alternatives: {},
-    metadata: [],
     permissions: {},
     incomingLinks: [],
-    possibleIncomingLinks: []
-  };
+    possibleIncomingLinks: [],
+    name: data.name??undefined,
+    labelField: data.labelField??undefined,
+    promotedFields: Array.isArray(data?.promotedFields)?data.promotedFields:undefined,
+    permissions: (data?.permissions) instanceof Object ? data.permissions: undefined,
+    incomingLinks: normalizeIncomingLinks(labelInstance.id, data?(data as InstanceFull).incomingLinks:undefined),
+    possibleIncomingLinks: normalizePossibleIncomingLinks(typeFromStore?.incomingLinks)
+  } as StatelessInstance;
 
-  if (!data) {
-    return instance;
-  }
-  if (data.id) {
-    instance.id = data.id;
-  }
-  if (data.types instanceof Array) {
-    instance.types = data.types;
-    if (instance.types.length) {
-      instance.primaryType = instance.types[0];
-    }
-  }
-  if (data.space) {
-    instance.space = data.space;
-  }
-  if (data.name) {
-    instance.name = data.name;
-  }
-  if (data.labelField) {
-    instance.labelField = data.labelField;
-  }
-  if (data.incomingLinks) {
-    const incomingLinks = Object.entries(data.incomingLinks).map(
-      ([property, field]) => {
-        let label = '';
-        const links = Object.entries(field).map(([typeName, type]) => {
-          label = type.nameForReverseLink;
-          return {
-            instanceId: instance.id,
-            property: property,
-            type: {
-              name: typeName,
-              label: type.label,
-              color: type.color
-            },
-            instances: type.data,
-            from: type.from,
-            size: type.size,
-            total: type.total,
-            isFetching: false,
-            fetchError: null
-          };
-        });
-        return {
-          property: property,
-          label: label,
-          links: links
-        };
-      }
-    );
-    instance.incomingLinks = incomingLinks;
-  }
-  if (typeFromStore?.incomingLinks) {
-    instance.possibleIncomingLinks = Object.values(typeFromStore.incomingLinks)
-      .flatMap(link => link.sourceTypes)
-      .reduce((acc, current) => {
-        if (
-          !acc.some(
-            obj =>
-              obj.type.name === current.type.name &&
-              JSON.stringify(obj.spaces) === JSON.stringify(current.spaces)
-          )
-        ) {
-          acc.push(current);
-        }
-        return acc;
-      }, []);
-  }
-  if (data.promotedFields instanceof Array) {
-    instance.promotedFields = data.promotedFields;
-  }
   if (data.fields instanceof Object) {
-    normalizeFields(data.fields, instance.id, data.alternatives);
+    normalizeFields((data as InstanceFull).fields, instance.id, data.alternatives);
     instance.fields = data.fields;
-  }
-  if (data.metadata instanceof Object) {
-    const metadata = data.metadata;
-    instance.metadata = Object.keys(metadata).map(key => {
-      if (key === 'lastUpdateAt' || key === 'createdAt') {
-        const d = new Date(metadata[key].value);
-        metadata[key].value = d.toLocaleString();
-      }
-      return metadata[key];
-    });
-  }
-  if (data.permissions instanceof Object) {
-    instance.permissions = data.permissions;
   }
   return instance;
 };
@@ -472,17 +474,17 @@ interface InstanceFields {
 }
 
 export interface StatelessInstance {
-  id: UUID;
+  id?: UUID;
   name?: string;
   types: StructureOfType[];
   primaryType: SimpleType;
   space: string;
-  fields: InstanceFields;
-  promotedFields: string[];
+  fields?: InstanceFields;
+  promotedFields?: string[];
   alternatives?: Alternatives;
-  metadata: {};
   permissions?: Permissions;
-  possibleIncomingLinks: type.incomingLinks;
+  incomingLinks?: InstanceIncomingLinkFull[];
+  possibleIncomingLinks?: SourceType[];
   labelField?: string;
 }
 
@@ -495,11 +497,10 @@ export class Instance implements StatelessInstance {
   _promotedFields = [];  // promotedFields is computed from _promotedFields
   primaryType: SimpleType = { name: '', color: '', label: '', description: '' };
   space = '';
-  metadata = [];
   permissions?: Permissions;
   fields: InstanceFields = {};
   incomingLinks: InstanceIncomingLinkFull[] = [];
-  possibleIncomingLinks = [];
+  possibleIncomingLinks?: SourceType[] = [];
   alternatives: Alternatives = {};
 
   isLabelFetching = false;
@@ -531,7 +532,6 @@ export class Instance implements StatelessInstance {
       _promotedFields: observable,
       primaryType: observable,
       space: observable,
-      metadata: observable,
       permissions: observable,
       fields: observable,
       incomingLinks: observable,
@@ -587,7 +587,6 @@ export class Instance implements StatelessInstance {
       }, {} as InstanceFields),
       labelField: this.labelField,
       promotedFields: [...this._promotedFields],
-      metadata: [],
       permissions: this.permissions?{ ...this.permissions }:undefined
     };
   }
@@ -826,7 +825,6 @@ export class Instance implements StatelessInstance {
     this.primaryType = normalizedData.primaryType;
     this._promotedFields = normalizedData.promotedFields;
     this.alternatives = normalizedData.alternatives;
-    this.metadata = normalizedData.metadata;
     this.permissions = normalizedData.permissions;
     this.incomingLinks = normalizedData.incomingLinks;
     this.possibleIncomingLinks = normalizedData.possibleIncomingLinks;

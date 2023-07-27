@@ -40,7 +40,7 @@ interface Messages {
 }
 
 export interface Value {
-  '@id': string;
+  [key:string]: unknown;
 }
 
 
@@ -61,7 +61,7 @@ class LinksStore extends FieldStore {
   lazyShowLinks = false;
   visibleLinks = new Set();
   initialValue = [];
-  isLink = true;
+  isLink = true; //TODO: could be removed after typscript complete refactoring
   targetTypes: SimpleType[] = [];
   targetType?: SimpleType;
   mappingValue = '@id';

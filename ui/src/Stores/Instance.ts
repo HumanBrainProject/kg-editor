@@ -28,6 +28,7 @@ import LinkStore from '../Fields/Stores/LinkStore';
 import LinksStore from '../Fields/Stores/LinksStore';
 import type RootStore from './RootStore';
 import type FieldStore from '../Fields/Stores/FieldStore';
+import type { Value } from '../Fields/Stores/LinksStore';
 import type NestedFieldStore from '../Fields/Stores/NestedFieldStore';
 import type SingleNestedFieldStore from '../Fields/Stores/SingleNestedFieldStore';
 import type { NestedInstanceFieldStores, NestedInstanceStores } from '../Fields/Stores/SingleNestedFieldStore';
@@ -77,27 +78,101 @@ const normalizeAlternative = (
         } as Alternative)
     );
 
-const normalizeField = (field: StructureOfField, instanceId: UUID) => {
+const normalizeField = (field: StructureOfField) => {
   if (
     field instanceof Object &&
     !Array.isArray(field) &&
     (field.widget === 'Nested' || field.widget === 'SingleNested')
   ) {
-    normalizeFields(field.fields, instanceId);
+    normalizeFields(field.fields);
   }
 };
 
 const normalizeFields = (
   fields: Fields,
-  instanceId: UUID,
   alternatives?: Alternatives
 ) => {
   if (fields instanceof Object && !Array.isArray(fields)) {
     Object.entries(fields).forEach(([name, field]) => {
-      normalizeField(field, instanceId);
+      normalizeField(field);
       field.alternatives = normalizeAlternative(name, alternatives);
     });
   }
+};
+
+const initializeStores = (instance: Instance, fields: Fields, api: API, rootStore: RootStore): InstanceFields => {
+  const stores = {} as InstanceFields;
+  Object.entries(fields).forEach(([name, field]) => {
+    let warning = null;
+    field.isPublic = name === instance.labelField;
+    if (field.widget === 'DynamicDropdown' && Array.isArray(field.value) && field.value.length > 30) {
+      field.widget = 'DynamicTable';
+    }
+    //TODO: temporary fix to support invalid array value
+    if (
+      (field.widget === 'SimpleDropdown' || field.widget === 'SingleNested') && Array.isArray(field.value)) {
+      if (field.value.length >= 1) {
+        field.value = field.value[0];
+      } else {
+        field.value = undefined;
+      }
+      window.console.warn(
+        `the field ${field.name} of instance ${instance.id}  is a ${field.widget} which require an object as value but received an array.`,
+        field.value
+      );
+    }
+    //TODO: temporary fix to support invalid object value
+    if (
+      (field.widget === 'DynamicDropdown' ||
+        field.widget === 'DynamicTable' ||
+        field.widget === 'Nested') &&
+      !Array.isArray(field.value) &&
+      field.value !== undefined &&
+      field.value !== null
+    ) {
+      window.console.warn(
+        `The field ${field.name} of instance ${instance.id} is a ${field.widget} which require an array as value but received an object.`,
+        field.value
+      );
+      field.value = [field.value];
+    }
+    // TO TEST regexRules RULES
+    // if ([
+    //   "https://openminds.ebrains.eu/vocab/IRI",
+    //   "https://openminds.ebrains.eu/vocab/keyword"
+    // ].includes(field.fullyQualifiedName)) {
+    //   field.validation = [
+    //     {
+    //       regex: "(https?|ftp|file):\\/\\/[\\-A-Za-z0-9+&@#\\/%?=~_|!:,.;]*[\\-A-Za-z0-9+&@#\\/%=~_|]",
+    //       errorMessage: "This is not a valid IRI"
+    //     }
+    //   ]
+    // }
+    if (!stores[name]) {
+      if (!field.widget) {
+        warning = `no widget defined for field "${name}" of type "${instance.primaryType.name}"!`;
+        field.widget = 'UnsupportedField';
+      } else if (!fieldsMapping[field.widget]) {
+        warning = `widget "${field.widget}" defined in field "${name}" of type "${instance.primaryType.name}" is not supported!`;
+        field.widget = 'UnsupportedField';
+      }
+      const fieldMapping = fieldsMapping[field.widget];
+      stores[name] = new fieldMapping.Store(
+        field,
+        fieldMapping.options,
+        this,
+        api,
+        rootStore
+      ) as FieldStore;
+    }
+    const store = stores[name];
+    store.updateValue(field.value);
+    store.setAlternatives(field.alternatives);
+    if (warning) {
+      store.setWarning(warning);
+    }
+  });
+  return stores;
 };
 
 const getChildrenIds = (fields: NestedInstanceFieldStores): Set<UUID> => {
@@ -119,19 +194,21 @@ const getChildrenIds = (fields: NestedInstanceFieldStores): Set<UUID> => {
         nestedField.nestedFieldsStores
       );
       idsOfNestedFields.forEach(id => acc.add(id));
-    } else if (field instanceof LinksStore && field.isLink) { // TODO: Check this one here -> LinksStore/LinkStore
-      const values = field.returnValue;
+    } else if (field instanceof LinksStore) {
+      const linksField = field as LinksStore;
+      const values = linksField.returnValue;
       if (Array.isArray(values)) {
         values
-          .map(obj => obj && obj[field.mappingValue])
-          .filter(id => !!id)
-          .forEach(id => acc.add(id));
-      } else if (values instanceof Object && !Array.isArray(values)) {
-        // field.widget === "SimpleDropdown"
-        const id = values[field.mappingValue];
-        if (id) {
-          acc.add(id);
-        }
+          .map(obj => obj && (obj as Value)[linksField.mappingValue])
+          .filter(id => !!id && typeof id === 'string')
+          .forEach(id => acc.add(id as UUID));
+      }
+    } else if (field instanceof LinkStore) {
+      const linkField = field as LinkStore;
+      const value = linkField.returnValue;
+      const id = !!value && typeof value !== 'string' ? value[linkField.mappingValue]:undefined;
+      if (id && typeof id === 'string') {
+        acc.add(id as UUID);
       }
     }
     return acc;
@@ -158,7 +235,7 @@ const getChildrenIdsOfSingleNestedFields = (
   return getChildrenIds(fields.stores);
 };
 
-export const compareField = (a, b, ignoreName = false) => {
+export const compareField = (a: FieldStore, b: FieldStore, ignoreName = false) => {
   if (!a && !b) {
     return 0;
   }
@@ -192,40 +269,16 @@ export const compareField = (a, b, ignoreName = false) => {
   return a.order - b.order;
 };
 
-export const normalizeLabelInstanceData = (data: StatelessInstance): StatelessInstance => {
-  const instance = {
-    id: undefined,
-    name: undefined,
-    types: Array.isArray(data.types)?data.types:[],
-    primaryType: { name: '', color: '', label: '' } as SimpleType,
-    space: '',
-    error: null
-  };
-
-  if (!data) {
-    return instance;
-  }
-
-  if (data.id) {
-    instance.id = data.id;
-  }
-  if (data.types instanceof Array) {
-    instance.types = data.types;
-    if (instance.types.length) {
-      instance.primaryType = instance.types[0];
-    }
-  }
-  if (data.space) {
-    instance.space = data.space;
-  }
-  if (data.name) {
-    instance.name = data.name;
-  }
-  if (typeof data.error === 'object') {
-    instance.error = data.error;
-  }
-  return instance;
-};
+export const normalizeLabelInstance = (data: NormalizedInstance): NormalizedInstance => ({
+  id: data.id,
+  name: data.name,
+  types: Array.isArray(data.types)?data.types:[],
+  primaryType: (Array.isArray(data.types) && data.types.length > 0)?data.types[0]:({ name: '', color: '', label: '' } as SimpleType),
+  space: data.space??'',
+  error: data.error instanceof Error?data.error:undefined,
+  promotedFields: [],
+  incomingLinks: []
+});
 
 interface NonNormalizedIncomingLinksByType {
   color: string;
@@ -300,27 +353,21 @@ const normalizePossibleIncomingLinks = (incomingLinksFromType?: StructureOfIncom
     }, [] as SourceType[]));
 };
 
-export const normalizeInstanceData = (data: any, typeFromStore: StructureOfType): StatelessInstance => {
-  const labelInstance = normalizeLabelInstanceData(data);
+const normalizeInstance = (data: any, typeFromStore: StructureOfType): NormalizedInstance => {
+  const labelInstance = normalizeLabelInstance(data);
   const instance = {
     ...labelInstance,
-    fields: {} as InstanceFields,
-    labelField: undefined,
-    promotedFields: [],
-    alternatives: {},
-    permissions: {},
-    incomingLinks: [],
-    possibleIncomingLinks: [],
+    fields: {} as Fields,
     name: data.name??undefined,
     labelField: data.labelField??undefined,
-    promotedFields: Array.isArray(data?.promotedFields)?data.promotedFields:undefined,
+    promotedFields: Array.isArray(data?.promotedFields)?data.promotedFields:[],
     permissions: (data?.permissions) instanceof Object ? data.permissions: undefined,
-    incomingLinks: normalizeIncomingLinks(labelInstance.id, data?(data as InstanceFull).incomingLinks:undefined),
+    incomingLinks: normalizeIncomingLinks(labelInstance.id, data?(data as InstanceFull).incomingLinks:[]),
     possibleIncomingLinks: normalizePossibleIncomingLinks(typeFromStore?.incomingLinks)
-  } as StatelessInstance;
+  } as NormalizedInstance;
 
   if (data.fields instanceof Object) {
-    normalizeFields((data as InstanceFull).fields, instance.id, data.alternatives);
+    normalizeFields((data as InstanceFull).fields, data.alternatives);
     instance.fields = data.fields;
   }
   return instance;
@@ -473,28 +520,28 @@ interface InstanceFields {
   [name: string]: FieldStore;
 }
 
-export interface StatelessInstance {
+export interface NormalizedInstance {
+  error?: Error;
   id?: UUID;
   name?: string;
   types: StructureOfType[];
   primaryType: SimpleType;
   space: string;
-  fields?: InstanceFields;
-  promotedFields?: string[];
-  alternatives?: Alternatives;
+  fields: Fields;
+  promotedFields: string[];
   permissions?: Permissions;
-  incomingLinks?: InstanceIncomingLinkFull[];
+  incomingLinks: InstanceIncomingLinkFull[];
   possibleIncomingLinks?: SourceType[];
   labelField?: string;
 }
 
-export class Instance implements StatelessInstance {
+export class Instance {
   id: UUID;
   _name?: string; // name is computed from _name
   types: StructureOfType[] = [];
   isNew = false;
   labelField?: string;
-  _promotedFields = [];  // promotedFields is computed from _promotedFields
+  _promotedFields: string[] = [];  // promotedFields is computed from _promotedFields
   primaryType: SimpleType = { name: '', color: '', label: '', description: '' };
   space = '';
   permissions?: Permissions;
@@ -574,7 +621,7 @@ export class Instance implements StatelessInstance {
     this.id = id;
   }
 
-  get cloneInitialData(): StatelessInstance {
+  get cloneInitialData(): NormalizedInstance {
     return {
       id: this.id,
       name: this.name,
@@ -587,7 +634,8 @@ export class Instance implements StatelessInstance {
       }, {} as InstanceFields),
       labelField: this.labelField,
       promotedFields: [...this._promotedFields],
-      permissions: this.permissions?{ ...this.permissions }:undefined
+      permissions: this.permissions?{ ...this.permissions }:undefined,
+      incomingLinks: []
     };
   }
 
@@ -664,8 +712,8 @@ export class Instance implements StatelessInstance {
     if (this.isFetched && !this.fetchError) {
       return this._promotedFields
         .map(name => [name, this.fields[name]])
-        .sort(([, a], [, b]) => compareField(a, b, true))
-        .map(([key]) => key);
+        .sort(([, a], [, b]) => compareField(a as FieldStore, b as FieldStore, true))
+        .map(([key]) => key as string);
     }
     return this._promotedFields;
   }
@@ -693,8 +741,8 @@ export class Instance implements StatelessInstance {
     return [];
   }
 
-  initializeLabelData(data) {
-    const normalizedData = normalizeLabelInstanceData(data);
+  initializeLabelData(data: any) {
+    const normalizedData = normalizeLabelInstance(data);
     this._name = normalizedData.name;
     this.space = normalizedData.space;
     this.types = normalizedData.types;
@@ -730,93 +778,13 @@ export class Instance implements StatelessInstance {
     return [];
   }
 
-  initializeData(api: API, rootStore: RootStore, data, isNew = false) {
-    const _initializeFields = (_fields: InstanceFields) => {
-      Object.entries(_fields).forEach(([name, field]) => {
-        let warning = null;
-        field.isPublic = name === this.labelField;
-        if (
-          field.widget === 'DynamicDropdown' &&
-          Array.isArray(field.value) &&
-          field.value.length > 30
-        ) {
-          field.widget = 'DynamicTable';
-        }
-        //TODO: temporary fix to support invalid array value
-        if (
-          (field.widget === 'SimpleDropdown' ||
-            field.widget === 'SingleNested') &&
-          Array.isArray(field.value)
-        ) {
-          if (field.value.length >= 1) {
-            field.value = field.value[0];
-          } else {
-            delete field.value;
-          }
-          window.console.warn(
-            `the field ${field.name} of instance ${this.id}  is a ${field.widget} which require an object as value but received an array.`,
-            field.value
-          );
-        }
-        //TODO: temporary fix to support invalid object value
-        if (
-          (field.widget === 'DynamicDropdown' ||
-            field.widget === 'DynamicTable' ||
-            field.widget === 'Nested') &&
-          !Array.isArray(field.value) &&
-          field.value !== undefined &&
-          field.value !== null
-        ) {
-          window.console.warn(
-            `The field ${field.name} of instance ${this.id} is a ${field.widget} which require an array as value but received an object.`,
-            field.value
-          );
-          field.value = [field.value];
-        }
-        // TO TEST regexRules RULES
-        // if ([
-        //   "https://openminds.ebrains.eu/vocab/IRI",
-        //   "https://openminds.ebrains.eu/vocab/keyword"
-        // ].includes(field.fullyQualifiedName)) {
-        //   field.validation = [
-        //     {
-        //       regex: "(https?|ftp|file):\\/\\/[\\-A-Za-z0-9+&@#\\/%?=~_|!:,.;]*[\\-A-Za-z0-9+&@#\\/%=~_|]",
-        //       errorMessage: "This is not a valid IRI"
-        //     }
-        //   ]
-        // }
-        if (!this.fields[name]) {
-          if (!field.widget) {
-            warning = `no widget defined for field "${name}" of type "${this.primaryType.name}"!`;
-            field.widget = 'UnsupportedField';
-          } else if (!fieldsMapping[field.widget]) {
-            warning = `widget "${field.widget}" defined in field "${name}" of type "${this.primaryType.name}" is not supported!`;
-            field.widget = 'UnsupportedField';
-          }
-          const fieldMapping = fieldsMapping[field.widget];
-          this.fields[name] = new fieldMapping.Store(
-            field,
-            fieldMapping.options,
-            this,
-            api,
-            rootStore
-          ) as FieldStore;
-        }
-        const store = this.fields[name];
-        store.updateValue(field.value);
-        store.setAlternatives(field.alternatives);
-        if (warning) {
-          store.setWarning(warning);
-        }
-      });
-    };
-
+  initializeData(api: API, rootStore: RootStore, data: any, isNew = false) {
     const typeFromStore =
       Array.isArray(data.types) && data.types.length
         ? rootStore.typeStore.typesMap.get(data.types[0].name)
         : undefined;
 
-    const normalizedData = normalizeInstanceData(data, typeFromStore);
+    const normalizedData = normalizeInstance(data, typeFromStore);
     this._name = normalizedData.name;
     this.space = normalizedData.space;
     this.types = normalizedData.types;
@@ -824,11 +792,10 @@ export class Instance implements StatelessInstance {
     this.labelField = normalizedData.labelField;
     this.primaryType = normalizedData.primaryType;
     this._promotedFields = normalizedData.promotedFields;
-    this.alternatives = normalizedData.alternatives;
     this.permissions = normalizedData.permissions;
     this.incomingLinks = normalizedData.incomingLinks;
     this.possibleIncomingLinks = normalizedData.possibleIncomingLinks;
-    _initializeFields(normalizedData.fields);
+    this.fields = initializeStores(this, normalizedData.fields, api, rootStore);
     this.fetchError = undefined;
     this.isNotFound = false;
     this.hasFetchError = false;

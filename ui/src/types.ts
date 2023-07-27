@@ -155,6 +155,7 @@ export interface StructureOfIncomingLinkByFieldName { //TODO: replace by a Map i
 }
 
 export interface StructureOfField {
+  isPublic?: boolean;
   alternatives: Alternative[];
   fullyQualifiedName: string;
   numOfOccurrences: number;
@@ -173,7 +174,7 @@ export interface StructureOfField {
   required: boolean;
   readOnly: boolean;
   fields: Fields;
-  value: object; // or array?
+  value: any;
   defaultTargetType: string;
   targetTypes: SimpleType[];
   validation: ValidationRule[];
@@ -273,7 +274,7 @@ export interface IncomingLink {
 export interface Error {
   code: number;
   message: string;
-  instanceId: UUID;
+  instanceId?: UUID;
 }
 
 export interface SuggestionStructure {

@@ -31,10 +31,8 @@ import type API from '../../Services/API';
 import type Instance from '../../Stores/Instance';
 import type RootStore from '../../Stores/RootStore';
 import type { FieldStoreDefinition, SimpleType, Space } from '../../types';
+import { Value } from './LinksStore';
 
-interface Value {
-  [key: string]: string;
-}
 
 interface Messages {
   required?: string;
@@ -63,7 +61,7 @@ class LinkStore extends FieldStore {
   optionsSize = 0;
   optionsTotal = Infinity;
   fetchingCounter = 0;
-  isLink = true;
+  isLink = true; //TODO: could be removed after typscript complete refactoring
   targetTypes: SimpleType[] = [];
   targetType?: SimpleType;
   mappingValue = '@id';

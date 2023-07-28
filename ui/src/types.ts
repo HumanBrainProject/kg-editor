@@ -126,16 +126,12 @@ export interface SimpleType {
   labelField?: string;
 }
 
-export interface SimpleTypeWithSpaces extends SimpleType {
-  space: Space[];
-}
-
 export interface Suggestion {
   id: string;
   name: string;
   additionalInformation: string;
-  type: SimpleTypeWithSpaces;
-  space: Space;
+  type: SimpleType;
+  space: string;
   isNew?: boolean;
   isExternal?: boolean;
 }

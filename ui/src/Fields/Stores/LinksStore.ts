@@ -385,11 +385,11 @@ class LinksStore extends FieldStore {
               if (!isExternal || space.permissions.canCreate) {
                 newValues.push({
                   id: `${spaceId}-${type.name}`,
-                  type: type,
-                  space: space,
+                  type: type as SimpleType,
+                  space: spaceId,
                   isExternal: isExternal,
                   isNew: true
-                });
+                } as Suggestion);
               }
             });
           });

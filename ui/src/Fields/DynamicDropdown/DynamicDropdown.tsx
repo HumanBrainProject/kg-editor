@@ -40,7 +40,7 @@ import Warning from '../Warning';
 
 import List from './List';
 import type { View } from '../../Stores/ViewStore';
-import type { Suggestion } from '../../types';
+import type { InstanceLabel, Suggestion } from '../../types';
 import type LinksStore from '../Stores/LinksStore';
 import type { Value } from '../Stores/LinksStore';
 import type { KeyboardEvent, MouseEvent, SyntheticEvent} from 'react';
@@ -162,7 +162,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     instanceStore.togglePreviewInstance();
   };
 
-  const handleSelectAlternative = (value: any) => {
+  const handleSelectAlternative = (value: InstanceLabel[]) => {
     const vals = value.map(v => ({[fieldStore.mappingValue]: v.id}));
     fieldStore.setValues(vals);
     instanceStore.togglePreviewInstance();
@@ -216,7 +216,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
       const name = optionsSearchTerm.trim();
       if (option.isExternal) {
         Matomo.trackEvent('Instance', 'CreateInstanceInExternalSpace', option.type.name);
-        appStore.createExternalInstance(option.space.id, option.type.name, name, location, navigate);
+        appStore.createExternalInstance(option.space, option.type.name, name, location, navigate);
       } else {
         Matomo.trackEvent('Instance', 'CreateInstanceInCurrentSpace', option.type.name);
         addNewValue(name, option.type.name);

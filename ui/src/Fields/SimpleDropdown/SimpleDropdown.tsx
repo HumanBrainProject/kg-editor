@@ -238,7 +238,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
       const name = optionsSearchTerm.trim();
       if (option.isExternal) {
         Matomo.trackEvent('Instance', 'CreateInstanceInExternalSpace', option.type.name);
-        appStore.createExternalInstance(option.space.id, option.type.name, name, location, navigate);
+        appStore.createExternalInstance(option.space, option.type.name, name, location, navigate);
       } else {
         Matomo.trackEvent('Instance', 'CreateInstanceInCurrentSpace', option.type.name);
         addNewValue(name, option.type.name);

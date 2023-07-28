@@ -28,12 +28,13 @@ import { v4 as uuidv4 } from 'uuid';
 import BrightTheme from '../Themes/Bright';
 import CupcakeTheme from '../Themes/Cupcake';
 import DefaultTheme from '../Themes/Default';
-import { type Space, type Permissions, type StructureOfType, ViewMode, SimpleType } from '../types';
+import { type Space, type Permissions,  ViewMode } from '../types';
 import type InstanceStore from './InstanceStore';
 import type RootStore from './RootStore';
 import type { View } from './ViewStore';
 import type API from '../Services/API';
 import type { APIError } from '../Services/API';
+import type { SimpleType } from '../types';
 import type { Location, NavigateFunction} from 'react-router-dom';
 
 const themes = {

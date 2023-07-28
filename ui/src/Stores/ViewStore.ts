@@ -26,7 +26,7 @@ import React from 'react';
 import { ViewMode } from '../types';
 import type RootStore from './RootStore';
 import type API from '../Services/API';
-import type { StructureOfType, UUID} from '../types';
+import type { SimpleType, UUID} from '../types';
 
 interface StoredSpaceView {
   id: UUID;
@@ -275,7 +275,7 @@ export class ViewStore{
     this.views.clear();
   }
 
-  registerViewByInstanceId(instanceId: string, name: string, type: StructureOfType|undefined, viewMode: ViewMode) {
+  registerViewByInstanceId(instanceId: string, name: string, type: SimpleType|undefined, viewMode: ViewMode) {
     const existingView = this.views.get(instanceId);
     if (existingView) {
       existingView.mode = viewMode;

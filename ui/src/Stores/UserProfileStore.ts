@@ -85,7 +85,20 @@ export class UserProfileStore {
     if (space) {
       return toJS(space);
     }
-    return {id: id, name: id, permissions: {} as Permissions};
+    return {
+      id: id,
+      name: id,
+      permissions: {
+        canCreate: false,
+        canInviteForReview: false,
+        canDelete: false,
+        canInviteForSuggestion: false,
+        canRead: false,
+        canSuggest: false,
+        canWrite: false,
+        canRelease: false
+      } as Permissions
+    } as Space;
   }
 
   get firstName() {

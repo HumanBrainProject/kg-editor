@@ -282,8 +282,12 @@ export interface SuggestionStructure {
   types: SuggestionsTypes;
 }
 
+export interface SuggestionSimpleTypeWithSpaces extends SimpleType {
+  space: string[];
+}
+
 export type SuggestionsTypes = { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
-  [typeName:string]: SimpleTypeWithSpaces;
+  [typeName:string]: SuggestionSimpleTypeWithSpaces;
 }
 
 export type InstanceRawData = { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly

@@ -30,7 +30,7 @@ import type { WidgetOptions } from '..';
 import type API from '../../Services/API';
 import type Instance from '../../Stores/Instance';
 import type RootStore from '../../Stores/RootStore';
-import type { FieldStoreDefinition, SimpleType } from '../../types';
+import type { FieldStoreDefinition, SimpleType, Suggestion } from '../../types';
 
 const defaultNumberOfVisibleLinks = 10;
 
@@ -46,8 +46,8 @@ export interface Value {
 
 class LinksStore extends FieldStore {
   value: Value[] = [];
-  options = [];
-  optionsResult = [];
+  options: Suggestion[] = [];
+  optionsResult: Suggestion[] = [];
   allowCustomValues = true;
   returnAsNull = false;
   optionsSearchActive = false;
@@ -60,7 +60,7 @@ class LinksStore extends FieldStore {
   fetchingCounter = 0;
   lazyShowLinks = false;
   visibleLinks = new Set();
-  initialValue = [];
+  initialValue: Value[] = [];
   isLink = true; //TODO: could be removed after typscript complete refactoring
   targetTypes: SimpleType[] = [];
   targetType?: SimpleType;
@@ -216,7 +216,7 @@ class LinksStore extends FieldStore {
     return [];
   }
 
-  updateValue(value) {
+  updateValue(value: Value | Value[] | null | undefined) {
     this.returnAsNull = false;
     const values = this.getValues(value);
     this.initialValue = [...values];
@@ -281,7 +281,7 @@ class LinksStore extends FieldStore {
     }
   }
 
-  setValues(values) {
+  setValues(values: Value[] | null | undefined) {
     if (values !== null && values !== undefined) {
       if (values.length  || !this.returnAsNull) {
         this.returnAsNull = false;
@@ -372,24 +372,27 @@ class LinksStore extends FieldStore {
     const payload = this.instance.payload;
     payload['@type'] = this.instance.types.map(t => t.name);
     try{
-      const { data: { suggestions: { data: values, total }, types }}  = await this.api.getSuggestions(this.instance.id, this.fullyQualifiedName, this.sourceType?this.sourceType:null, this.targetType?this.targetType.name:null, this.optionsFrom, this.optionsPageSize, this.optionsSearchTerm, payload);
+      const { data: { suggestions: { data: values, total }, types }}  = await this.api.getSuggestions(this.instance.id, this.fullyQualifiedName, this.sourceType??undefined, this.targetType?.name??undefined, this.optionsFrom, this.optionsPageSize, this.optionsSearchTerm, payload);
       const newOptions = Array.isArray(values)?values:[];
       runInAction(()=>{
         if (this.optionsSearchActive) {
-          const optionsResult = from === 0?newOptions:this.optionsResult.concat(newOptions);
-          let newValues = [];
+          const optionsResult = from === 0?newOptions:[...this.optionsResult, ...newOptions];
+          const newValues: Suggestion[] = [];
           this.allowCustomValues && Object.values(types).forEach(type => {
-            type.space.forEach(space => {
-              newValues.push({
-                id: `${space}-${type.name}`,
-                type: type,
-                space: this.rootStore.userProfileStore.getSpaceInfo(space),
-                isExternal: space !== this.rootStore.appStore.currentSpace?.id,
-                isNew: true
-              });
+            type.space.forEach(spaceId => {
+              const space = this.rootStore.userProfileStore.getSpaceInfo(spaceId);
+              const isExternal = spaceId !== this.rootStore.appStore.currentSpace?.id;
+              if (!isExternal || space.permissions.canCreate) {
+                newValues.push({
+                  id: `${spaceId}-${type.name}`,
+                  type: type,
+                  space: space,
+                  isExternal: isExternal,
+                  isNew: true
+                });
+              }
             });
           });
-          newValues = newValues.filter(value => !value.isExternal || value.space.permissions.canCreate);
           newValues.sort((a, b) => {
             if (!a.isExternal && b.isExternal) {
               return -1;

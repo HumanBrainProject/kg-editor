@@ -40,7 +40,7 @@ import Matomo from '../../Services/Matomo';
 import InstanceRow from '../Instance/InstanceRow';
 import Preview from '../Preview';
 import type { Instance } from '../../Stores/InstanceStore';
-import type { InstanceSummary } from '../../types';
+import { ViewMode, type InstanceSummary } from '../../types';
 
 const useStyles = createUseStyles({
   container: {
@@ -411,7 +411,7 @@ const Instances = observer(() => {
         instance.id,
         instance.name,
         instance.primaryType,
-        isTypesSupported ? 'view' : 'raw'
+        isTypesSupported ? ViewMode.VIEW : ViewMode.RAW
       );
     }
   };

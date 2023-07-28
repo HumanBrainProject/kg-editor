@@ -61,7 +61,25 @@ const endpoints = {
   instancesSummary: (stage?: Stage) => `${RELATIVE_ROOT_PATH}/instancesBulk/summary${getStage(stage)}`,
   instancesLabel: (stage?: Stage) => `${RELATIVE_ROOT_PATH}/instancesBulk/label${getStage(stage)}`,
   searchInstancesByType: (space: string, type: string, from: number, size: number, search: string) => `${RELATIVE_ROOT_PATH}/summary?space=${space}&type=${encodeURIComponent(type)}&from=${from}&size=${size}&searchByLabel=${encodeURIComponent(search)}`,
-  suggestions: (instanceId: UUID, field: string, sourceType: string, targetType: string, start:number, size:number, search: string) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}/suggestions?field=${encodeURIComponent(field)}${sourceType?'&sourceType=' + encodeURIComponent(sourceType):''}${targetType?'&targetType=' + encodeURIComponent(targetType):''}&start=${start}&size=${size}&search=${search}`,
+  suggestions: (instanceId: UUID, field: string, sourceType: string|undefined, targetType: string|undefined, start:number|undefined, size:number|undefined, search: string|undefined) => {
+    const params = [];
+    if(sourceType) {
+      params.push(`sourceType=${encodeURIComponent(sourceType)}`);
+    }
+    if(targetType) {
+      params.push(`targetType=${encodeURIComponent(targetType)}`);
+    }
+    if(start) {
+      params.push(`start=${start}`);
+    }
+    if(size) {
+      params.push(`size=${size}`);
+    }
+    if(search) {
+      params.push(`search=${encodeURIComponent(search)}`);
+    }
+    return `${RELATIVE_ROOT_PATH}/instances/${instanceId}/suggestions?field=${encodeURIComponent(field)}${params.length>0?('&' + params.join('&')):''}`;
+  },
   instance: (instanceId: UUID) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}`,
   rawInstance: (instanceId: UUID) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}/raw`,
   instanceScope: (instanceId: UUID) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}/scope`,
@@ -111,7 +129,7 @@ class APIBackendAdapter implements API {
     await this._axios.delete(endpoints.instance(instanceId));
   }
 
-  async createInstance(space: string, instanceId: UUID, payload: object): Promise<KGCoreResult<InstanceFull>> {
+  async createInstance(space: string, instanceId: UUID|undefined, payload: object): Promise<KGCoreResult<InstanceFull>> {
     const { data } = await this._axios.post(endpoints.createInstance(space, instanceId), payload);
     return data;
   }
@@ -130,7 +148,7 @@ class APIBackendAdapter implements API {
     return data;
   }
 
-  async getSuggestions(instanceId: UUID, field: string, sourceType: string, targetType: string, from: number, size: number, search: string, payload: object): Promise<KGCoreResult<SuggestionStructure>> { //NOSONAR
+  async getSuggestions(instanceId: UUID, field: string, sourceType: string|undefined, targetType: string|undefined, from: number|undefined, size: number|undefined, search: string|undefined, payload: object): Promise<KGCoreResult<SuggestionStructure>> { //NOSONAR
     const { data } = await this._axios.post(endpoints.suggestions(instanceId, field, sourceType, targetType, from, size, search), payload);
     return data;
   }

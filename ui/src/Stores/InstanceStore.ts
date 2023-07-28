@@ -557,7 +557,7 @@ export class InstanceStore {
       const instance = new Instance(instanceId, this);
       this.instances.set(instanceId, instance);
     }
-    return this.instances.get(instanceId);
+    return this.instances.get(instanceId) as Instance;
   }
 
   createNewInstance(type: StructureOfType, id: UUID, name = '') {

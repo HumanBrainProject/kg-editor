@@ -59,7 +59,7 @@ interface API {
 
   deleteInstance(instanceId: UUID): Promise<void>;
 
-  createInstance(space: string, instanceId: UUID, payload: object): Promise<KGCoreResult<InstanceFull>>;
+  createInstance(space: string, instanceId: UUID|undefined, payload: object): Promise<KGCoreResult<InstanceFull>>;
 
   moveInstance(instanceId: UUID, space: string): Promise<void>;
 
@@ -67,7 +67,7 @@ interface API {
 
   searchInstancesByType(space: string, type: string, from: number, size: number, search: string): Promise<KGCoreResult<InstanceSummary[]>>;
 
-  getSuggestions(instanceId: UUID, field: string, sourceType: string, targetType: string, from: number, size: number, search: string, payload: object): Promise<KGCoreResult<SuggestionStructure>>;
+  getSuggestions(instanceId: UUID, field: string, sourceType: string|undefined, targetType: string|undefined, from: number|undefined, size: number|undefined, search: string|undefined, payload: object): Promise<KGCoreResult<SuggestionStructure>>;
 
   getInstanceNeighbors(instanceId: UUID): Promise<KGCoreResult<Neighbor>>;
 

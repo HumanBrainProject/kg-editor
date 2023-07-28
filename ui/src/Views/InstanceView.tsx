@@ -51,7 +51,7 @@ const InstanceView = observer(({ mode }: InstanceViewProps) => {
     viewStore.selectViewByInstanceId(instanceId);
     const instance = instanceStore.instances.get(instanceId); //NOSONAR
     if (instance?.space ===  typeStore.space) {
-      const isTypesSupported = typeStore.isTypesSupported(instance?.typeNames);
+      const isTypesSupported = typeStore.isTypesSupported(instance?.typeNames??[]);
       if (!isTypesSupported && !['raw', 'graph', 'manage'].includes(mode)) {
         navigate(`/instances/${instanceId}/raw`, {replace: true});
       }
@@ -60,7 +60,7 @@ const InstanceView = observer(({ mode }: InstanceViewProps) => {
   }, [instanceId, mode, typeStore.space]);
 
   const instance = instanceStore.instances.get(instanceId);
-  const isTypesSupported = typeStore.isTypesSupported(instance?.typeNames);
+  const isTypesSupported = typeStore.isTypesSupported(instance?.typeNames??[]);
   if (!instance || (instance?.space !== typeStore.space) || (!isTypesSupported && !['raw', 'graph', 'manage'].includes(mode))) {
     return null;
   }

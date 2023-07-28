@@ -26,7 +26,7 @@ import type { WidgetOptions } from '..';
 import type API from '../../Services/API';
 import type Instance from '../../Stores/Instance';
 import type RootStore from '../../Stores/RootStore';
-import type { FieldStoreDefinition } from '../../types';
+import type { Alternative, FieldStoreDefinition } from '../../types';
 import type { IconProp } from '@fortawesome/fontawesome-svg-core';
 import type { ErrorInfo } from 'react';
 
@@ -36,8 +36,8 @@ class FieldStore {
   labelTooltip?: string;
   labelTooltipIcon?: IconProp;
   isPublic = false;
-  fullyQualifiedName?: string;
-  alternatives = [];
+  fullyQualifiedName: string;
+  alternatives: Alternative[] = [];
   warning?: string;
   errorMessage?: string;
   errorInfo?: ErrorInfo;
@@ -45,7 +45,7 @@ class FieldStore {
   widget?: string;
   isRequired = false;
   isReadOnly = false;
-  instance?: Instance;
+  instance: Instance;
   api: API;
   rootStore: RootStore;
 
@@ -94,6 +94,7 @@ class FieldStore {
   /**
    * @param {any} value field value
    */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any, autofix/no-unused-vars
   updateValue(value: any): void {
     throw new Error(`update method is not implemented for ${this.widget} store`);
   }
@@ -153,7 +154,7 @@ class FieldStore {
     return this.errorMessage || this.errorInfo;
   }
 
-  setAlternatives(alternatives) {
+  setAlternatives(alternatives: Alternative[]) {
     this.alternatives = alternatives;
   }
 }

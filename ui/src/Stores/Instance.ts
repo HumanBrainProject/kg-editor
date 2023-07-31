@@ -423,7 +423,7 @@ const getIds = (field: FieldStore) => {
   return [];
 };
 
-interface Group {
+export interface Group {
   label: string;
   ids: UUID[];
   pagination?: Pagination;

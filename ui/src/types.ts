@@ -161,7 +161,7 @@ export interface StructureOfField {
   numOfOccurrences: number;
   order: number;
   name: string;
-  label: string;
+  label?: string;
   widget: string;
   regex: string;
   maxLength: number;

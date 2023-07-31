@@ -27,6 +27,7 @@ import React, { useState, useEffect } from 'react';
 import useStores from '../Hooks/useStores';
 
 import Alternatives from './Alternatives';
+import type Instance from '../Stores/Instance';
 import type { Alternative } from '../types';
 import type { RefObject } from 'react';
 
@@ -34,7 +35,7 @@ interface AlternativeValueProps {
   alternative: Alternative;
 }
 
-const AlternativeValue = observer(({alternative}: AlternativeValueProps) => alternative.value.map(instance => instance.name).join('; '));
+const AlternativeValue = observer(({alternative}: AlternativeValueProps) => alternative.value.map((instance: Instance) => instance.name).join('; '));
 AlternativeValue.displayName = 'AlternativeValue';
 
 interface LinksAlternativesProps {

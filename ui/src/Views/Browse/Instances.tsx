@@ -37,10 +37,10 @@ import Filter from '../../Components/Filter';
 import Spinner from '../../Components/Spinner';
 import useStores from '../../Hooks/useStores';
 import Matomo from '../../Services/Matomo';
+import { ViewMode, type InstanceSummary } from '../../types';
 import InstanceRow from '../Instance/InstanceRow';
 import Preview from '../Preview';
 import type { Instance } from '../../Stores/InstanceStore';
-import { ViewMode, type InstanceSummary } from '../../types';
 
 const useStyles = createUseStyles({
   container: {

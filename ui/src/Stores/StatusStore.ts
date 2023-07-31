@@ -25,7 +25,7 @@ import debounce from 'lodash/debounce';
 import { observable, action, runInAction, makeObservable } from 'mobx';
 import type { APIError } from '../Services/API';
 import type API from '../Services/API';
-import type { StatusResponse, UUID } from '../types';
+import type { ReleaseStatus, StatusResponse, UUID } from '../types';
 
 
 export interface Status {
@@ -38,7 +38,7 @@ export interface Status {
   hasFetchErrorChildren: boolean;
   fetchErrorChildren?: string;
   data?: string;
-  childrenData?: string;
+  childrenData?: ReleaseStatus;
 }
 
 type Statuses = Map<string, Status>;

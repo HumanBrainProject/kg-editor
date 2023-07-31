@@ -34,10 +34,10 @@ const normalizeInstancesData = (api: API, rootStore: RootStore, data:InstanceSum
   Object.values(rowData.fields).forEach(d => {
     if(d.widget === 'TextArea') {
       d.value = d.value && d.value.substr(0, 197) + '...';
-      delete d.label;
+      d.label = undefined;
     }
   });
-  const instance = new Instance(rowData.id, api);
+  const instance = new Instance(rowData.id);
   instance.initializeData(api, rootStore, rowData);
   return instance;
 }):[];

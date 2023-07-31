@@ -26,12 +26,12 @@ import debounce from 'lodash/debounce';
 import { observable, action, runInAction, computed, toJS, makeObservable } from 'mobx';
 
 import FieldStore from './FieldStore';
+import type { Value } from './LinksStore';
 import type { WidgetOptions } from '..';
 import type API from '../../Services/API';
 import type Instance from '../../Stores/Instance';
 import type RootStore from '../../Stores/RootStore';
-import type { FieldStoreDefinition, SimpleType, Space } from '../../types';
-import { Value } from './LinksStore';
+import type { FieldStoreDefinition, SimpleType, Space, Suggestion } from '../../types';
 
 
 interface Messages {
@@ -49,8 +49,8 @@ export interface Option {
 class LinkStore extends FieldStore {
   value: Value | null | undefined;
   initialValue?: Value | null;
-  options: Option[] = [];
-  optionsResult = [];
+  options: Suggestion[] = [];
+  optionsResult: Suggestion[] = [];
   allowCustomValues = true;
   returnAsNull = false;
   optionsSearchActive = false;
@@ -235,14 +235,14 @@ class LinkStore extends FieldStore {
     const payload = this.instance ? this.instance.payload: undefined;
     if(this.instance && payload) {
       payload['@type'] = this.instance.types.map(t => t.name);
-    } 
+    }
     try{
-      const { data: { suggestions: { data: values, total }, types }} = await this.api.getSuggestions(this.instance.id, this.fullyQualifiedName, this.sourceType?this.sourceType:null, this.targetType?this.targetType.name:null, this.optionsFrom, this.optionsPageSize, this.optionsSearchTerm, payload);
+      const { data: { suggestions: { data: values, total }, types }} = await this.api.getSuggestions(this.instance.id, this.fullyQualifiedName, this.sourceType?this.sourceType:undefined, this.targetType?this.targetType.name:undefined, this.optionsFrom, this.optionsPageSize, this.optionsSearchTerm, payload);
       const newOptions = Array.isArray(values)?values:[];
       runInAction(()=>{
         if (this.optionsSearchActive) {
           const optionsResult = from === 0?newOptions:this.optionsResult.concat(newOptions);
-          let newValues = [];
+          let newValues: Suggestion[] = [];
           this.allowCustomValues && Object.values(types).forEach(type => {
             type.space.forEach(space => {
               newValues.push({

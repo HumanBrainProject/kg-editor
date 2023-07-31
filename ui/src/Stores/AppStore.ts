@@ -28,13 +28,15 @@ import { v4 as uuidv4 } from 'uuid';
 import BrightTheme from '../Themes/Bright';
 import CupcakeTheme from '../Themes/Cupcake';
 import DefaultTheme from '../Themes/Default';
-import { type Space, type Permissions, type StructureOfType, ViewMode, SimpleType } from '../types';
+import { type Space, type Permissions,  ViewMode } from '../types';
 import type InstanceStore from './InstanceStore';
 import type RootStore from './RootStore';
 import type { View } from './ViewStore';
 import type API from '../Services/API';
 import type { APIError } from '../Services/API';
+import type { SimpleType } from '../types';
 import type { Location, NavigateFunction} from 'react-router-dom';
+import { Instance } from './InstanceStore';
 
 const themes = {
   [DefaultTheme.name]: DefaultTheme,
@@ -429,7 +431,7 @@ export class AppStore{
 
   }
 
-  async saveInstance(instance, navigate: NavigateFunction) {
+  async saveInstance(instance: Instance, navigate: NavigateFunction) {
     const isNew = instance.isNew;
     const id = instance.id;
     await instance.save();
@@ -455,7 +457,7 @@ export class AppStore{
     this.rootStore.statusStore.flush();
   }
 
-  syncInstancesHistory(instance, mode: ViewMode) {
+  syncInstancesHistory(instance: Instance, mode: ViewMode) {
     if(instance && this.rootStore.viewStore.views.has(instance.id)){
       this.rootStore.historyStore.updateInstanceHistory(instance.id, mode);
     }

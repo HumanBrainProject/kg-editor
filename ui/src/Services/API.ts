@@ -32,7 +32,7 @@
  *   limitations under the License.
  *
  */
-import type { Settings, UserProfile, KGCoreResult, UUID, Stage, StructureOfType, InstanceLabel, InstanceFull, InstanceSummary, SuggestionStructure, Neighbor, Scope, UserSummary, IncomingLink, InstanceRawStructure, InstanceLabelData, InstanceSummaryData, InstanceFullData } from '../types';
+import type { Settings, UserProfile, KGCoreResult, UUID, Stage, StructureOfType, InstanceFull, InstanceSummary, SuggestionStructure, Neighbor, Scope, UserSummary, IncomingLink, InstanceRawStructure, InstanceLabelData, InstanceSummaryData, InstanceFullData } from '../types';
 
 interface APIErrorResponse {
   status: number;

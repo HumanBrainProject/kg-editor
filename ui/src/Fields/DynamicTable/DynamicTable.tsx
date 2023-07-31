@@ -251,7 +251,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     if (view && pane) {
       const { value: values } = fieldStore;
       const value = values[index];
-      const id = value && value[fieldStore.mappingValue];
+      const id = value ? value[fieldStore.mappingValue] as string: undefined;
       if (id && id !== instance?.id) {
         fieldStore.showLink(id);
         setTimeout(() => {
@@ -270,7 +270,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     if (view) {
       const { value: values } = fieldStore;
       const value = values[index];
-      const id = value && value[fieldStore.mappingValue];
+      const id = value ? value[fieldStore.mappingValue] as string:undefined;
       if (id && id !== instance?.id && fieldStore.isLinkVisible(id)) {
         const idx = view.panes.findIndex(p => p === pane);
         if (idx !== -1 && idx < view.panes.length -1) {

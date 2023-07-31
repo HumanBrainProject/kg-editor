@@ -28,7 +28,6 @@ import { createUseStyles } from 'react-jss';
 
 import ReleaseStatus from '../../Components/ReleaseStatus';
 import useStores from '../../Hooks/useStores';
-
 import { Status } from '../../Stores/StatusStore';
 
 const useStyles = createUseStyles({

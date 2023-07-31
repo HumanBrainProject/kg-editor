@@ -37,7 +37,7 @@ export interface Status {
   isFetchedChildren: boolean;
   hasFetchErrorChildren: boolean;
   fetchErrorChildren?: string;
-  data?: string;
+  data?: ReleaseStatus;
   childrenData?: ReleaseStatus;
 }
 

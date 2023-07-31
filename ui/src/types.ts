@@ -355,7 +355,7 @@ export interface ReleaseScope extends Scope {
 }
 
 export interface StatusResponse {
-  data: string;
+  data: ReleaseStatus;
 }
 
 export interface GraphNode extends NodeObject {

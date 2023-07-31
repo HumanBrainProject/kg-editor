@@ -70,7 +70,7 @@ export class TypeStore {
   }
 
   get typesMap() {
-    const map = new Map();
+    const map = new Map<string, StructureOfType>();
     if (this.types.length) {
       return this.types.reduce(
         (acc, current) => acc.set(current.name, current),

@@ -40,7 +40,7 @@ import TargetTypeSelection from '../TargetTypeSelection';
 import Warning from '../Warning';
 import Table from './Table';
 import type { View } from '../../Stores/ViewStore';
-import type { Suggestion } from '../../types';
+import type { StructureOfType, Suggestion } from '../../types';
 import type LinksStore from '../Stores/LinksStore';
 import type { MouseEvent, SyntheticEvent} from 'react';
 
@@ -171,7 +171,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     if (fieldStore.allowCustomValues) {
       const id = uuidv4();
       const type = typeStore.typesMap.get(typeName);
-      instanceStore.createNewInstance(type, id, name);
+      instanceStore.createNewInstance(type as StructureOfType, id, name);
       const value = {[fieldStore.mappingValue]: id};
       fieldStore.addValue(value);
       setTimeout(() => {

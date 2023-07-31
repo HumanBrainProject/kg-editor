@@ -40,7 +40,7 @@ import TargetTypeSelection from '../TargetTypeSelection';
 import Warning from '../Warning';
 
 import type { View } from '../../Stores/ViewStore';
-import type { Suggestion } from '../../types';
+import type { StructureOfType, Suggestion } from '../../types';
 import type LinkStore from '../Stores/LinkStore';
 import type { MouseEvent, SyntheticEvent} from 'react';
 
@@ -56,11 +56,11 @@ const useStyles = createUseStyles({
     height:'auto',
     paddingBottom:'3px',
     position:'relative',
-    minHeight: '34px',
-    '&[disabled]': {
-      backgroundColor: '#e9ecef',
-      pointerEvents:'none'
-    }
+    minHeight: '34px'
+  },
+  disabledValues:{
+    backgroundColor: '#e9ecef',
+    pointerEvents:'none'
   },
   label: {},
   readMode:{
@@ -167,7 +167,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     if (fieldStore.allowCustomValues) {
       const newId = uuidv4();
       const type = typeStore.typesMap.get(typeName);
-      instanceStore.createNewInstance(type, newId, name);
+      instanceStore.createNewInstance(type as StructureOfType, newId, name);
       const newValue = {[mappingValue]: newId};
       fieldStore.addValue(newValue);
       setTimeout(() => {
@@ -323,7 +323,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
         </div>
         {hasMultipleTypes && <TargetTypeSelection id={`targetType-${fullyQualifiedName}`} types={sortedTargetTypes} selectedType={targetType} onSelect={handleSelectTargetType} />}
       </div>
-      <div ref={formControlRef} className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''}`} disabled={isDisabled} onClick={handleDropDownFocus} >
+      <div ref={formControlRef} className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''} ${isDisabled?classes.disabledValues:''}`} onClick={handleDropDownFocus} >
         {value &&
         <ListItem
           isCircular={instance?.id===id}

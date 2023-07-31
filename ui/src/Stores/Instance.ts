@@ -276,6 +276,7 @@ export const normalizeLabelInstance = (data: NormalizedInstance): NormalizedInst
   primaryType: (Array.isArray(data.types) && data.types.length > 0)?data.types[0]:({ name: '', color: '', label: '' } as SimpleType),
   space: data.space??'',
   error: data.error instanceof Error?data.error:undefined,
+  fields: {} as Fields,
   promotedFields: [],
   incomingLinks: []
 });
@@ -353,7 +354,7 @@ const normalizePossibleIncomingLinks = (incomingLinksFromType?: StructureOfIncom
     }, [] as SourceType[]));
 };
 
-const normalizeInstance = (data: any, typeFromStore: StructureOfType): NormalizedInstance => {
+const normalizeInstance = (data: any, typeFromStore?: StructureOfType): NormalizedInstance => {
   const labelInstance = normalizeLabelInstance(data);
   const instance = {
     ...labelInstance,
@@ -631,7 +632,7 @@ export class Instance {
       fields: Object.entries(this.fields).reduce((acc, [name, field]) => {
         acc[name] = field.cloneWithInitialValue;
         return acc;
-      }, {} as InstanceFields),
+      }, {} as Fields),
       labelField: this.labelField,
       promotedFields: [...this._promotedFields],
       permissions: this.permissions?{ ...this.permissions }:undefined,
@@ -779,11 +780,7 @@ export class Instance {
   }
 
   initializeData(api: API, rootStore: RootStore, data: any, isNew = false) {
-    const typeFromStore =
-      Array.isArray(data.types) && data.types.length
-        ? rootStore.typeStore.typesMap.get(data.types[0].name)
-        : undefined;
-
+    const typeFromStore = (Array.isArray(data.types) && data.types.length)? rootStore.typeStore.typesMap.get(data.types[0].name): undefined;
     const normalizedData = normalizeInstance(data, typeFromStore);
     this._name = normalizedData.name;
     this.space = normalizedData.space;

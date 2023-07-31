@@ -40,9 +40,8 @@ import Warning from '../Warning';
 
 import List from './List';
 import type { View } from '../../Stores/ViewStore';
-import type { InstanceLabel, Suggestion } from '../../types';
+import type { InstanceLabel, StructureOfType, Suggestion } from '../../types';
 import type LinksStore from '../Stores/LinksStore';
-import type { Value } from '../Stores/LinksStore';
 import type { KeyboardEvent, MouseEvent, SyntheticEvent} from 'react';
 
 
@@ -59,11 +58,11 @@ const useStyles = createUseStyles({
     height:'auto',
     paddingBottom:'3px',
     position:'relative',
-    minHeight: '34px',
-    '&[disabled]': {
-      backgroundColor: '#e9ecef',
-      pointerEvents:'none'
-    }
+    minHeight: '34px'
+  },
+  disabledValues: {
+    backgroundColor: '#e9ecef',
+    pointerEvents:'none'
   },
   label: {},
   readMode:{
@@ -133,7 +132,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     if (fieldStore.allowCustomValues) {
       const id = uuidv4();
       const type = typeStore.typesMap.get(typeName);
-      instanceStore.createNewInstance(type, id, name);
+      instanceStore.createNewInstance(type as StructureOfType, id, name);
       const value = {[fieldStore.mappingValue]: id};
       fieldStore.addValue(value);
       setTimeout(() => {
@@ -242,8 +241,9 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     instanceStore.togglePreviewInstance();
   };
 
-  const handleKeyDown = (value: Value , e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Backspace') { //User pressed "Backspace" while focus on a value
+  const handleKeyDown = (index: number , e: KeyboardEvent<HTMLDivElement>) => {
+    const value = index !== undefined ? values[index]: undefined;
+    if (value && e.key === 'Backspace') { //User pressed "Backspace" while focus on a value
       e.preventDefault();
       fieldStore.removeValue(value);
       instanceStore.togglePreviewInstance();
@@ -337,7 +337,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
         </div>
         {hasMultipleTypes && <TargetTypeSelection id={`targetType-${fullyQualifiedName}`} types={sortedTargetTypes} selectedType={targetType} onSelect={handleSelectTargetType} />}
       </div>
-      <div ref={formControlRef} className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''}`} disabled={isDisabled} onClick={handleDropDownFocus} >
+      <div ref={formControlRef} className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''} ${isDisabled?classes.disabledValues:''}`} onClick={handleDropDownFocus} >
         <List
           mainInstanceId={instance?.id}
           list={links}

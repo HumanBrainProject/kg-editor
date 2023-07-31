@@ -24,24 +24,24 @@
 import { observable, action, computed, makeObservable, toJS } from 'mobx';
 import { fieldsMapping } from '..';
 import FieldStore from './FieldStore';
-import type { NestedInstanceStores } from './SingleNestedFieldStore';
+import type { NestedInstanceFieldStores, NestedInstanceStores } from './SingleNestedFieldStore';
 import type { WidgetOptions} from '..';
 import type API from '../../Services/API';
 import type Instance from '../../Stores/Instance';
 import type RootStore from '../../Stores/RootStore';
-import type { FieldStoreDefinition, SimpleType } from '../../types';
+import type { FieldStoreDefinition, SimpleType, StructureOfField } from '../../types';
 
 interface Messages {
   numberOfItems?: string;
 }
 
 interface Value {
-  [key: string]: string[];
+  [key: string]: any[];
 }
 
 class NestedFieldStore extends FieldStore {
   fieldsTemplate = {};
-  initialValue = [];
+  initialValue: Value[] = [];
   returnAsNull = false;
   nestedFieldsStores: NestedInstanceStores[] = [];
   targetTypes?: SimpleType[] = [];
@@ -97,7 +97,7 @@ class NestedFieldStore extends FieldStore {
     return this.nestedFieldsStores.map(row => Object.values(row.stores).reduce((acc, store) => {
       acc[store.fullyQualifiedName] = store.returnValue;
       return acc;
-    }, {'@type': row['@type']}));
+    }, {'@type': row['@type']} as Value));
   }
 
   get numberOfItemsWarning() {
@@ -130,7 +130,7 @@ class NestedFieldStore extends FieldStore {
   }
 
   get resolvedTargetTypes() {
-    return this.targetTypes?.map(simpleType => this.rootStore.typeStore.typesMap.get(simpleType.name)).filter(type => !!type);
+    return (this.targetTypes?this.targetTypes.map(simpleType => this.rootStore.typeStore.typesMap.get(simpleType.name)).filter(type => !!type):[]) as SimpleType[];
   }
 
   getType(types: string[]) {
@@ -138,7 +138,7 @@ class NestedFieldStore extends FieldStore {
     return typeName && this.rootStore.typeStore.typesMap.get(typeName);
   }
 
-  _addNestedStore = (stores: any, name: string, template, value: Value) => {
+  _addNestedStore = (stores: NestedInstanceFieldStores, name: string, template: StructureOfField, value: Value) => {
     const field = JSON.parse(JSON.stringify(toJS(template)));
     let warning = null;
     if(name === this.labelField) {
@@ -171,7 +171,7 @@ class NestedFieldStore extends FieldStore {
     }
   };
 
-  _setValue(values) {
+  _setValue(values: Value[]) {
     this.nestedFieldsStores = [];
     if(values) {
       values.forEach(value => {
@@ -186,7 +186,7 @@ class NestedFieldStore extends FieldStore {
     }
   }
 
-  updateValue(values) {
+  updateValue(values: Value[]) {
     this.returnAsNull = false;
     this._setValue(values);
     this.initialValue = this.returnValue;

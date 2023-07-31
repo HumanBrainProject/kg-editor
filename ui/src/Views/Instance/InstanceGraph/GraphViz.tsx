@@ -114,7 +114,7 @@ const GraphViz = observer(() => {
     }
   };
 
-  const handleNodeHover = (node: NodeObject | null, previewsNode: NodeObject| null) => graphStore.setHighlightNodeConnections(node as GraphNode, true);
+  const handleNodeHover = (node: NodeObject | null) => graphStore.setHighlightNodeConnections(node as GraphNode, true);
 
   const getNodeName = (node: GraphNode) => {
     if(node.isGroup) {
@@ -224,8 +224,12 @@ const GraphViz = observer(() => {
   const getLinkWidth = (link: LinkObject) => (graphStore.highlightedNode && (link as GraphLink).highlighted)?2:1;
 
   const handleCapture = (e: MouseEvent<HTMLButtonElement>) => {
-    e.target.href = wrapperRef?.current && wrapperRef.current.querySelector('canvas')?.toDataURL('image/png');
-    e.target.download = 'test.png';
+    const canvas = wrapperRef?.current && wrapperRef.current.querySelector('canvas');
+    if (canvas) {
+      const target = e.target as HTMLAnchorElement;
+      target.href = canvas.toDataURL('image/png');
+      target.download = 'test.png';
+    }
   };
 
   return (
@@ -246,7 +250,7 @@ const GraphViz = observer(() => {
         nodeRelSize={7}
         linkDirectionalArrowLength={3}
       />
-      <button className={`${classes.capture} btn btn-primary`} onClick={handleCapture} alt="capture"><FontAwesomeIcon icon="camera" /></button>
+      <button className={`${classes.capture} btn btn-primary`} onClick={handleCapture} title="capture"><FontAwesomeIcon icon="camera" /></button>
     </div>
   );
 });

@@ -47,11 +47,12 @@ const CompareChanges = observer(({ instanceId, onClose }: CompareChangesProps) =
 
   const [savedInstanceStore, setSavedInstanceStore] = useState<InstanceStore>();
 
-  const { instanceStore } = useStores();
+  const rootStore = useStores();
+  const { instanceStore } = rootStore;
 
   useEffect(() => {
     if(!savedInstanceStore){
-      const store = createInstanceStore(instanceStore.api);
+      const store = createInstanceStore(instanceStore.api, rootStore);
       setSavedInstanceStore(store);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

@@ -28,7 +28,6 @@ import { createUseStyles } from 'react-jss';
 
 import useStores from '../../Hooks/useStores';
 import type Instance from '../../Stores/Instance';
-import type { Value } from '../Stores/LinksStore';
 import type { DragEvent, FocusEvent, KeyboardEvent, MouseEvent} from 'react';
 
 const useStyles = createUseStyles({
@@ -106,7 +105,7 @@ interface ListItemProps {
   onDragEnd?: () => void;
   onDragStart?: (index?: number) => void;
   onDrop?: (droppedIndex?: number) => void;
-  onKeyDown?: (value: Value, e: KeyboardEvent<HTMLDivElement>) => void;
+  onKeyDown?: (value: number, e: KeyboardEvent<HTMLDivElement>) => void;
   onFocus?: (index?: number) => void;
   onBlur?: () => void;
   fetchLabel: boolean;
@@ -165,7 +164,9 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     if(enablePointerEvents) {
       e.stopPropagation();
-      onKeyDown && onKeyDown(index, e); //TODO: Fix me. This is not working.
+      if(index) {
+        onKeyDown && onKeyDown(index, e); //TODO: Fix me. This is not working.
+      }
     }
   };
 
@@ -202,8 +203,7 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
     }
 
     return (
-      <div className={`btn btn-xs btn-default ${classes.valueTag}  ${isDisabled? 'disabled' : ''} ${hasError ? classes.notFound : ''}`}
-        disabled={isDisabled}
+      <div className={`btn btn-xs btn-default ${classes.valueTag} ${isDisabled? 'disabled' : ''} ${hasError ? classes.notFound : ''}`}
         onClick={handleClick}
         onFocus={handleFocus}
         onBlur={handleBlur}
@@ -217,8 +217,7 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
     return (
       <div
         tabIndex={0}
-        className={`btn btn-xs btn-default ${classes.valueTag} ${classes.circular} ${hasError ? classes.notFound : ''}`}
-        disabled={isDisabled}
+        className={`btn btn-xs btn-default ${classes.valueTag} ${isDisabled? 'disabled' : ''} ${classes.circular} ${hasError ? classes.notFound : ''}`}
         draggable={!isDisabled}
         onDragEnd={handleDragEnd}
         onDragOver={handleDragOver}
@@ -237,7 +236,6 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
     <div
       tabIndex={0}
       className={`btn btn-xs btn-default ${classes.valueTag} ${isDisabled ? 'disabled' : ''} ${hasError ? classes.notFound : ''}`}
-      disabled={isDisabled}
       draggable={!isDisabled}
       onClick={handleClick}
       onDragEnd={handleDragEnd}

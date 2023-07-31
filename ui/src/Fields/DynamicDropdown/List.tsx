@@ -24,11 +24,10 @@
 import React from 'react';
 
 import ListItem from './ListItem';
-import type { Value } from '../Stores/LinksStore';
 import type { KeyboardEvent } from 'react';
 
 interface ListProps {
-  list: string[];
+  list: (string|null)[];
   readOnly: boolean;
   disabled: boolean;
   enablePointerEvents: boolean;
@@ -37,7 +36,7 @@ interface ListProps {
   onDragEnd?: () => void;
   onDragStart?: (index?: number) => void;
   onDrop?: (droppedIndex?: number) => void;
-  onKeyDown?: (value: Value, e: KeyboardEvent<HTMLDivElement>) => void;
+  onKeyDown?: (value: number, e: KeyboardEvent<HTMLDivElement>) => void;
   onFocus?: (index?: number) => void;
   onBlur?: () => void;
   fetchLabel: boolean;

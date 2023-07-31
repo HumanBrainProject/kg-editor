@@ -37,10 +37,10 @@ import Filter from '../../Components/Filter';
 import Spinner from '../../Components/Spinner';
 import useStores from '../../Hooks/useStores';
 import Matomo from '../../Services/Matomo';
-import { ViewMode, type InstanceSummary } from '../../types';
+import { ViewMode } from '../../types';
 import InstanceRow from '../Instance/InstanceRow';
 import Preview from '../Preview';
-import type { Instance } from '../../Stores/InstanceStore';
+import type { Instance } from '../../Stores/Instance';
 
 const useStyles = createUseStyles({
   container: {
@@ -190,7 +190,7 @@ const useStyles = createUseStyles({
 interface InstancesResultProps {
   onRetry: () => void;
   onClick: (i: Instance) => void;
-  onActionClick: (summaryInstance: InstanceSummary, mode: string) => void;
+  onActionClick: (i: Instance, mode: string) => void;
   onCtrlClick: (i: Instance) => void;
   loadMore: () => void;
   classes: any;
@@ -417,27 +417,25 @@ const Instances = observer(() => {
   };
 
   const handleInstanceActionClick = (
-    summaryInstance: InstanceSummary,
+    instance: Instance,
     mode: string
   ) => {
-    const id = summaryInstance && summaryInstance.id;
-    if (id) {
-      if (!instanceStore.instances.has(id)) {
-        const instance = instanceStore.createInstanceOrGet(id);
-        if (instance) {
-          instance.initializeLabelData(toJS(summaryInstance));
-        }
+    const id = instance.id;
+    if (!instanceStore.instances.has(id)) {
+      const instance = instanceStore.createInstanceOrGet(id);
+      if (instance) {
+        instance.initializeLabelData(toJS(instance));
       }
-      Matomo.trackEvent(
-        'Browse',
-        `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`,
-        id
-      );
-      if (mode === 'view') {
-        navigate(`/instances/${id}`);
-      } else {
-        navigate(`/instances/${id}/${mode}`);
-      }
+    }
+    Matomo.trackEvent(
+      'Browse',
+      `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`,
+      id
+    );
+    if (mode === 'view') {
+      navigate(`/instances/${id}`);
+    } else {
+      navigate(`/instances/${id}/${mode}`);
     }
   };
 

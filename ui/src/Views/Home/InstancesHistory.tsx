@@ -33,7 +33,7 @@ import useStores from '../../Hooks/useStores';
 import Matomo from '../../Services/Matomo';
 import InstanceRow from '../Instance/InstanceRow';
 
-import type { Instance } from '../../Stores/InstanceStore';
+import type { Instance } from '../../Stores/Instance';
 import type { ViewMode } from '../../types';
 import type { ChangeEvent} from 'react';
 
@@ -153,20 +153,18 @@ const InstancesHistoryBody = observer(({ onError }: InstancesHistoryBodyProps) =
   };
 
   const handleInstanceActionClick = (historyInstance: Instance, mode: ViewMode) => {
-    const id = historyInstance?.id;
-    if (id) {
-      if (!instanceStore.instances.has(id)) {
-        const instance = instanceStore.createInstanceOrGet(id);
-        if(instance) {
-          instance.initializeLabelData(toJS(historyInstance));
-        }
+    const id = historyInstance.id;
+    if (!instanceStore.instances.has(id)) {
+      const instance = instanceStore.createInstanceOrGet(id);
+      if(instance) {
+        instance.initializeLabelData(toJS(historyInstance));
       }
-      Matomo.trackEvent('Home', `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id);
-      if(mode === 'view') {
-        navigate(`/instances/${id}`);
-      } else {
-        navigate(`/instances/${id}/${mode}`);
-      }
+    }
+    Matomo.trackEvent('Home', `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id);
+    if(mode === 'view') {
+      navigate(`/instances/${id}`);
+    } else {
+      navigate(`/instances/${id}/${mode}`);
     }
   };
 
@@ -241,7 +239,7 @@ const InstancesHistoryHeader = observer(({ onChange }: InstancesHistoryHeaderPro
       <h3>
         <span>Your last </span>
         <div className="selector">
-          <select value={appStore.historySettings?.size} onChange={handleHistorySizeChange} >
+          <select title="number of instances" value={appStore.historySettings?.size} onChange={handleHistorySizeChange} >
             <option value={5}>5</option>
             <option value={10}>10</option>
             <option value={25}>25</option>
@@ -251,9 +249,9 @@ const InstancesHistoryHeader = observer(({ onChange }: InstancesHistoryHeaderPro
           instances in {appStore.currentSpaceName}
       </h3>
       <ul className="config">
-        <li><input type="checkbox" checked={appStore.historySettings?.eventTypes.viewed} onChange={handleHistoryViewedFlagChange} />Viewed</li>
-        <li><input type="checkbox" checked={appStore.historySettings?.eventTypes.edited} onChange={handleHistoryEditedFlagChange} />Edited</li>
-        <li><input type="checkbox" checked={appStore.historySettings?.eventTypes.released} onChange={handleHistoryReleasedFlagChange} />Released</li>
+        <li><input title="Viewed" type="checkbox" checked={appStore.historySettings?.eventTypes.viewed} onChange={handleHistoryViewedFlagChange} />Viewed</li>
+        <li><input title="Edited" type="checkbox" checked={appStore.historySettings?.eventTypes.edited} onChange={handleHistoryEditedFlagChange} />Edited</li>
+        <li><input title="Released" type="checkbox" checked={appStore.historySettings?.eventTypes.released} onChange={handleHistoryReleasedFlagChange} />Released</li>
       </ul>
     </div>
   );

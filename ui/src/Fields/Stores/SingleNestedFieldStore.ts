@@ -28,10 +28,10 @@ import type { WidgetOptions} from '..';
 import type API from '../../Services/API';
 import type Instance from '../../Stores/Instance';
 import type RootStore from '../../Stores/RootStore';
-import type { FieldStoreDefinition, SimpleType } from '../../types';
+import type { FieldStoreDefinition, SimpleType, StructureOfField } from '../../types';
 
 interface Value {
-  [key: string]: string[];
+  [key: string]: any;
 }
 
 export interface NestedInstanceFieldStores {
@@ -44,7 +44,7 @@ export interface NestedInstanceStores {
 
 class SingleNestedFieldStore extends FieldStore {
   fieldsTemplate = {};
-  initialValue = null;
+  initialValue: {[key:string]:any}|null = null;
   returnAsNull = false;
   nestedFieldsStores?: NestedInstanceStores;
   targetTypes?: SimpleType[] = [];
@@ -92,11 +92,11 @@ class SingleNestedFieldStore extends FieldStore {
     return Object.values(this.nestedFieldsStores.stores).reduce((acc, store) => {
       acc[store.fullyQualifiedName] = store.returnValue;
       return acc;
-    }, {'@type': this.nestedFieldsStores['@type']});
+    }, {'@type': this.nestedFieldsStores['@type']} as Value);
   }
 
   get resolvedTargetTypes() {
-    return this.targetTypes?.map(simpleType => this.rootStore.typeStore.typesMap.get(simpleType.name)).filter(type => !!type);
+    return (this.targetTypes?this.targetTypes.map(simpleType => this.rootStore.typeStore.typesMap.get(simpleType.name)).filter(type => !!type):[]) as SimpleType[];
   }
 
   getType(types: string[]) {
@@ -104,7 +104,7 @@ class SingleNestedFieldStore extends FieldStore {
     return typeName && this.rootStore.typeStore.typesMap.get(typeName);
   }
 
-  _addNestedStore = (stores: any, name: string, template, value: Value) => {
+  _addNestedStore = (stores: NestedInstanceFieldStores, name: string, template: StructureOfField, value: Value) => {
     const field = JSON.parse(JSON.stringify(toJS(template)));
     let warning = null;
     if(name === this.labelField) {
@@ -141,11 +141,12 @@ class SingleNestedFieldStore extends FieldStore {
     if(!value) {
       this.nestedFieldsStores = undefined;
     } else {
-      this.nestedFieldsStores = {stores: {}, '@type': value['@type']};
+      const nestedFieldsStores = {stores: {}, '@type': value['@type']} as NestedInstanceStores;
+      this.nestedFieldsStores = nestedFieldsStores;
       const type = this.getType(value['@type']);
       if (type) {
         const fieldsTemplate = type.fields;
-        Object.entries(fieldsTemplate).forEach(([name, template]) => this._addNestedStore(this.nestedFieldsStores.stores, name, template, value));
+        Object.entries(fieldsTemplate).forEach(([name, template]) => this._addNestedStore(nestedFieldsStores.stores, name, template, value));
       }
     }
   }
@@ -166,7 +167,7 @@ class SingleNestedFieldStore extends FieldStore {
 
   reset() {
     this.returnAsNull = false;
-    this.updateValue(toJS(this.initialValue));
+    this.updateValue(toJS(this.initialValue) as Value);
   }
 
   get hasChanged() {

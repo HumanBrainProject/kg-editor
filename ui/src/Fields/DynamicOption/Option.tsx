@@ -26,7 +26,6 @@ import React from 'react';
 import { createUseStyles } from 'react-jss';
 
 import useStores from '../../Hooks/useStores';
-import { Option } from '../Stores/LinkStore';
 import type { Suggestion } from '../../types';
 import type { MouseEvent } from 'react';
 

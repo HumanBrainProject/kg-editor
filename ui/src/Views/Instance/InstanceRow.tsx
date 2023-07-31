@@ -146,10 +146,10 @@ interface ActionProps {
   className: string;
   show?: boolean;
   icon: IconProp;
-  mode: string;
+  mode: ViewMode;
   label: string;
-  onClick: (mode: string) => void;
-  onCtrlClick: (mode: string) => void;
+  onClick: (mode: ViewMode) => void;
+  onCtrlClick: (mode: ViewMode) => void;
 }
 
 const Action = ({
@@ -187,9 +187,9 @@ const Action = ({
 interface InstanceRowProps {
   instance: Instance;
   selected: boolean;
-  onClick: () => void;
+  onClick: (instance: Instance) => void;
   onCtrlClick: (instance: Instance) => void;
-  onActionClick: (instance: Instance, mode: string) => void;
+  onActionClick: (instance: Instance, mode: ViewMode) => void;
 }
 
 const InstanceRow = observer(
@@ -208,7 +208,7 @@ const InstanceRow = observer(
 
     const { permissions } = instance;
 
-    const timeout = useRef<NodeJS.Timeout | undefined>(undefined)
+    const timeout = useRef<NodeJS.Timeout | undefined>(undefined);
 
     const handleClick = (e: MouseEvent<HTMLDivElement>) => {
       e.stopPropagation();
@@ -254,7 +254,7 @@ const InstanceRow = observer(
       typeof onCtrlClick === 'function' && onCtrlClick(instance);
     };
 
-    const handleActionClick = (mode: string) => {
+    const handleActionClick = (mode: ViewMode) => {
       typeof onActionClick === 'function' && onActionClick(instance, mode);
     };
 

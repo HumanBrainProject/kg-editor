@@ -29,6 +29,7 @@ import BrightTheme from '../Themes/Bright';
 import CupcakeTheme from '../Themes/Cupcake';
 import DefaultTheme from '../Themes/Default';
 import { type Space, type Permissions,  ViewMode } from '../types';
+import type { Instance } from './InstanceStore';
 import type InstanceStore from './InstanceStore';
 import type RootStore from './RootStore';
 import type { View } from './ViewStore';
@@ -36,7 +37,6 @@ import type API from '../Services/API';
 import type { APIError } from '../Services/API';
 import type { SimpleType } from '../types';
 import type { Location, NavigateFunction} from 'react-router-dom';
-import { Instance } from './InstanceStore';
 
 const themes = {
   [DefaultTheme.name]: DefaultTheme,

@@ -330,7 +330,7 @@ class LinksStore extends FieldStore {
   }
 
   get links() { // be aware that it may contains null values and null value are needed!
-    return this.value.map(value => value && value[this.mappingValue]);
+    return this.value.map(value => value && value[this.mappingValue]) as  (string|null)[];
   }
 
   showLink(id: string) {

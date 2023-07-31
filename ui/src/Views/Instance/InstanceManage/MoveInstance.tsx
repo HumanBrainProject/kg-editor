@@ -33,9 +33,9 @@ import SpinnerModal from '../../../Components/SpinnerModal';
 import useStores from '../../../Hooks/useStores';
 
 import Matomo from '../../../Services/Matomo';
-import { Status } from '../../../Stores/StatusStore';
 import { ReleaseStatus } from '../../../types';
 import type Instance from '../../../Stores/Instance';
+import type { Status as StatusProp } from '../../../Stores/StatusStore';
 import type { ChangeEvent } from 'react';
 
 const useStyles = createUseStyles({
@@ -102,7 +102,7 @@ const useStyles = createUseStyles({
 });
 
 interface StatusProps {
-  status?: Status;
+  status?: StatusProp;
   fetchStatus: () => void;
   onClick: () => void;
   classes: any;
@@ -231,6 +231,7 @@ const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
             <h4 className={classes.title}>Move this instance to space</h4>
             <div className={classes.selector}>
               <select
+                title="space"
                 value={spaceId}
                 onChange={handleSetSpaceId}
                 disabled={!status || status.data !== ReleaseStatus.UNRELEASED}

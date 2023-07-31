@@ -241,20 +241,23 @@ class LinkStore extends FieldStore {
       const newOptions = Array.isArray(values)?values:[];
       runInAction(()=>{
         if (this.optionsSearchActive) {
-          const optionsResult = from === 0?newOptions:this.optionsResult.concat(newOptions);
-          let newValues: Suggestion[] = [];
+          const optionsResult = from === 0?newOptions:[...this.optionsResult, ...newOptions];
+          const newValues: Suggestion[] = [];
           this.allowCustomValues && Object.values(types).forEach(type => {
-            type.space.forEach(space => {
-              newValues.push({
-                id: `${space}-${type.name}`,
-                type: type,
-                space: this.rootStore.userProfileStore.getSpaceInfo(space),
-                isExternal: space !== this.rootStore.appStore.currentSpace?.id,
-                isNew: true
-              });
+            type.space.forEach(spaceId => {
+              const space = this.rootStore.userProfileStore.getSpaceInfo(spaceId);
+              const isExternal = spaceId !== this.rootStore.appStore.currentSpace?.id;
+              if (!isExternal || space.permissions.canCreate) {
+                newValues.push({
+                  id: `${spaceId}-${type.name}`,
+                  type: type as SimpleType,
+                  space: spaceId,
+                  isExternal: isExternal,
+                  isNew: true
+                } as Suggestion);
+              }
             });
           });
-          newValues = newValues.filter(value => !value.isExternal || value.space.permissions.canCreate);
           newValues.sort((a, b) => {
             if (!a.isExternal && b.isExternal) {
               return -1;

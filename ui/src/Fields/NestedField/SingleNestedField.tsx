@@ -28,6 +28,7 @@ import { createUseStyles } from 'react-jss';
 
 import { compareField } from '../../Stores/Instance';
 import { ViewContext, PaneContext } from '../../Stores/ViewStore';
+
 import Field from '../Field';
 import Label from '../Label';
 import Add from './Add';

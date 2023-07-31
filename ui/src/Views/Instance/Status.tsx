@@ -28,7 +28,7 @@ import { createUseStyles } from 'react-jss';
 
 import ReleaseStatus from '../../Components/ReleaseStatus';
 import useStores from '../../Hooks/useStores';
-import { Status } from '../../Stores/StatusStore';
+import type { Status as StatusProp } from '../../Stores/StatusStore';
 
 const useStyles = createUseStyles({
   container: {
@@ -68,7 +68,7 @@ const useStyles = createUseStyles({
 });
 
 interface InstanceStatusProps {
-  instanceStatus?: Status;
+  instanceStatus?: StatusProp;
   classes: any;
   darkmode: boolean;
 }
@@ -94,7 +94,7 @@ const InstanceStatus = observer(({ instanceStatus, classes, darkmode }: Instance
 });
 
 interface  InstanceChildrenStatusProps {
-  instanceStatus?: Status;
+  instanceStatus?: StatusProp;
   classes: any;
   darkmode: boolean;
 }
@@ -140,7 +140,7 @@ const Status = observer(({ id, darkmode }: StatusProps) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const instanceStatus: Status|undefined = id ? statusStore.getInstance(id): undefined;
+  const instanceStatus: StatusProp|undefined = id ? statusStore.getInstance(id): undefined;
 
   if (!instanceStatus) {
     return null;

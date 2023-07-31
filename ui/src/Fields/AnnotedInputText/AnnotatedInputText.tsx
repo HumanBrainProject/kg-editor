@@ -46,11 +46,11 @@ const useStyles = createUseStyles({
     '& .btn':{
       marginRight:'3px',
       marginBottom:'3px'
-    },
-    '&:disabled':{
-      pointerEvents:'none',
-      display: 'none !important'
     }
+  },
+  valuesDisabled:{
+    pointerEvents:'none',
+    display: 'none !important'
   },
   label: {},
   readMode:{
@@ -145,6 +145,15 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
     draggedIndex.current = null;
   };
 
+  const handleDropAtTheEnd = () => {
+    if (Array.isArray(values) && draggedIndex.current && draggedIndex.current >= 0 && draggedIndex.current < values.length) {
+      const value = values[draggedIndex.current];
+      const afterValue = values[values.length-1];
+      fieldStore.moveValueAfter(value, afterValue);
+    }
+    draggedIndex.current = null;
+  };
+
   const handleBlur = (e: FocusEvent<HTMLInputElement, Element>) => {
     const value = e.target.value.trim();
     if (value) {
@@ -153,9 +162,10 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
     e.target.value = '';
   };
 
-  const handleKeyDown = (value: Value, e: KeyboardEvent<HTMLDivElement>) => {
+  const handleKeyDown = (index: number, e: KeyboardEvent<HTMLDivElement>) => {
     if (e.key === 'Backspace') { //User pressed "Backspace" while focus on a value
       e.preventDefault();
+      const value = values[index];
       fieldStore.removeValue(value);
     }
   };
@@ -224,7 +234,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
         parentContainerRef={formGroupRef}
         ValueRenderer={getAlternativeValue(fieldStore.mappingValue)}
       />
-      <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''}`} disabled={isDisabled} >
+      <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''} ${isDisabled?classes.valuesDisabled:''}`} >
         <List
           list={resources}
           readOnly={false}
@@ -233,12 +243,13 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
           onDragEnd={handleDragEnd}
           onDragStart={handleDragStart}
           onDrop={handleDrop}
-          onKeyDown={handleKeyDown} //TODO: Fix me! Is this even working ?
+          onKeyDown={handleKeyDown}
         />
         <input type="text"
+          title="value"
           className={classes.userInput}
           disabled={isDisabled}
-          onDrop={handleDrop} //TODO: Again, is this really needed? What is it doing ?
+          onDrop={handleDropAtTheEnd} //TODO: Again, is this really needed? What is it doing ?
           onDragOver={e => e.preventDefault()}
           onKeyDown={handleKeyStrokes}
           onBlur={handleBlur}

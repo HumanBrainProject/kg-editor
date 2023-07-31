@@ -156,7 +156,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     isReadOnly
   } = fieldStore;
 
-  const id = value && value[mappingValue];
+  const id = value ? value[mappingValue] as string: undefined;
 
   const handleDropdownReset = () => {
     fieldStore.resetOptionsSearch();
@@ -208,7 +208,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
 
   const handleClick = () => {
     if (view && pane) {
-      const selectedId = value && value[mappingValue];
+      const selectedId = value ? value[mappingValue] as string: undefined;
       if (selectedId) {
         view.resetInstanceHighlight();
         const paneForInstanceId = view.getPaneByInstanceId(id);
@@ -251,7 +251,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
 
   const handleFocus = () => {
     if (view) {
-      const focusedId = value && value[mappingValue];
+      const focusedId = value ? value[mappingValue] as string:undefined;
       if (focusedId) {
         const index = view.panes.findIndex(p => p === pane);
         if (index !== -1 && index < view.panes.length -1) {

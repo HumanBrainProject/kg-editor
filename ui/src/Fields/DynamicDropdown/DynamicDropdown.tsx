@@ -183,7 +183,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
       view.resetInstanceHighlight();
       if(index !== undefined) {
         const value = values[index];
-        const id = value && value[fieldStore.mappingValue];
+        const id = value ? value[fieldStore.mappingValue] as string : undefined;
         if (id) {
           const paneForInstanceId = view.getPaneByInstanceId(id);
           const _pane = paneForInstanceId?paneForInstanceId:view.currentInstanceIdPane;
@@ -253,7 +253,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
   const handleFocus = (index?: number) => {
     if (view) {
       const value = index !== undefined && values[index];
-      const id = value && value[fieldStore.mappingValue];
+      const id = value ? value[fieldStore.mappingValue] as string: undefined;
       if (id) {
         const idx = view.panes.findIndex(p => p === pane);
         if (idx !== -1 && idx < view.panes.length -1) {

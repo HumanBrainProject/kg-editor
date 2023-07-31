@@ -30,9 +30,9 @@ import Tab from '../Components/Tab';
 import useStores from '../Hooks/useStores';
 
 import Matomo from '../Services/Matomo';
+import { ViewMode } from '../types';
 import type Instance from '../Stores/Instance';
 import type { View } from '../Stores/ViewStore';
-import type { ViewMode } from '../types';
 
 const useStyles = createUseStyles({
   container: {
@@ -78,9 +78,9 @@ const getDescription = (instance: Instance | undefined, view: View) => {
 };
 
 const getInstanceTabPath = (instanceId: string, mode: ViewMode, space: string, type?: string) => {
-  if(mode === 'view') {
+  if(mode === ViewMode.VIEW) {
     return `/instances/${instanceId}`;
-  } else if (mode === 'create') {
+  } else if (mode === ViewMode.CREATE) {
     if(type){
       return `/instances/${instanceId}/create?space=${space}&type=${encodeURIComponent(type)}`;
     }
@@ -113,7 +113,7 @@ const InstanceTab = observer(({view, pathname}: InstanceTabProps) => {
   }, [instance, view]);
 
   const isCurrent = (instanceId: string, mode: string) => {
-    if(mode !== 'view') {
+    if(mode !== ViewMode.VIEW) {
       return matchPath({ path: `/instances/${instanceId}/${mode}` }, pathname);
     }
     return matchPath({ path: `/instances/${instanceId}` }, pathname);

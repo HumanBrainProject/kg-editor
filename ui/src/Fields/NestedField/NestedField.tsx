@@ -34,6 +34,7 @@ import Label from '../Label';
 import Warning from '../Warning';
 import Add from './Add';
 import type NestedFieldStore from '../Stores/NestedFieldStore';
+import type { NestedInstanceFieldStores } from '../Stores/SingleNestedFieldStore';
 import type { IconProp } from '@fortawesome/fontawesome-svg-core';
 import type { MouseEvent} from 'react';
 
@@ -146,7 +147,7 @@ const Action = ({ icon, title, single, onClick }: ActionProps) => {
 };
 
 interface ItemProps {
-  itemFieldStores: any;
+  itemFieldStores: NestedInstanceFieldStores;
   readMode: boolean;
   active: boolean;
   index: number;

@@ -157,7 +157,7 @@ export interface StructureOfField {
   numOfOccurrences: number;
   order: number;
   name: string;
-  label: string;
+  label?: string;
   widget: string;
   regex: string;
   maxLength: number;
@@ -351,7 +351,7 @@ export interface ReleaseScope extends Scope {
 }
 
 export interface StatusResponse {
-  data: string;
+  data: ReleaseStatus;
 }
 
 export interface GraphNode extends NodeObject {

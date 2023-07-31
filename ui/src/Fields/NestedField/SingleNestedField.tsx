@@ -32,6 +32,7 @@ import Field from '../Field';
 import Label from '../Label';
 import Add from './Add';
 import type { ActionProps } from './NestedField';
+import type { NestedInstanceFieldStores } from '../Stores/SingleNestedFieldStore';
 import type SingleNestedFieldStore from '../Stores/SingleNestedFieldStore';
 import type { MouseEvent} from 'react';
 
@@ -120,7 +121,7 @@ const Action = ({ icon, title, onClick }: ActionProps) => {
 };
 
 interface ItemProps {
-  itemFieldStores: any;
+  itemFieldStores: NestedInstanceFieldStores;
   readMode: boolean;
   active: boolean;
   index?: number;

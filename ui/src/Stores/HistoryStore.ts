@@ -43,7 +43,7 @@ interface InstancesHistory {
 
 export class HistoryStore {
   instancesHistory: InstancesHistory[] = [];
-  instances = [];
+  instances: Instance[] = [];
   isFetching = false;
   fetchError?: string;
 

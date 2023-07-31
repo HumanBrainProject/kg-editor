@@ -28,6 +28,7 @@ import { createUseStyles } from 'react-jss';
 import useStores from '../../Hooks/useStores';
 import InstanceForm from './InstanceForm';
 import Pane from './Pane';
+import type { Group } from '../../Stores/Instance';
 
 import type Instance from '../../Stores/Instance';
 
@@ -55,7 +56,7 @@ const getGroups = (instance: Instance, instancePath: string[]) => {
       });
     }
     return acc;
-  }, []);
+  }, [] as Group[]);
 };
 
 interface LinksProps {

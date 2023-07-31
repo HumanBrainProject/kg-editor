@@ -214,7 +214,7 @@ const UserProfileTab = observer(
       setShowPopOver(!showPopOver);
     };
 
-    const handlePopOverClose = e => { //TODO: Do we need this e ? Is it necessary to stop the propagation here ?
+    const handlePopOverClose = (e: Event) => {
       e && e.stopPropagation();
       setShowPopOver(false);
     };

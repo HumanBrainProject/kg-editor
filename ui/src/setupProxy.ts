@@ -32,9 +32,9 @@ module.exports = function(app: any) {
       target:'https://editor.kg-dev.ebrains.eu',
       secure:false,
       changeOrigin: false,
-      // pathRewrite: function(path) {
-      //   return path.replace("/editor/api/", "/");
-      //  }
+      // pathRewrite: function(path: string) {
+      //   return path.replace('/editor/api/', '/');
+      // }
     })
   );
 };

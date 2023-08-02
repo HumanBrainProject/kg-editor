@@ -28,6 +28,7 @@ import Markdown from '../../Components/Markdown';
 import InputText from '../InputText/InputText';
 import Label from '../Label';
 import type InputTextStore from '../Stores/InputTextStore';
+import type { Field } from '../index';
 
 const useStyles = createUseStyles({
   label: {},
@@ -43,12 +44,8 @@ const useStyles = createUseStyles({
   }
 });
 
-interface TextAreaProps {
-  [key: string]: any;
-  readMode: boolean;
+interface TextAreaProps extends Field {
   fieldStore: InputTextStore;
-  className: string;
-  showIfNoValue: boolean;
 }
 
 const TextArea = (props: TextAreaProps) => {

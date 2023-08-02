@@ -35,6 +35,7 @@ import Warning from '../Warning';
 import Add from './Add';
 import type NestedFieldStore from '../Stores/NestedFieldStore';
 import type { NestedInstanceFieldStores } from '../Stores/SingleNestedFieldStore';
+import type { Field as FieldProps } from '../index';
 import type { IconProp } from '@fortawesome/fontawesome-svg-core';
 import type { MouseEvent} from 'react';
 
@@ -190,11 +191,8 @@ const Item = ({ itemFieldStores, readMode, active, index, total, onDelete, onMov
   );
 };
 
-interface NestedFieldProps {
-  className: string;
+interface NestedFieldProps extends FieldProps {
   fieldStore: NestedFieldStore;
-  readMode: boolean;
-  showIfNoValue: boolean;
 }
 
 const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}: NestedFieldProps) => {

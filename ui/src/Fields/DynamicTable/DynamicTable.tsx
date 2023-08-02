@@ -39,9 +39,9 @@ import Label from '../Label';
 import TargetTypeSelection from '../TargetTypeSelection';
 import Warning from '../Warning';
 import Table from './Table';
-import type { View } from '../../Stores/ViewStore';
 import type { StructureOfType, Suggestion } from '../../types';
 import type LinksStore from '../Stores/LinksStore';
+import type { Field } from '../index';
 import type { MouseEvent, SyntheticEvent} from 'react';
 
 const useStyles = createUseStyles({
@@ -122,13 +122,8 @@ const useStyles = createUseStyles({
   }
 });
 
-interface DynamicTableProps {
-  className: string;
+interface DynamicTableProps extends Field {
   fieldStore: LinksStore;
-  view: View;
-  pane: string;
-  readMode: boolean;
-  showIfNoValue: boolean;
 }
 
 const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, showIfNoValue}: DynamicTableProps) => {
@@ -174,20 +169,22 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
       instanceStore.createNewInstance(type as StructureOfType, id, name);
       const value = {[fieldStore.mappingValue]: id};
       fieldStore.addValue(value);
-      setTimeout(() => {
-        if (fieldStore.isLinkVisible(id)) {
-          const index = view.panes.findIndex(p => p === pane);
-          if (index !== -1 && index < view.panes.length -1) {
-            const targetPane = view.panes[index+1];
-            const paneForInstanceId = view.getPaneByInstanceId(id);
-            const _pane = paneForInstanceId?paneForInstanceId:targetPane;
-            view.setInstanceHighlight(_pane, id, fieldStore.label);
-            view.setCurrentInstanceId(_pane, id);
-            view.selectPane(_pane);
-            view.resetInstanceHighlight();
+      if (view && pane) {
+        setTimeout(() => {
+          if (fieldStore.isLinkVisible(id)) {
+            const index = view.panes.findIndex(p => p === pane);
+            if (index !== -1 && index < view.panes.length -1) {
+              const targetPane = view.panes[index+1];
+              const paneForInstanceId = view.getPaneByInstanceId(id);
+              const _pane = paneForInstanceId?paneForInstanceId:targetPane;
+              view.setInstanceHighlight(_pane, id, fieldStore.label);
+              view.setCurrentInstanceId(_pane, id);
+              view.selectPane(_pane);
+              view.resetInstanceHighlight();
+            }
           }
-        }
-      }, 1000);
+        }, 1000);
+      }
     }
     instanceStore.togglePreviewInstance();
   };
@@ -196,15 +193,17 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
     instanceStore.createInstanceOrGet(id);
     const value = {[fieldStore.mappingValue]: id};
     fieldStore.addValue(value);
-    setTimeout(() => {
-      if (fieldStore.isLinkVisible(id)) {
-        const index = view.panes.findIndex(p => p === pane);
-        if (index !== -1 && index < view.panes.length -1) {
-          const targetPane = view.panes[index+1];
-          view.setInstanceHighlight(targetPane, id, fieldStore.label);
+    if (view && pane) {
+      setTimeout(() => {
+        if (fieldStore.isLinkVisible(id)) {
+          const index = view.panes.findIndex(p => p === pane);
+          if (index !== -1 && index < view.panes.length -1) {
+            const targetPane = view.panes[index+1];
+            view.setInstanceHighlight(targetPane, id, fieldStore.label);
+          }
         }
-      }
-    }, 1000);
+      }, 1000);
+    }
     instanceStore.togglePreviewInstance();
   };
 

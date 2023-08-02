@@ -29,7 +29,12 @@ import { createUseStyles } from 'react-jss';
 
 import BGMessage from '../../Components/BGMessage';
 import Spinner from '../../Components/Spinner';
+import LinkStore from '../../Fields/Stores/LinkStore';
+import LinksStore from '../../Fields/Stores/LinksStore';
 import CompareValue from './CompareValue';
+import type FieldStore from '../../Fields/Stores/FieldStore';
+import type NestedFieldStore from '../../Fields/Stores/NestedFieldStore';
+import type { NestedInstanceStores } from '../../Fields/Stores/SingleNestedFieldStore';
 import type Instance from '../../Stores/Instance';
 import type InstanceStore from '../../Stores/InstanceStore';
 
@@ -44,7 +49,7 @@ const useStyles = createUseStyles({
 
 const separator = '; ';
 
-const getLabel = (instanceStore: InstanceStore, field, value) => {
+const getLabel = (instanceStore: InstanceStore, field: LinkStore|LinksStore, value: {[key:string]: any}) => {
   const id = value[field.mappingValue];
   if (!id) {
     return 'Unknown instance';
@@ -58,7 +63,7 @@ const getLabel = (instanceStore: InstanceStore, field, value) => {
   return id;
 };
 
-const getNestedFieldValue = (instanceStore: InstanceStore, fields, level: number) => {
+const getNestedFieldValue = (instanceStore: InstanceStore, fields: NestedInstanceStores[], level: number) => {
   const tabs = Array.from({ length: level }, () => '\t').join('');
   let result = `${tabs}[`;
   fields.forEach(row => {
@@ -70,15 +75,17 @@ const getNestedFieldValue = (instanceStore: InstanceStore, fields, level: number
   return result;
 };
 
-const getFieldValue = (instanceStore: InstanceStore, field, level: number) => {
+const getFieldValue = (instanceStore: InstanceStore, field: FieldStore, level: number) => {
+  //TODO: what about SingleNested?
   if (field.widget === 'Nested') {
-    return getNestedFieldValue(instanceStore, field.nestedFieldsStores, level);
+    const nestedField = field as NestedFieldStore;
+    return getNestedFieldValue(instanceStore, nestedField.nestedFieldsStores, level);
   }
   const value = field.returnValue;
   if (value === 'https://core.kg.ebrains.eu/vocab/resetValue') {
     return '';
   }
-  if (field.isLink) {
+  if (field instanceof LinksStore) {
     if (!value) {
       return 'null';
     }
@@ -87,6 +94,12 @@ const getFieldValue = (instanceStore: InstanceStore, field, level: number) => {
       return vals.map(val => getLabel(instanceStore, field, val)).join(separator);
     }
     return '';
+  }
+  if (field instanceof LinkStore) {
+    if (!value) {
+      return 'null';
+    }
+    return getLabel(instanceStore, field, value);
   }
   if (!value) {
     return '';
@@ -113,14 +126,18 @@ const getValue = (instanceStore: InstanceStore, instance:Instance, name: string)
 
 const getStatus = (store: InstanceStore, ids: string[]) => ids.reduce((acc, id) => {
   const instance = store.instances.get(id);
-  acc.isFetched = acc.isFetched && instance && (instance.isFetched || instance.isLabelFetched || instance.isNotFound || instance.isLabelNotFound);
-  acc.isFetching = acc.isFetching || (instance && (instance.isFetching || instance.isLabelFetching));
-  acc.hasFetchError = acc.hasFetchError || (instance && instance.fetchLabelError && !instance.isLabelNotFound);
+  acc.isFetched = acc.isFetched && !!instance && (instance.isFetched || instance.isLabelFetched || instance.isNotFound || instance.isLabelNotFound);
+  acc.isFetching = acc.isFetching || (!!instance && (instance.isFetching || instance.isLabelFetching));
+  acc.hasFetchError = acc.hasFetchError || (!!instance && !!instance.fetchLabelError && !instance.isLabelNotFound);
   return acc;
 }, {
   isFetched: true,
   isFetching: false,
   hasFetchError: false
+} as {
+  isFetched: boolean;
+  isFetching: boolean;
+  hasFetchError: boolean;
 });
 
 interface CompareFieldsChangesProps {

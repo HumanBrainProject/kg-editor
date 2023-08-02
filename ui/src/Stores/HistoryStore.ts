@@ -126,7 +126,7 @@ export class HistoryStore {
           result.history.push(instance.id);
         }
         return result;
-      }, {map: {}, history: []}).history
+      }, {map: {}, history: []} as {map: {[instanceId: UUID]: boolean}, history: UUID[]}).history
       .slice(0, isNaN(max) || max < 0?0:max);
   }
 

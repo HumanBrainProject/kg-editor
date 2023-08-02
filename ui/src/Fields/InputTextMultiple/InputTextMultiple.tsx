@@ -34,6 +34,7 @@ import Warning from '../Warning';
 import List from './List';
 import type { Alternative } from '../../types';
 import type InputTextMultipleStore from '../Stores/InputTextMultipleStore';
+import type { Field } from '../index';
 import type { ClipboardEvent, FocusEvent, KeyboardEvent} from 'react';
 
 const useStyles = createUseStyles({
@@ -45,11 +46,11 @@ const useStyles = createUseStyles({
     '& .btn':{
       marginRight:'3px',
       marginBottom:'3px'
-    },
-    '&[disabled]': {
-      pointerEvents:'none',
-      display: 'none !important'
     }
+  },
+  disabledValues:{
+    pointerEvents:'none',
+    display: 'none !important'
   },
   label: {},
   readMode:{
@@ -87,11 +88,8 @@ const getAlternativeValue = () => {
   return AlternativeValue;
 };
 
-interface InputTextMultipleProps {
-  className: string;
-  fieldStore: InputTextMultipleStore
-  readMode: boolean;
-  showIfNoValue: boolean;
+interface InputTextMultipleProps extends Field {
+  fieldStore: InputTextMultipleStore;
 }
 
 const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoValue}: InputTextMultipleProps) => {
@@ -139,6 +137,15 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     draggedIndex.current = null;
   };
 
+  const handleDropAtTheEnd = () => {
+    if (Array.isArray(list) && draggedIndex.current && draggedIndex.current >= 0 && draggedIndex.current < list.length) {
+      const value = list[draggedIndex.current];
+      const afterValue = list[list.length-1];
+      fieldStore.moveValueAfter(value, afterValue);
+    }
+    draggedIndex.current = null;
+  };
+
   const handleBlur = (e: FocusEvent<HTMLInputElement, Element>) => {
     const value = e.target.value.trim();
     if (value) {
@@ -147,9 +154,10 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     e.target.value = '';
   };
 
-  const handleKeyDown = (value: number, e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Backspace') { //User pressed "Backspace" while focus on a value
+  const handleKeyDown = (index: number, e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Backspace' && index >= 0 && index < list.length) { //User pressed "Backspace" while focus on a value
       e.preventDefault();
+      const value = list[index];
       fieldStore.removeValue(value);
     }
   };
@@ -211,7 +219,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
         parentContainerRef={formGroupRef}
         ValueRenderer={getAlternativeValue()}
       />
-      <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''}`} disabled={isDisabled} >
+      <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''} ${isDisabled?classes.disabledValues:''}`} >
         <List
           list={list}
           readOnly={false}
@@ -223,8 +231,9 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
           onKeyDown={handleKeyDown}
         />
         <input type="text" className={classes.userInput}
+          title="value"
           disabled={isDisabled}
-          onDrop={handleDrop} //TODO: Again! This is currently not working! Fix or drop ?
+          onDrop={handleDropAtTheEnd} //TODO: Again! This is currently not working! Fix or drop ?
           onDragOver={e => e.preventDefault()}
           onKeyDown={handleKeyStrokes}
           onBlur={handleBlur}

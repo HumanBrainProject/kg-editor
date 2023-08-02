@@ -26,7 +26,7 @@ import React from 'react';
 import { createUseStyles } from 'react-jss';
 import Label from '../../../Fields/Label';
 import PossibleIncomingLink from './PossibleIncomingLink';
-import type {  SourceType, StructureOfType } from '../../../types';
+import type {  SourceType } from '../../../types';
 
 const useStyles = createUseStyles({
   container: {
@@ -44,8 +44,8 @@ const useStyles = createUseStyles({
 });
 
 interface PossibleIncomingLinksProps {
-  links: SourceType[];
-  type: StructureOfType;
+  links?: SourceType[];
+  type: string;
 }
 
 const PossibleIncomingLinks = observer(({ links, type }: PossibleIncomingLinksProps) => {

@@ -27,6 +27,7 @@ import Form from 'react-bootstrap/Form';
 import { createUseStyles } from 'react-jss';
 import Label from '../Label';
 import type CheckBoxStore from '../Stores/CheckBoxStore';
+import type { Field } from '../index';
 
 const useStyles = createUseStyles({
   container: {
@@ -42,11 +43,8 @@ const useStyles = createUseStyles({
   }
 });
 
-interface CheckBoxProps {
-  className: string;
+interface CheckBoxProps extends Field {
   fieldStore: CheckBoxStore;
-  readMode: boolean;
-  showIfNoValue: boolean;
 }
 
 const CheckBox = observer(({ className, fieldStore, readMode, showIfNoValue }: CheckBoxProps) => {

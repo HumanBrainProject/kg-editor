@@ -32,6 +32,7 @@ import Label from '../Label';
 import 'react-datepicker/dist/react-datepicker.css';
 import type { Alternative } from '../../types';
 import type InputDateStore from '../Stores/InputDateStore';
+import type { Field } from '../index';
 
 const useStyles = createUseStyles({
   containerDatepicker: {
@@ -93,11 +94,8 @@ interface AlternativeValueProps {
 const AlternativeValue = observer(({alternative}: AlternativeValueProps) => getDateTimeValue(alternative.value)) ;
 AlternativeValue.displayName = 'AlternativeValue';
 
-interface InputDateTimeProps {
+interface InputDateTimeProps extends Field {
   fieldStore: InputDateStore;
-  className: string;
-  readMode: boolean;
-  showIfNoValue: boolean;
 }
 
 const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue }:InputDateTimeProps) => {

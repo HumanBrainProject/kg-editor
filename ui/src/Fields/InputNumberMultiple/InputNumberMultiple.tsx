@@ -21,6 +21,7 @@
  *
  */
 
+
 import { observer } from 'mobx-react-lite';
 import React, { useRef } from 'react';
 import Form from 'react-bootstrap/Form';
@@ -34,6 +35,7 @@ import Label from '../Label';
 import Warning from '../Warning';
 import type { Alternative } from '../../types';
 import type InputNumberMultipleStore from '../Stores/InputNumberMultipleStore';
+import type { Field } from '../index';
 import type { ClipboardEvent, FocusEvent, KeyboardEvent} from 'react';
 
 const useStyles = createUseStyles({
@@ -45,11 +47,11 @@ const useStyles = createUseStyles({
     '& .btn':{
       marginRight:'3px',
       marginBottom:'3px'
-    },
-    '&[disabled]': {
-      pointerEvents:'none',
-      display: 'none !important'
     }
+  },
+  disabledValues: {
+    pointerEvents:'none',
+    display: 'none !important'
   },
   label: {},
   readMode:{
@@ -87,11 +89,8 @@ const getAlternativeValue = () => {
   return AlternativeValue;
 };
 
-interface InputNumberMultipleProps {
+interface InputNumberMultipleProps extends Field {
   fieldStore: InputNumberMultipleStore;
-  className: string;
-  readMode: boolean;
-  showIfNoValue: boolean;
 }
 
 const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNoValue}: InputNumberMultipleProps) => {
@@ -146,6 +145,15 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
     draggedIndex.current = null;
   };
 
+  const handleDropAtTheEnd = () => {
+    if (Array.isArray(list) && draggedIndex.current && draggedIndex.current >= 0 && draggedIndex.current < list.length) {
+      const value = list[draggedIndex.current];
+      const afterValue = list[list.length-1];
+      fieldStore.moveValueAfter(value, afterValue);
+    }
+    draggedIndex.current = null;
+  };
+
   const handleBlur = (e: FocusEvent<HTMLInputElement, Element>) => {
     const value = e.target.value.trim();
     if (value) {
@@ -154,9 +162,10 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
     e.target.value = '';
   };
 
-  const handleKeyDown = (value: string, e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Backspace') { //User pressed "Backspace" while focus on a value
+  const handleKeyDown = (index: number, e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Backspace' && index >= 0 && index < list.length) { //User pressed "Backspace" while focus on a value
       e.preventDefault();
+      const value = list[index];
       fieldStore.removeValue(value);
     }
   };
@@ -218,7 +227,7 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
         parentContainerRef={formGroupRef}
         ValueRenderer={getAlternativeValue()}
       />
-      <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''}`} disabled={isDisabled} >
+      <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''} ${isDisabled?classes.disabledValues:''}`} >
         <List
           list={list}
           readOnly={false}
@@ -230,8 +239,9 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
           onKeyDown={handleKeyDown} // TODO: Again! Check if this is still needed! It is currently not working!
         />
         <input type="number" className={classes.userInput}
+          title="value"
           disabled={isDisabled}
-          onDrop={handleDrop} // TODO: Again! Check if this is still needed! It is currently not working!
+          onDrop={handleDropAtTheEnd} // TODO: Again! Check if this is still needed! It is currently not working!
           onDragOver={e => e.preventDefault()}
           onKeyDown={handleKeyStrokes}
           onBlur={handleBlur}

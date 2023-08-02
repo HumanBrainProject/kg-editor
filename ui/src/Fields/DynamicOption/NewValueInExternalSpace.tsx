@@ -52,22 +52,11 @@ const NewValueInExternalSpace = ({item:{space, type}}: NewValueInExternalSpacePr
 
   const style = type.color ? { color: type.color } : {};
 
-  if (space.permissions.canCreate) {
-    return (
-      <em className={classes.create}>
-          Add a new <span style={style}><FontAwesomeIcon fixedWidth icon="circle" /></span>
-        {type.label} in space <strong>{space.name}</strong>
-      </em>
-    );
-  }
-
   return (
-    <div className={classes.info}>
-      <em>You are not allowed to create a new <span style={style}>
-        <FontAwesomeIcon fixedWidth icon="circle" />
-      </span>
-      {type.label} in space <strong>{space.name}</strong>. Please contact the support.</em>
-    </div>
+    <em className={classes.create}>
+        Add a new <span style={style}><FontAwesomeIcon fixedWidth icon="circle" /></span>
+      {type.label} in space <strong>{space}</strong>
+    </em>
   );
 };
 

@@ -27,12 +27,7 @@ import React from 'react';
 
 import FieldError from './FieldError';
 import { fieldsMapping } from '.';
-import type FieldStore from './Stores/FieldStore';
-
-interface FieldProps {
-  [key: string]: any;
-  fieldStore: FieldStore;
-}
+import type { Field as FieldProps } from '../Fields/index';
 
 const Field = (props:FieldProps) => {
   if(!props || !props.fieldStore) {

@@ -33,6 +33,7 @@ import Invalid from '../Invalid';
 import Label from '../Label';
 import Warning from '../Warning';
 import type InputTextStore from '../Stores/InputTextStore';
+import type { Field } from '../index';
 import type { ChangeEvent} from 'react';
 
 const useStyles = createUseStyles({
@@ -71,11 +72,8 @@ const useStyles = createUseStyles({
   }
 });
 
-interface InputColorProps {
+interface InputColorProps extends Field {
   fieldStore: InputTextStore;
-  className: string;
-  readMode: boolean;
-  showIfNoValue: boolean;
 }
 
 const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue }: InputColorProps) => {

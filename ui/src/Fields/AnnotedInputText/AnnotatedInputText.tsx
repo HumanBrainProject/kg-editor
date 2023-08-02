@@ -35,6 +35,7 @@ import Warning from '../Warning';
 import type { Alternative } from '../../types';
 import type { Value } from '../Stores/AnnotatedInputTextStore';
 import type AnnotatedInputTextStore from '../Stores/AnnotatedInputTextStore';
+import type { Field } from '../index';
 import type { ClipboardEvent, FocusEvent, KeyboardEvent} from 'react';
 
 const useStyles = createUseStyles({
@@ -88,11 +89,8 @@ const getAlternativeValue = (mappingValue: string) => {
   return AlternativeValue;
 };
 
-interface AnnotatedInputTextProps {
-  className: string;
+interface AnnotatedInputTextProps extends Field {
   fieldStore: AnnotatedInputTextStore;
-  readMode: boolean;
-  showIfNoValue: boolean;
 }
 
 

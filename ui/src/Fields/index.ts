@@ -55,23 +55,35 @@ import UnsupportedFieldStore from './Stores/UnsupportedFieldStore';
 import TextArea from './TextArea/TextArea';
 import UnsupportedField from './UnsupportedField/UnsupportedField';
 import type FieldStore from './Stores/FieldStore';
+import type { View } from '../Stores/ViewStore';
 import type React from 'react';
+
+export interface Field {
+  fieldStore: FieldStore;
+  name: string;
+  className:string;
+  readMode: boolean;
+  enablePointerEvents?: boolean;
+  showIfNoValue?: boolean;
+  view?: View;
+  pane?: string;
+}
 
 export interface WidgetOptions {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [option: string]: any;
 }
 
-interface Widget<T extends FieldStore>  {
+interface Widget<P extends Field, T extends FieldStore>  {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  Component: React.ComponentType<any> | React.ReactNode;
+  Component: React.FunctionComponent<P>;
   Store: T;
   options?: WidgetOptions;
 }
 
 interface FieldMapping {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  [widget: string]: Widget<any>;
+  [widget: string]: Widget<any,any>;
 }
 
 export const fieldsMapping: FieldMapping = {

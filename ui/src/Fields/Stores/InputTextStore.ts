@@ -137,11 +137,11 @@ class InputTextStore extends FieldStore {
     return this.value.length > this.maxLength;
   }
 
-  get regexWarning() {
+  get regexWarning(): string | undefined {
     //NOSONAR by design return null when no warning
     return this.regexRules.reduce((message, rule) =>
-        message || rule.regex.test(this.value) ? message : rule.errorMessage, //TODO: What is this code doing ?? It looks like a hack!
-      undefined
+      message || rule.regex.test(this.value) ? message : rule.errorMessage, //TODO: What is this code doing ?? It looks like a hack!
+      undefined as string | undefined
     );
   }
 

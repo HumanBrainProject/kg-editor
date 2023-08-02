@@ -397,7 +397,7 @@ export interface FieldStoreValidation {
 
 export interface FieldStoreRegexRule {
   errorMessage: string;
-  regex: RegExp | string;
+  regex: RegExp;
 }
 
 export interface FieldStoreDefinition {

@@ -74,7 +74,7 @@ class InputTextMultipleStore extends FieldStore {
     ) {
       this.regexRules = [
         {
-          regex: definition.regex,
+          regex: new RegExp(definition.regex),
           errorMessage: 'this is not a valid value'
         }
       ];
@@ -138,7 +138,7 @@ class InputTextMultipleStore extends FieldStore {
     return !!this.maxLength;
   }
 
-  get regexWarning() {
+  get regexWarning(): string | undefined {
     return this.regexRules.reduce((message, rule) => {
       !message &&
         Array.isArray(this.value) &&
@@ -150,7 +150,7 @@ class InputTextMultipleStore extends FieldStore {
           return false;
         });
       return message;
-    }, undefined);
+    }, undefined as string | undefined);
   }
 
   get hasRegexWarning() {

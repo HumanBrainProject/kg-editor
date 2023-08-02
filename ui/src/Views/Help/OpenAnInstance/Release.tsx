@@ -23,6 +23,7 @@
 
 import React from 'react';
 import ReleaseStatus from '../../../Components/ReleaseStatus';
+import {ReleaseStatus as Status } from '../../../types';
 
 const Release = () => (
   <div>
@@ -71,21 +72,21 @@ const Release = () => (
 
     <h3>Examples</h3>
     <p>Hover those examples with your mouse to reveal a tooltip explaining the status</p>
-    <p><ReleaseStatus darkmode={true} instanceStatus="RELEASED" childrenStatus="RELEASED"/></p>
-    <p><ReleaseStatus darkmode={true} instanceStatus="RELEASED" childrenStatus="HAS_CHANGED"/></p>
-    <p><ReleaseStatus darkmode={true} instanceStatus="RELEASED" childrenStatus="UNRELEASED"/></p>
+    <p><ReleaseStatus darkmode={true} instanceStatus={Status.RELEASED} /></p>
+    <p><ReleaseStatus darkmode={true} instanceStatus={Status.RELEASED} /></p>
+    <p><ReleaseStatus darkmode={true} instanceStatus={Status.RELEASED} /></p>
 
-    <p><ReleaseStatus darkmode={true} instanceStatus="HAS_CHANGED" childrenStatus="RELEASED"/></p>
-    <p><ReleaseStatus darkmode={true} instanceStatus="HAS_CHANGED" childrenStatus="HAS_CHANGED"/></p>
-    <p><ReleaseStatus darkmode={true} instanceStatus="HAS_CHANGED" childrenStatus="UNRELEASED"/></p>
+    <p><ReleaseStatus darkmode={true} instanceStatus={Status.HAS_CHANGED} /></p>
+    <p><ReleaseStatus darkmode={true} instanceStatus={Status.HAS_CHANGED} /></p>
+    <p><ReleaseStatus darkmode={true} instanceStatus={Status.HAS_CHANGED} /></p>
 
-    <p><ReleaseStatus darkmode={true} instanceStatus="UNRELEASED" childrenStatus="RELEASED"/></p>
-    <p><ReleaseStatus darkmode={true} instanceStatus="UNRELEASED" childrenStatus="HAS_CHANGED"/></p>
-    <p><ReleaseStatus darkmode={true} instanceStatus="UNRELEASED" childrenStatus="UNRELEASED"/></p>
+    <p><ReleaseStatus darkmode={true} instanceStatus={Status.UNRELEASED} /></p>
+    <p><ReleaseStatus darkmode={true} instanceStatus={Status.UNRELEASED} /></p>
+    <p><ReleaseStatus darkmode={true} instanceStatus={Status.UNRELEASED} /></p>
 
-    <p><ReleaseStatus darkmode={true} instanceStatus="RELEASED" childrenStatus={null}/></p>
-    <p><ReleaseStatus darkmode={true} instanceStatus="HAS_CHANGED" childrenStatus={null}/></p>
-    <p><ReleaseStatus darkmode={true} instanceStatus="UNRELEASED" childrenStatus={null}/></p>
+    <p><ReleaseStatus darkmode={true} instanceStatus={Status.RELEASED} /></p>
+    <p><ReleaseStatus darkmode={true} instanceStatus={Status.HAS_CHANGED} /></p>
+    <p><ReleaseStatus darkmode={true} instanceStatus={Status.UNRELEASED} /></p>
   </div>
 );
 

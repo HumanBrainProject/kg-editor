@@ -32,6 +32,7 @@ import Label from '../Label';
 import Warning from '../Warning';
 import type { Alternative } from '../../types';
 import type InputTextStore from '../Stores/InputTextStore';
+import type { Field } from '../index';
 import type { ChangeEvent } from 'react';
 
 const useStyles = createUseStyles({
@@ -106,12 +107,9 @@ AlternativeValue.displayName = 'AlternativeValue';
 const AlternativeDateValue = observer(({alternative}: AlternativeValueProps) => getDateValue(alternative.value));
 AlternativeDateValue.displayName = 'AlternativeDateValue';
 
-interface InputTextProps {
+interface InputTextProps extends Field {
   fieldStore: InputTextStore;
-  className: string;
-  as: any;
-  readMode: boolean;
-  showIfNoValue: boolean;
+  as: React.ElementType<any>;
 }
 
 const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue }: InputTextProps) => {

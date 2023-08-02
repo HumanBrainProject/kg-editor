@@ -22,8 +22,9 @@
  */
 
 import type UnsupportedFieldStore from '../Stores/UnsupportedFieldStore';
+import type { Field } from '../index';
 
-interface UnsupportedFieldProps {
+interface UnsupportedFieldProps extends Field {
   fieldStore: UnsupportedFieldStore;
 }
 

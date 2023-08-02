@@ -32,6 +32,7 @@ import Label from '../Label';
 import Warning from '../Warning';
 import type { Alternative } from '../../types';
 import type InputNumberStore from '../Stores/InputNumberStore';
+import type { Field } from '../index';
 import type { ChangeEvent} from 'react';
 
 const useStyles = createUseStyles({
@@ -56,11 +57,8 @@ interface AlternativeValueProps {
 const AlternativeValue = observer(({alternative}: AlternativeValueProps) => JSON.stringify(alternative.value));
 AlternativeValue.displayName = 'AlternativeValue';
 
-interface InputNumberProps {
+interface InputNumberProps extends Field {
   fieldStore: InputNumberStore;
-  className: string;
-  readMode: boolean;
-  showIfNoValue: boolean;
 }
 
 const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }: InputNumberProps) => {

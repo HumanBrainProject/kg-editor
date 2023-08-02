@@ -35,6 +35,7 @@ import Add from './Add';
 import type { ActionProps } from './NestedField';
 import type { NestedInstanceFieldStores } from '../Stores/SingleNestedFieldStore';
 import type SingleNestedFieldStore from '../Stores/SingleNestedFieldStore';
+import type { Field as FieldProps } from '../index';
 import type { MouseEvent} from 'react';
 
 const useStyles = createUseStyles({
@@ -155,11 +156,8 @@ const Item = ({ itemFieldStores, readMode, active, index, onDelete }: ItemProps)
   );
 };
 
-interface SingleNestedFieldProps {
-  className: string;
+interface SingleNestedFieldProps extends FieldProps {
   fieldStore: SingleNestedFieldStore;
-  readMode: boolean;
-  showIfNoValue: boolean;
 }
 
 const SingleNestedField = observer(({className, fieldStore, readMode, showIfNoValue}:SingleNestedFieldProps) => {

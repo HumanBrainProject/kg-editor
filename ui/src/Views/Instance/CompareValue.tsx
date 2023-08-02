@@ -25,6 +25,7 @@ import Color from 'color';
 import uniqueId from 'lodash/uniqueId';
 import React from 'react';
 import { createUseStyles } from 'react-jss';
+import type { Change } from 'diff';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const jsdiff = require('diff');
 
@@ -78,9 +79,9 @@ const CompareValue = ({ label, leftValue, rightValue, separator }: CompareValueP
 
   const classes = useStyles();
 
-  const diff = jsdiff.diffWordsWithSpace(leftValue, rightValue);
+  const diff: Change[] = jsdiff.diffWordsWithSpace(leftValue, rightValue);
 
-  const getClassname = part => {
+  const getClassname = (part: Change): string => {
     if(part.added) {
       return classes.added;
     }
@@ -99,7 +100,7 @@ const CompareValue = ({ label, leftValue, rightValue, separator }: CompareValueP
             return null;
           }
           const className = getClassname(part);
-          let [, , first, value, , last] = [null, null, null, part.value, null, null];
+          let [, , first, value, , last]: string[] = ['', '', '', part.value, '', ''];
           const match = part.value.match(new RegExp('^((' + separator + '){0,1})(.*[^' + separator[separator.length-1] + '])((' + separator + '){0,1})$'));
           if (match && match.length >= 6) {
             [, , first, value, , last] = match;

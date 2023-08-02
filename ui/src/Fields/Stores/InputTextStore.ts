@@ -94,7 +94,6 @@ class InputTextStore extends FieldStore {
     }
 
     makeObservable(this, {
-      value: observable,
       returnAsNull: observable,
       initialValue: observable,
       maxLength: observable,

@@ -70,7 +70,6 @@ class AnnotatedInputTextStore extends FieldStore {
     this.maxItems = definition.maxItems;
 
     makeObservable(this, {
-      value: observable,
       options: observable,
       returnAsNull: observable,
       initialValue: observable,

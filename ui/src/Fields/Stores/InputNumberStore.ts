@@ -44,7 +44,6 @@ class InputNumberStore extends FieldStore {
   constructor(definition: FieldStoreDefinition, options: WidgetOptions, instance: Instance, api: API, rootStore: RootStore) {
     super(definition, options, instance, api, rootStore);
     makeObservable(this, {
-      value: observable,
       returnAsNull: observable,
       initialValue: observable,
       minValue: observable,

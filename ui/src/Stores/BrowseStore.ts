@@ -149,6 +149,7 @@ export class BrowseStore {
       runInAction(() => {
         this.isFetching = false;
         const instances = normalizeInstancesData(this.api, this.rootStore, data.data);
+        console.log(instances);
         if(loadMore){
           this.instances = [...this.instances, ...instances];
         } else {

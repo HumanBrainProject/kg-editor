@@ -51,7 +51,6 @@ class FieldStore {
 
   constructor(definition: FieldStoreDefinition, _options: WidgetOptions, instance: Instance, api:API, rootStore: RootStore) {
     makeObservable(this, {
-      value: observable,
       label: observable,
       labelTooltip: observable,
       labelTooltipIcon: observable,

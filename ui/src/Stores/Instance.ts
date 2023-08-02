@@ -157,7 +157,7 @@ const initializeStores = (instance: Instance, fields: Fields, api: API, rootStor
         field.widget = 'UnsupportedField';
       }
       const fieldMapping = fieldsMapping[field.widget];
-      stores[name] = new fieldMapping.Store(
+      stores[name] =  new fieldMapping.Store(
         field,
         fieldMapping.options,
         this,
@@ -338,7 +338,7 @@ const normalizePossibleIncomingLinks = (incomingLinksFromType?: StructureOfIncom
     return undefined;
   }
 
-  return (Object.values(incomingLinksFromType.incomingLinks)
+  return (Object.values(incomingLinksFromType)
     .flatMap((link: StructureOfIncomingLink) => link.sourceTypes)
     .reduce((acc, current) => {
       if (

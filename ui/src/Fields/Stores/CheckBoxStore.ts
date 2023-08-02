@@ -39,7 +39,6 @@ class CheckBoxStore extends FieldStore {
     super(definition, options, instance, api, rootStore);
 
     makeObservable(this, {
-      value: observable,
       initialValue: observable,
       returnValue: computed,
       requiredValidationWarning: computed,

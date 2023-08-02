@@ -32,6 +32,7 @@ import { createUseStyles } from 'react-jss';
 import useStores from '../../../Hooks/useStores';
 
 import CompareWithReleasedVersionChanges from '../CompareWithReleasedVersionChanges';
+import type { ReleaseStatus, UUID } from '../../../types';
 import type { MouseEvent } from 'react';
 
 const useStyles = createUseStyles({
@@ -59,7 +60,7 @@ const CompareInstancesModal = observer(() => {
 
   const { releaseStore } = useStores();
 
-  const handleHideCompare = (e: MouseEvent<HTMLButtonElement>) => { //TODO: Check this! onHide does NOT accept an event in Modal. Do we really need to stopPropagation ?
+  const handleHideCompare = (e?: MouseEvent<HTMLButtonElement>) => {
     e && e.stopPropagation();
     releaseStore.setComparedInstance(undefined);
   };
@@ -73,15 +74,15 @@ const CompareInstancesModal = observer(() => {
       <Modal.Header closeButton>
         Compare with the released version of &nbsp;
         <strong>
-          {releaseStore.comparedInstance?.type}&nbsp;
+          {releaseStore.comparedInstance?.typesName}&nbsp;
           {releaseStore.comparedInstance?.label}
         </strong>
       </Modal.Header>
       <Modal.Body>
         <Scrollbars autoHide>
           <CompareWithReleasedVersionChanges
-            instanceId={releaseStore.comparedInstance?.id}
-            status={releaseStore.comparedInstance?.status}
+            instanceId={releaseStore.comparedInstance?.id as UUID}
+            status={releaseStore.comparedInstance?.status as ReleaseStatus}
           />
         </Scrollbars>
       </Modal.Body>

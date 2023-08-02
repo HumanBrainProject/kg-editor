@@ -41,6 +41,7 @@ import InstanceView from './InstanceView';
 import SaveBar from './SaveBar';
 import Tabs from './Tabs';
 import type {Instance as InstanceType} from '../../Stores/Instance';
+import type { PreviewInstanceOptions, UUID} from '../../types';
 
 const useStyles = createUseStyles({
   container: {
@@ -216,7 +217,12 @@ const Instance = observer(({ instance, mode }: InstanceProps) =>  {
 
   const previewInstance = instanceStore.previewInstance;
 
-  const previewOptions = previewInstance?.options ?? {};
+  const previewOptions = (previewInstance?.options) ?? {
+    showEmptyFields: false,
+    showAction: false,
+    showType: false,
+    showStatus: false
+  } as PreviewInstanceOptions;
 
   return (
     <>
@@ -233,11 +239,11 @@ const Instance = observer(({ instance, mode }: InstanceProps) =>  {
         {previewInstance && (
           <>
             <h3>Preview</h3>
-            <Preview instanceId={previewInstance.id}
+            <Preview instanceId={previewInstance.id as UUID}
               instanceName={previewInstance.name}
               showEmptyFields={previewOptions.showEmptyFields}
               showAction={previewOptions.showAction}
-              showType={previewOptions.showType}
+              showTypes={previewOptions.showType}
               showStatus={previewOptions.showStatus} />
             <div className={classes.closePreviewBtn} title="close preview" onClick={handleHidePreview}>
               <FontAwesomeIcon icon={'times'} />

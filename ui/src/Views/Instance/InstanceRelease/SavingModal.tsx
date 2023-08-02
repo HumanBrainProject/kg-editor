@@ -39,6 +39,11 @@ const useStyles = createUseStyles({
     textOverflow: 'ellipsis',
     overflow: 'hidden'
   },
+  lastEndedInstance: {
+    fontWeight: 'bold',
+    fontSize: '0.8em',
+    whiteSpace: 'nowrap'
+  },
   reloadRelease: {
     extend: 'lastEndedOperation'
   },
@@ -95,7 +100,7 @@ const SavingModal = observer(() => {
     <Modal show={releaseStore.isSaving}>
       <Modal.Body>
         <ProgressBar
-          active={releaseStore.savingProgress !== releaseStore.savingTotal}
+          animated={releaseStore.savingProgress !== releaseStore.savingTotal}
           now={
             releaseStore.savingTotal <= 0
               ? 100
@@ -133,9 +138,9 @@ const SavingModal = observer(() => {
         {releaseStore.savingErrors.length > 0 && (
           <div className={classes.errors}>
             {releaseStore.savingErrors.map((error) => (
-              <div key={error.id} className={classes.error}>
+              <div key={error.node.id} className={classes.error}>
                 <FontAwesomeIcon icon={'times-circle'} />
-                  &nbsp; ({error.node.type}) {error.node.label}
+                  &nbsp; ({error.node.typesName}) {error.node.label}
                 <br />
                 <br />
                 {error.message}

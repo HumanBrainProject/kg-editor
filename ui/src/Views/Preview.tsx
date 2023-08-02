@@ -115,7 +115,7 @@ const useStyles = createUseStyles({
 
 interface PreviewProps {
   instanceId: string;
-  instanceName: string;
+  instanceName?: string;
   showEmptyFields?: boolean;
   showAction?: boolean;
   showTypes?: boolean;

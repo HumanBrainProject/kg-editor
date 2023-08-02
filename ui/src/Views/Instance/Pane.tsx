@@ -64,11 +64,12 @@ const useStyles = createUseStyles({
 });
 
 interface PaneProps {
+  className?: string;
   paneId: string;
   children: ReactNode;
 }
 
-const Pane = observer(({ paneId, children }: PaneProps) => {
+const Pane = observer(({ className, paneId, children }: PaneProps) => {
 
   const classes = useStyles();
 
@@ -130,7 +131,7 @@ const Pane = observer(({ paneId, children }: PaneProps) => {
   const paneIndexStyle: CSSProperties = {'--pane-index':index} as CSSProperties;
   return (
     <PaneContext.Provider value={paneId} >
-      <div ref={paneRef} className={`${classes.pane} ${mainClass} ${activeClass}`} style={paneIndexStyle} onFocus={handleFocus} onClick={handleFocus}>
+      <div ref={paneRef} className={`${classes.pane} ${mainClass} ${activeClass} ${className?className:''}`} style={paneIndexStyle} onFocus={handleFocus} onClick={handleFocus}>
         <Scrollbars autoHide>
           <div className={`${classes.scrolledView} scrolledView`} >
             {children}

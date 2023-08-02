@@ -116,7 +116,7 @@ const getFieldValue = (instanceStore: InstanceStore, field: FieldStore, level: n
   return value;
 };
 
-const getValue = (instanceStore: InstanceStore, instance:Instance, name: string) => {
+const getValue = (instanceStore: InstanceStore, instance:Instance|undefined|null, name: string) => {
   if (!instance) {
     return '';
   }
@@ -142,7 +142,7 @@ const getStatus = (store: InstanceStore, ids: string[]) => ids.reduce((acc, id) 
 
 interface CompareFieldsChangesProps {
   instanceId: string;
-  leftInstance: Instance;
+  leftInstance?: Instance|null;
   rightInstance: Instance;
   leftInstanceStore: InstanceStore;
   rightInstanceStore: InstanceStore;

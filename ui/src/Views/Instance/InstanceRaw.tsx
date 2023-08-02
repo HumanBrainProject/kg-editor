@@ -95,7 +95,7 @@ const InstanceRaw = observer(({instance}: InstanceRawProps) => {
         )}
         <div className={classes.content}>
           <Scrollbars autoHide>
-            <ReactJson collapsed={1} name={false} theme={ThemeRJV} src={instance.rawData} />
+            <ReactJson collapsed={1} name={false} theme={ThemeRJV} src={instance.rawData as object} />
           </Scrollbars>
         </div>
         <div className={classes.id}>

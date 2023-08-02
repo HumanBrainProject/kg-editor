@@ -62,7 +62,7 @@ const getElementToScroll = (elem: HTMLElement | null) => {
 
 const getScrollTop = (elem: HTMLElement | null) => {
   let distance = 0;
-  while(elem !== null && !elem.attributes['data-id']) {
+  while(elem !== null && !elem.hasAttribute('data-id')) {
     elem = elem.parentElement;
     if(elem !== null) {
       distance += elem.offsetTop;
@@ -72,12 +72,13 @@ const getScrollTop = (elem: HTMLElement | null) => {
 };
 
 interface HeaderPanelProps {
+  className?: string;
   types?: SimpleType[];
   hasChanged?: boolean;
   highlight?: boolean;
 }
 
-const HeaderPanel = observer(({ types, hasChanged, highlight }: HeaderPanelProps) => {
+const HeaderPanel = observer(({ className, types, hasChanged, highlight }: HeaderPanelProps) => {
 
   const classes = useStyles();
 
@@ -97,7 +98,7 @@ const HeaderPanel = observer(({ types, hasChanged, highlight }: HeaderPanelProps
   }, [highlight]);
 
   return (
-    <div className={classes.panel}>
+    <div className={`${classes.panel} ${className ? className : ''}`}>
       <Row>
         <Col xs={12}>
           <h6 ref={scrollIntoViewRef}>

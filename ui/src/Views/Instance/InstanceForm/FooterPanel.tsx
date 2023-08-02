@@ -32,6 +32,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import useStores from '../../../Hooks/useStores';
 import { ViewMode } from '../../../types';
 import type Instance from '../../../Stores/Instance';
+import type { MouseEvent } from 'react';
 
 const useStyles = createUseStyles({
   panel:{
@@ -105,7 +106,7 @@ const FooterPanel = observer(({ className, instance, showOpenActions }: FooterPa
   const location = useLocation();
   const navigate = useNavigate();
 
-  const handleOpenInstance = async e => {
+  const handleOpenInstance = async (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     if(appStore.currentSpace?.id !== instance.space) {
       await appStore.switchSpace(location, navigate, instance.space);

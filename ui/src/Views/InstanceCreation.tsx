@@ -67,7 +67,7 @@ const InstanceCreation = observer(({ children }: InstanceCreationProps) => {
   useEffect(() => {
     if (isAvailable) {
       if (appStore.currentSpacePermissions.canCreate) {
-        const type = typeStore.typesMap.get(typeName);
+        const type = typeName?typeStore.typesMap.get(typeName):undefined;
         if (type) {
           if (type.canCreate !== false && type.isSupported && !type.embeddedOnly) {
             if(instanceId) {

@@ -31,6 +31,7 @@ import Pane from './Pane';
 import type { Group } from '../../Stores/Instance';
 
 import type Instance from '../../Stores/Instance';
+import type { View } from '../../Stores/ViewStore';
 
 const useStyles = createUseStyles({
   pane: {
@@ -86,7 +87,7 @@ const Links = observer(({ instanceId }: LinksProps) => {
     }
   };
 
-  const view = viewStore.selectedView;
+  const view = viewStore.selectedView as View;
   //TODO: Check this logic still works with the current changes made!
   const path = view?.instancePath;
   const index = path?.findIndex(id => id === instanceId);

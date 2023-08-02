@@ -244,7 +244,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
 
   const handleSearchFilterChange = (event: ChangeEvent<HTMLInputElement>) => {
     //TODO: Do we need to check this ? key does not exist on a ChangeEvent!
-    if (event 
+    if (event && event instanceof KeyboardEvent
       && event.key !== 'ArrowDown'   // Down
       && event.key !== 'ArrowUp'   // Up
       && event.key !== 'Escape') { //escape

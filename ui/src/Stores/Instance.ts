@@ -160,7 +160,7 @@ const initializeStores = (instance: Instance, fields: Fields, api: API, rootStor
       stores[name] =  new fieldMapping.Store(
         field,
         fieldMapping.options,
-        this,
+        instance,
         api,
         rootStore
       ) as FieldStore;

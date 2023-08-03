@@ -24,7 +24,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { createUseStyles } from 'react-jss';
 
 import { useNavigate } from 'react-router-dom';
@@ -249,9 +249,9 @@ const InstancesHistoryHeader = observer(({ onChange }: InstancesHistoryHeaderPro
           instances in {appStore.currentSpaceName}
       </h3>
       <ul className="config">
-        <li><input title="Viewed" type="checkbox" checked={appStore.historySettings?.eventTypes.viewed} onChange={handleHistoryViewedFlagChange} />Viewed</li>
-        <li><input title="Edited" type="checkbox" checked={appStore.historySettings?.eventTypes.edited} onChange={handleHistoryEditedFlagChange} />Edited</li>
-        <li><input title="Released" type="checkbox" checked={appStore.historySettings?.eventTypes.released} onChange={handleHistoryReleasedFlagChange} />Released</li>
+        <li><input title="Viewed" type="checkbox" checked={appStore.historySettings?.eventTypes.view} onChange={handleHistoryViewedFlagChange} />Viewed</li>
+        <li><input title="Edited" type="checkbox" checked={appStore.historySettings?.eventTypes.edit} onChange={handleHistoryEditedFlagChange} />Edited</li>
+        <li><input title="Released" type="checkbox" checked={appStore.historySettings?.eventTypes.release} onChange={handleHistoryReleasedFlagChange} />Released</li>
       </ul>
     </div>
   );
@@ -260,12 +260,17 @@ InstancesHistoryHeader.displayName = 'InstancesHistoryHeader';
 
 const InstancesHistory = observer(() => {
 
+  const initializedRef = useRef<string|undefined>(undefined);
+
   const classes = useStyles();
 
   const { appStore, historyStore } = useStores();
 
   useEffect(() => {
-    fetchInstances(appStore.currentSpace?.id);
+    if (appStore.currentSpace && (!initializedRef.current || initializedRef.current !== appStore.currentSpace.id)) {
+      initializedRef.current = appStore.currentSpace.id;
+      fetchInstances(appStore.currentSpace.id);
+    }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [appStore.currentSpace?.id]);
 

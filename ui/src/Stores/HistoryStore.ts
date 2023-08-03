@@ -110,7 +110,7 @@ export class HistoryStore {
       modes = [modes];
     }
     max = Number(max);
-    return this.instancesHistory
+    const history = this.instancesHistory
       .filter(instance => {
         if (instance.space !== space) {
           return false;
@@ -121,16 +121,13 @@ export class HistoryStore {
         return modes.includes(instance.mode);
       })
       .reduce((result, instance) => {
-        if (!result.map[instance.id]) {
-          result.map[instance.id] = true;
-          result.history.push(instance.id);
-        }
+        result.add(instance.id);
         return result;
-      }, {map: {}, history: []} as {map: {[instanceId: UUID]: boolean}, history: UUID[]}).history
-      .slice(0, isNaN(max) || max < 0?0:max);
+      }, new Set<UUID>());
+    return Array.from(history).slice(0, isNaN(max) || max < 0?0:max);
   }
 
-  async fetchInstances(list: string[]) {
+  async fetchInstances(list: UUID[]) {
     if (!list.length) {
       this.instances = [];
       this.isFetching = false;

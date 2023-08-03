@@ -72,9 +72,9 @@ interface InstanceToMove {
 }
 
 export interface EventType {
-  viewed: boolean,
-  edited: boolean,
-  released: boolean
+  [ViewMode.VIEW]: boolean,
+  [ViewMode.EDIT]: boolean,
+  [ViewMode.RELEASE]: boolean
 }
 
 interface HistorySettings {
@@ -172,9 +172,9 @@ export class AppStore{
       savedHistorySettings = {
         size: 10,
         eventTypes: {
-          viewed: false,
-          edited: true,
-          released: false
+          [ViewMode.VIEW]: false,
+          [ViewMode.EDIT]: true,
+          [ViewMode.RELEASE]: false
         }
       };
     }
@@ -339,21 +339,21 @@ export class AppStore{
 
   toggleViewedFlagHistorySetting(on: boolean){
     if(this.historySettings) {
-      this.historySettings.eventTypes.viewed = on?true:false;
+      this.historySettings.eventTypes.view = on?true:false;
       localStorage.setItem('historySettings', JSON.stringify(this.historySettings));
     }
   }
 
   toggleEditedFlagHistorySetting(on: boolean){
     if(this.historySettings) {
-      this.historySettings.eventTypes.edited = on?true:false;
+      this.historySettings.eventTypes.edit = on?true:false;
       localStorage.setItem('historySettings', JSON.stringify(this.historySettings));
     }
   }
 
   toggleReleasedFlagHistorySetting(on: boolean) {
     if(this.historySettings) {
-      this.historySettings.eventTypes.released = on?true:false;
+      this.historySettings.eventTypes.release = on?true:false;
       localStorage.setItem('historySettings', JSON.stringify(this.historySettings));
     }
   }

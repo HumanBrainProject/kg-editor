@@ -24,7 +24,6 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useRef } from 'react';
-import { KeyboardEvent} from 'react';
 import { createUseStyles } from 'react-jss';
 
 import useStores from '../../../../Hooks/useStores';
@@ -184,8 +183,9 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
 
   const handleLoadSearchResults = () => userStore.searchUsers();
 
-  const handleSelect = (user: UserSummary, event: KeyboardEvent<HTMLDivElement> |  MouseEvent<HTMLElement>) => {
-    if(event && event instanceof KeyboardEvent &&  event.key === 'ArrowDown'){ // Down
+  const handleSelect = (user: UserSummary, event: React.KeyboardEvent<HTMLDivElement> |  MouseEvent<HTMLElement>) => {
+    const e = event as unknown as KeyboardEvent;
+    if(e &&  e.key === 'ArrowDown'){ // Down
       event.preventDefault();
       const users = usersRef.current?.querySelectorAll('.option');
       if (users && users.length) {
@@ -195,7 +195,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
         }
         (users[index] as HTMLDivElement).focus();
       }
-    } else if(event && event instanceof KeyboardEvent && event.key === 'ArrowUp'){ // Up
+    } else if(e && e.key === 'ArrowUp'){ // Up
       event.preventDefault();
       const users = usersRef.current?.querySelectorAll('.option');
       if (users && users.length) {
@@ -205,17 +205,17 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
         }
         (users[index] as HTMLDivElement).focus();
       }
-    } else if(event && event instanceof KeyboardEvent && event.key === 'Escape') { //escape
+    } else if(e && e.key === 'Escape') { //escape
       event.preventDefault();
       userStore.clearSearch();
-    } else if (user && (!event || (event && event instanceof KeyboardEvent &&  (!event.key || event.key === 'Enter')))) { // enter
+    } else if (user && (!event || (e &&  (!e.key || e.key === 'Enter')))) { // enter
       event.preventDefault();
       inputRef.current?.focus();
       typeof onSelect === 'function' && onSelect(user.id);
     }
   };
 
-  const handleInputKeyStrokes = (event: KeyboardEvent<HTMLInputElement>) => {
+  const handleInputKeyStrokes = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if(event && event.key === 'ArrowDown' ){ // Down
       event.preventDefault();
       const users = usersRef.current?.querySelectorAll('.option');
@@ -242,13 +242,12 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
     }
   };
 
-  const handleSearchFilterChange = (event: ChangeEvent<HTMLInputElement>) => {
-    //TODO: Do we need to check this ? key does not exist on a ChangeEvent!
-    if (event && event instanceof KeyboardEvent
-      && event.key !== 'ArrowDown'   // Down
+  const handleSearchFilterChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const event = e as unknown as KeyboardEvent;
+    if (event.key !== 'ArrowDown'   // Down
       && event.key !== 'ArrowUp'   // Up
       && event.key !== 'Escape') { //escape
-      userStore.setSearchFilter(event.target.value, excludedUsers);
+      userStore.setSearchFilter(e.target.value, excludedUsers);
     }
   };
 

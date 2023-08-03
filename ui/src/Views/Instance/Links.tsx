@@ -23,7 +23,6 @@
 
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
-import { createUseStyles } from 'react-jss';
 
 import useStores from '../../Hooks/useStores';
 import InstanceForm from './InstanceForm';
@@ -32,12 +31,6 @@ import type { Group } from '../../Stores/Instance';
 
 import type Instance from '../../Stores/Instance';
 import type { View } from '../../Stores/ViewStore';
-
-const useStyles = createUseStyles({
-  pane: {
-    position: 'relative'
-  }
-});
 
 const getGroups = (instance: Instance, instancePath: string[]) => {
   if (!instance) {
@@ -65,8 +58,6 @@ interface LinksProps {
 }
 
 const Links = observer(({ instanceId }: LinksProps) => {
-
-  const classes = useStyles();
 
   const { instanceStore, viewStore } = useStores();
 
@@ -104,7 +95,7 @@ const Links = observer(({ instanceId }: LinksProps) => {
   const showChildInstance = !!childInstanceId && (childPaneIndex === -1 || (childPaneIndex !== undefined && index !== undefined && childPaneIndex > index));
   return (
     <>
-      <Pane className={classes.pane} paneId={paneId}>
+      <Pane paneId={paneId}>
         {groups.map(group => (
           <div key={group.label} data-provenance={group.label}>
             <h4>{group.label}{group.pagination?

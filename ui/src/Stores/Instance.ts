@@ -404,7 +404,7 @@ const showId = (field: FieldStore, id: string) => {
 
 const getIds = (field: FieldStore) => {
   const values = field.returnValue;
-  if (field instanceof LinksStore || field instanceof LinksStore) {
+  if (field instanceof LinksStore || field instanceof LinkStore) {
     const mappingValue = field.mappingValue;
     if (Array.isArray(values)) {
       return values

@@ -65,6 +65,7 @@ class InputNumberMultipleStore extends FieldStore {
     this.maxValue = definition.maxValue;
 
     makeObservable(this, {
+      value: observable,
       options: observable,
       returnAsNull: observable,
       initialValue: observable,

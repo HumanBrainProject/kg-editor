@@ -94,6 +94,7 @@ class LinksStore extends FieldStore {
     }
 
     makeObservable(this, {
+      value: observable,
       options: observable,
       allowCustomValues: observable,
       returnAsNull: observable,

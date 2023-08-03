@@ -155,6 +155,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
   const isDisabled = returnAsNull;
   const hasValidationWarnings = !isDisabled && fieldStore.hasValidationWarnings;
   const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.hasWarning;
+
   return (
     <Form.Group className={className} ref={formGroupRef} >
       <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isPublic={isPublic}/>

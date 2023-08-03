@@ -215,7 +215,7 @@ const InstanceRow = observer(
       if (!e.currentTarget.contains(e.target as Node)) {
         return;
       }
-      if (timeout.current === null) {
+      if (timeout.current === undefined) {
         let action = typeof onClick === 'function' ? onClick : null;
         if (e.metaKey || e.ctrlKey) {
           action = typeof onCtrlClick === 'function' ? onCtrlClick : null;

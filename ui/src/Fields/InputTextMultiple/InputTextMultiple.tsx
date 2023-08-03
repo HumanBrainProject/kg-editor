@@ -96,7 +96,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
 
   const classes = useStyles();
 
-  const draggedIndex = useRef<number|null>(null);
+  const draggedIndex = useRef<number|undefined>(undefined);
   const formGroupRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -124,17 +124,17 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
     fieldStore.removeValue(value);
   };
 
-  const handleDragEnd = () => draggedIndex.current = null;
+  const handleDragEnd = () => draggedIndex.current = undefined;
 
   const handleDragStart = (index: number) => draggedIndex.current = index;
 
   const handleDrop = (droppedIndex: number) => {
-    if (Array.isArray(list) && draggedIndex.current && draggedIndex.current >= 0 && draggedIndex.current < list.length && droppedIndex >= 0 && droppedIndex < list.length) {
+    if (Array.isArray(list) && draggedIndex.current !== undefined && draggedIndex.current >= 0 && draggedIndex.current < list.length && droppedIndex >= 0 && droppedIndex < list.length) {
       const value = list[draggedIndex.current];
       const afterValue = list[droppedIndex];
       fieldStore.moveValueAfter(value, afterValue);
     }
-    draggedIndex.current = null;
+    draggedIndex.current = undefined;
   };
 
   const handleDropAtTheEnd = () => {
@@ -143,7 +143,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
       const afterValue = list[list.length-1];
       fieldStore.moveValueAfter(value, afterValue);
     }
-    draggedIndex.current = null;
+    draggedIndex.current = undefined;
   };
 
   const handleBlur = (e: FocusEvent<HTMLInputElement, Element>) => {

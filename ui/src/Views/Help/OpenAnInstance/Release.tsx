@@ -22,8 +22,6 @@
  */
 
 import React from 'react';
-import ReleaseStatus from '../../../Components/ReleaseStatus';
-import {ReleaseStatus as Status } from '../../../types';
 
 const Release = () => (
   <div>
@@ -70,23 +68,6 @@ const Release = () => (
       <li>The red color means that this instance or at least one of its children doesn’t exist in the public API.</li>
     </ul>
 
-    <h3>Examples</h3>
-    <p>Hover those examples with your mouse to reveal a tooltip explaining the status</p>
-    <p><ReleaseStatus darkmode={true} instanceStatus={Status.RELEASED} /></p>
-    <p><ReleaseStatus darkmode={true} instanceStatus={Status.RELEASED} /></p>
-    <p><ReleaseStatus darkmode={true} instanceStatus={Status.RELEASED} /></p>
-
-    <p><ReleaseStatus darkmode={true} instanceStatus={Status.HAS_CHANGED} /></p>
-    <p><ReleaseStatus darkmode={true} instanceStatus={Status.HAS_CHANGED} /></p>
-    <p><ReleaseStatus darkmode={true} instanceStatus={Status.HAS_CHANGED} /></p>
-
-    <p><ReleaseStatus darkmode={true} instanceStatus={Status.UNRELEASED} /></p>
-    <p><ReleaseStatus darkmode={true} instanceStatus={Status.UNRELEASED} /></p>
-    <p><ReleaseStatus darkmode={true} instanceStatus={Status.UNRELEASED} /></p>
-
-    <p><ReleaseStatus darkmode={true} instanceStatus={Status.RELEASED} /></p>
-    <p><ReleaseStatus darkmode={true} instanceStatus={Status.HAS_CHANGED} /></p>
-    <p><ReleaseStatus darkmode={true} instanceStatus={Status.UNRELEASED} /></p>
   </div>
 );
 

@@ -98,7 +98,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
 
   const classes = useStyles();
 
-  const draggedIndex = useRef<number|null>(null);
+  const draggedIndex = useRef<number|undefined>(undefined);
   const formGroupRef = useRef<HTMLInputElement>(null);
 
   const {
@@ -130,26 +130,26 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
     fieldStore.removeValue(value);
   };
 
-  const handleDragEnd = () => draggedIndex.current = null;
+  const handleDragEnd = () => draggedIndex.current = undefined;
 
   const handleDragStart = (index: number) => draggedIndex.current = index;
 
   const handleDrop = (droppedIndex: number) => {
-    if (Array.isArray(values) && draggedIndex.current && draggedIndex.current >= 0 && draggedIndex.current < values.length && droppedIndex >= 0 && droppedIndex < values.length) {
+    if (Array.isArray(values) && draggedIndex.current !== undefined && draggedIndex.current >= 0 && draggedIndex.current < values.length && droppedIndex >= 0 && droppedIndex < values.length) {
       const value = values[draggedIndex.current];
       const afterValue = values[droppedIndex];
       fieldStore.moveValueAfter(value, afterValue);
     }
-    draggedIndex.current = null;
+    draggedIndex.current = undefined;
   };
 
   const handleDropAtTheEnd = () => {
-    if (Array.isArray(values) && draggedIndex.current && draggedIndex.current >= 0 && draggedIndex.current < values.length) {
+    if (Array.isArray(values) && draggedIndex.current !== undefined && draggedIndex.current >= 0 && draggedIndex.current < values.length) {
       const value = values[draggedIndex.current];
       const afterValue = values[values.length-1];
       fieldStore.moveValueAfter(value, afterValue);
     }
-    draggedIndex.current = null;
+    draggedIndex.current = undefined;
   };
 
   const handleBlur = (e: FocusEvent<HTMLInputElement, Element>) => {

@@ -90,7 +90,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
 
   const { typeStore, instanceStore, appStore } = useStores();
 
-  const draggedIndex = useRef<number|null|undefined>(null);
+  const draggedIndex = useRef<number|undefined>(undefined);
   const formGroupRef = useRef<HTMLInputElement>(null);
   const formControlRef = useRef<HTMLDivElement>(null);
   const dropdownInputRef = useRef<HTMLInputElement>(null);
@@ -193,7 +193,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
   };
 
   const handleDelete = (index?: number) => {
-    if(index){
+    if(index !== undefined){
       const value = values[index];
       fieldStore.removeValue(value);
       instanceStore.togglePreviewInstance();
@@ -223,19 +223,28 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
     }
   };
 
-  const handleDragEnd = () => draggedIndex.current = null;
+  const handleDragEnd = () => draggedIndex.current = undefined;
 
   const handleDragStart = (index?: number) => draggedIndex.current = index;
 
   const handleDrop = (droppedIndex?: number) => {
-    if (Array.isArray(values) && draggedIndex.current && draggedIndex.current >= 0 && draggedIndex.current < values.length && droppedIndex && droppedIndex >= 0 && droppedIndex < values.length) {
+    if (Array.isArray(values) && draggedIndex.current !== undefined && draggedIndex.current >= 0 && draggedIndex.current < values.length && droppedIndex !== undefined && droppedIndex >= 0 && droppedIndex < values.length) {
       const value = values[draggedIndex.current];
-      if(droppedIndex !== undefined) {
-        const afterValue = values[droppedIndex];
-        fieldStore.moveValueAfter(value, afterValue);
-      }
+      const afterValue = values[droppedIndex];
+      fieldStore.moveValueAfter(value, afterValue);
     }
-    draggedIndex.current = null;
+    draggedIndex.current = undefined;
+    instanceStore.togglePreviewInstance();
+  };
+
+
+  const handleDropAtTheEnd = () => {
+    if (Array.isArray(values) && draggedIndex.current !== undefined && draggedIndex.current >= 0 && draggedIndex.current < values.length) {
+      const value = values[draggedIndex.current];
+      const afterValue = values[values.length-1];
+      fieldStore.moveValueAfter(value, afterValue);
+    }
+    draggedIndex.current = undefined;
     instanceStore.togglePreviewInstance();
   };
 
@@ -364,7 +373,7 @@ const DynamicDropdown = observer(({ className, fieldStore, readMode, showIfNoVal
             onReset={handleDropdownReset}
             onSelect={handleOnSelectOption}
             onDeleteLastValue={handleDeleteLastValue}
-            onDrop={handleDrop}
+            onDrop={handleDropAtTheEnd}
           />
         )}
       </div>

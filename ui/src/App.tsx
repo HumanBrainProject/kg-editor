@@ -23,7 +23,7 @@
 
 import { observer } from 'mobx-react-lite';
 import React, { Suspense } from 'react';
-import { JssProvider, ThemeProvider } from 'react-jss';
+import { JssProvider, ThemeProvider, createGenerateId } from 'react-jss';
 import { BrowserRouter, Navigate, useSearchParams, Route, Routes } from 'react-router-dom';
 
 import 'react-virtualized/styles.css';
@@ -198,8 +198,13 @@ const App = observer(({ stores, api, authAdapter } : AppProps) => {
 });
 App.displayName = 'App';
 
+const jssId = {
+  minify: process.env.NODE_ENV === 'production'
+};
+const jssGenerateId = createGenerateId(jssId);
+
 const Component = ({ stores, api, authAdapter }: AppProps) => (
-  <JssProvider id={{minify: process.env.NODE_ENV === 'production'}}>
+  <JssProvider  id={jssId} generateId={jssGenerateId} >
     <ErrorBoundary stores={stores} >
       <BrowserRouter>
         <App stores={stores} api={api} authAdapter={authAdapter}/>

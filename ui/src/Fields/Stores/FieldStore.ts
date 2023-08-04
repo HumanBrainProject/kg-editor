@@ -30,6 +30,8 @@ import type { Alternative, FieldStoreDefinition } from '../../types';
 import type { IconProp } from '@fortawesome/fontawesome-svg-core';
 import type { ErrorInfo } from 'react';
 
+export type FieldStores = Record<string,FieldStore>; // by fieldName
+
 class FieldStore {
   value: any;
   label?:string;

@@ -33,8 +33,8 @@ import Invalid from '../Invalid';
 import Label from '../Label';
 import Warning from '../Warning';
 import Add from './Add';
+import type { FieldStores } from '../Stores/FieldStore';
 import type NestedFieldStore from '../Stores/NestedFieldStore';
-import type { NestedInstanceFieldStores } from '../Stores/SingleNestedFieldStore';
 import type { Field as FieldProps } from '../index';
 import type { IconProp } from '@fortawesome/fontawesome-svg-core';
 import type { MouseEvent} from 'react';
@@ -148,7 +148,7 @@ const Action = ({ icon, title, single, onClick }: ActionProps) => {
 };
 
 interface ItemProps {
-  itemFieldStores: NestedInstanceFieldStores;
+  itemFieldStores: FieldStores;
   readMode: boolean;
   active: boolean;
   index: number;

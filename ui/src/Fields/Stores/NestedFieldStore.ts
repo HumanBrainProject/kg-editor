@@ -24,7 +24,8 @@
 import { observable, action, computed, makeObservable, toJS } from 'mobx';
 import { fieldsMapping } from '..';
 import FieldStore from './FieldStore';
-import type { NestedInstanceFieldStores, NestedInstanceStores } from './SingleNestedFieldStore';
+import type { FieldStores } from './FieldStore';
+import type { NestedInstanceStores } from './SingleNestedFieldStore';
 import type { WidgetOptions} from '..';
 import type API from '../../Services/API';
 import type Instance from '../../Stores/Instance';
@@ -138,7 +139,7 @@ class NestedFieldStore extends FieldStore {
     return typeName && this.rootStore.typeStore.typesMap.get(typeName);
   }
 
-  _addNestedStore = (stores: NestedInstanceFieldStores, name: string, template: StructureOfField, value: Value) => {
+  _addNestedStore = (stores: FieldStores, name: string, template: StructureOfField, value: Value) => {
     const field = JSON.parse(JSON.stringify(toJS(template)));
     let warning = null;
     if(name === this.labelField) {

@@ -28,9 +28,10 @@ import LinkStore from '../Fields/Stores/LinkStore';
 import LinksStore from '../Fields/Stores/LinksStore';
 import type RootStore from './RootStore';
 import type FieldStore from '../Fields/Stores/FieldStore';
+import type { FieldStores } from '../Fields/Stores/FieldStore';
 import type NestedFieldStore from '../Fields/Stores/NestedFieldStore';
 import type SingleNestedFieldStore from '../Fields/Stores/SingleNestedFieldStore';
-import type { NestedInstanceFieldStores, NestedInstanceStores } from '../Fields/Stores/SingleNestedFieldStore';
+import type { NestedInstanceStores } from '../Fields/Stores/SingleNestedFieldStore';
 import type API from '../Services/API';
 import type { APIError } from '../Services/API';
 import type {
@@ -99,8 +100,8 @@ const normalizeFields = (
   }
 };
 
-const initializeStores = (instance: Instance, fields: Fields, api: API, rootStore: RootStore): InstanceFields => {
-  const stores = {} as InstanceFields;
+const initializeStores = (instance: Instance, fields: Fields, api: API, rootStore: RootStore): FieldStores => {
+  const stores = {} as FieldStores;
   Object.entries(fields).forEach(([name, field]) => {
     let warning = null;
     field.isPublic = name === instance.labelField;
@@ -174,7 +175,7 @@ const initializeStores = (instance: Instance, fields: Fields, api: API, rootStor
   return stores;
 };
 
-const getChildrenIds = (fields: NestedInstanceFieldStores): Set<UUID> => {
+const getChildrenIds = (fields: FieldStores): Set<UUID> => {
   if (!(fields instanceof Object) || Array.isArray(fields)) {
     return new Set();
   }
@@ -509,10 +510,6 @@ const getChildrenIdsGroupedByField = (fields: FieldStore[]): Group[] => {
     .sort((a, b) => a.label.toLowerCase().localeCompare(b.label.toLowerCase()));
 };
 
-interface InstanceFields {
-  [name: string]: FieldStore;
-}
-
 export interface NormalizedInstance {
   error?: Error;
   id?: UUID;
@@ -538,7 +535,7 @@ export class Instance {
   primaryType: SimpleType = { name: '', color: '', label: '', description: '' };
   space = '';
   permissions?: Permissions;
-  fields: InstanceFields = {};
+  fields: FieldStores = {};
   incomingLinks: InstanceIncomingLinkFull[] = [];
   possibleIncomingLinks?: SourceType[] = [];
   alternatives: Alternatives = {};

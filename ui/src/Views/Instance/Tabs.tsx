@@ -130,7 +130,7 @@ const Tabs = observer(({ instance, mode }: TabsProps) => {
   const handleClick = (instanceMode: ViewMode) => {
     Matomo.trackEvent(
       'Instance',
-      `Select${instanceMode[0].toUpperCase() + instanceMode.substr(1)}Mode`,
+      `Select${instanceMode[0].toUpperCase() + instanceMode.substring(1)}Mode`,
       instance.id
     );
     if (instanceMode === ViewMode.VIEW) {

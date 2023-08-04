@@ -160,7 +160,7 @@ const InstancesHistoryBody = observer(({ onError }: InstancesHistoryBodyProps) =
         instance.initializeLabelData(toJS(historyInstance));
       }
     }
-    Matomo.trackEvent('Home', `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`, id);
+    Matomo.trackEvent('Home', `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substring(1)}Mode`, id);
     if(mode === 'view') {
       navigate(`/instances/${id}`);
     } else {

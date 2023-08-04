@@ -30,6 +30,8 @@ import type Instance from '../../Stores/Instance';
 import type RootStore from '../../Stores/RootStore';
 import type { FieldStoreDefinition, FieldStoreRegexRule, FieldStoreValidation } from '../../types';
 
+type MultipleValues = string[] | null | undefined;
+
 const getRegexRules = (validation?: FieldStoreValidation[]): FieldStoreRegexRule[] =>
   Array.isArray(validation)
     ? validation.map(rule => ({
@@ -216,7 +218,7 @@ class InputTextMultipleStore extends FieldStore {
     return !!this.value.length || this.hasChanged;
   }
 
-  getValues(value: string[] | null | undefined) {
+  getValues(value: MultipleValues) {
     if (Array.isArray(value)) {
       return value;
     }
@@ -226,7 +228,7 @@ class InputTextMultipleStore extends FieldStore {
     return [];
   }
 
-  updateValue(value: string[] | null | undefined) {
+  updateValue(value: MultipleValues) {
     this.returnAsNull = false;
     const values = this.getValues(value);
     this.initialValue = [...values];
@@ -262,7 +264,7 @@ class InputTextMultipleStore extends FieldStore {
     this.insertValue(value);
   }
 
-  setValues(values: string[] | null | undefined) {
+  setValues(values: MultipleValues) {
     if (values !== null && values !== undefined) {
       if (values.length || !this.returnAsNull) {
         this.returnAsNull = false;

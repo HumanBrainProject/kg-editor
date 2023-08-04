@@ -33,7 +33,7 @@ import type { InstanceSummary, StructureOfType } from '../types';
 const normalizeInstancesData = (api: API, rootStore: RootStore, data:InstanceSummary[]) => (Array.isArray(data))?data.map(rowData => {
   Object.values(rowData.fields).forEach(d => {
     if(d.widget === 'TextArea') {
-      d.value = d.value && d.value.substr(0, 197) + '...';
+      d.value = d.value && d.value.substring(0, 197) + '...';
       d.label = undefined;
     }
   });

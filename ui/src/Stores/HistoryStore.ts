@@ -145,7 +145,7 @@ export class HistoryStore {
               if (!data.error) {
                 Object.values(data.fields).forEach(d => {
                   if(d.widget === 'TextArea') {
-                    d.value = d.value && d.value.substr(0, 197) + '...';
+                    d.value = d.value && d.value.substring(0, 197) + '...';
                     delete d.label;
                   }
                 });

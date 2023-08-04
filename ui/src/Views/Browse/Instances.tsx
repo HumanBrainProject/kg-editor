@@ -429,7 +429,7 @@ const Instances = observer(() => {
     }
     Matomo.trackEvent(
       'Browse',
-      `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substr(1)}Mode`,
+      `InstanceOpenTabIn${mode[0].toUpperCase() + mode.substring(1)}Mode`,
       id
     );
     if (mode === 'view') {

@@ -21,17 +21,18 @@
  *
  */
 
-import React, { useEffect, useState } from "react";
-import { observer } from "mobx-react-lite";
-import { useNavigate, matchPath } from "react-router-dom";
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import { useLocation, useNavigate, matchPath } from 'react-router-dom';
 
-import useStores from "../Hooks/useStores";
-import { Space as SpaceType } from "../types";
-import useAuth from "../Hooks/useAuth";
+import ErrorPanel from '../Components/ErrorPanel';
+import GridSelector from '../Components/GridSelector';
+import Modal from '../Components/Modal';
+import useAuth from '../Hooks/useAuth';
+import useStores from '../Hooks/useStores';
+import type { Space as SpaceType } from '../types';
 
-import SpaceModal from "./SpaceModal";
-import ErrorPanel from "../Components/ErrorPanel";
-import Button from "react-bootstrap/Button";
 
 const hasSpace = (spaces: SpaceType[], name?: string|null) => !!name && spaces.find(s => s.id === name);
 
@@ -41,13 +42,15 @@ const getSpace = (spaces: SpaceType[], name?: string|null) => {
       return name;
     }
   } else {
-    const savedSpaceName = localStorage.getItem("space");
+    const savedSpaceName = localStorage.getItem('space');
     if (hasSpace(spaces, savedSpaceName)) {
       return savedSpaceName;
     }
   }
   return null;
 };
+
+const SpaceItem = ({ item: space }: { item: SpaceType }) => <>{space.name??space.id}</>;
 
 interface SpaceProps {
   space?: string|null;
@@ -57,7 +60,8 @@ interface SpaceProps {
 
 const Space = observer(({ space, skipHistory, children }: SpaceProps) => {
 
-  const  navigate = useNavigate();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const { logout } = useAuth();
 
@@ -65,16 +69,20 @@ const Space = observer(({ space, skipHistory, children }: SpaceProps) => {
 
   const { appStore, userProfileStore, viewStore } = useStores();
 
+  const handleSpaceSelection = (space: SpaceType) => appStore.switchSpace(location, navigate, space.id);
+
   useEffect(() => {
     const selectedSpace = getSpace(userProfileStore.spaces as SpaceType[], space);
-    appStore.setSpace(selectedSpace);
+    if(selectedSpace) {
+      appStore.setSpace(selectedSpace);
+    }
     if (skipHistory) {
       viewStore.flushStoredViewsforSpace();
       setInitialized(true);
     } else {
       if (!viewStore.views.size) {
         const path = viewStore.restoreViews();
-        const noRoute = !!matchPath({path:"/"}, location.pathname);
+        const noRoute = !!matchPath({path:'/'}, location.pathname);
         if (noRoute && path) {
           navigate(path);
         } else {
@@ -92,7 +100,7 @@ const Space = observer(({ space, skipHistory, children }: SpaceProps) => {
       <ErrorPanel>
         <h1>Welcome <span title={userProfileStore.firstName}>{userProfileStore.firstName}</span></h1>
         <p>You are currently not granted permission to acccess any spaces.</p>
-        <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
+        <p>Please contact our team by email at : <a href={'mailto:kg@ebrains.eu'}>kg@ebrains.eu</a></p>
         <Button onClick={logout}>Logout</Button>
       </ErrorPanel>
     );
@@ -104,24 +112,32 @@ const Space = observer(({ space, skipHistory, children }: SpaceProps) => {
 
   if (!appStore.currentSpace) {
     if (!space) {
+      const Component = GridSelector<SpaceType>;
+
+      const list = userProfileStore.spaces as SpaceType[];
+
+      const handleSpaceFilter = (list: SpaceType[], term: string) => list.filter(space => space.id.toLowerCase().includes(term));
+
       return (
-        <SpaceModal/>
+        <Modal title={`Welcome ${userProfileStore.firstName}, please select a space:`} show={true} closeButton={false} >
+          <Component list={list} itemComponent={SpaceItem} getKey={space => space.id} onSelect={handleSpaceSelection} onFilter={handleSpaceFilter} filterPlaceholder="Filter spaces" />
+        </Modal>
       );
     }
     return (
       <ErrorPanel>
         <p>You are currently not granted permission to acccess the space  &quot;<i>{space}&quot;</i>.</p>
-        <p>Please contact our team by email at : <a href={"mailto:kg@ebrains.eu"}>kg@ebrains.eu</a></p>
+        <p>Please contact our team by email at : <a href={'mailto:kg@ebrains.eu'}>kg@ebrains.eu</a></p>
       </ErrorPanel>
     );
   }
-  
+
   return (
     <>
       {children}
     </>
   );
 });
-Space.displayName = "Space";
+Space.displayName = 'Space';
 
 export default Space;

@@ -20,9 +20,9 @@
  * (Human Brain Project SGA1, SGA2 and SGA3).
  *
  */
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from 'react';
 
-import { APIError } from "../Services/API";
+import type { APIError } from '../Services/API';
 
 export interface GenericQuery<T> {
   data?: T;
@@ -35,7 +35,7 @@ export interface GenericQuery<T> {
 }
 
 function useGenericQuery<T>(fetchT: () => Promise<T>, skip?: boolean): GenericQuery<T> {
-  
+
   const initializedRef = useRef<(() => Promise<T>)|undefined>(undefined);
 
   const [isUninitialized, setUninitialized] = useState(true);
@@ -44,7 +44,7 @@ function useGenericQuery<T>(fetchT: () => Promise<T>, skip?: boolean): GenericQu
   const [isError, setIsError] = useState(false);
   const [isSuccess, setSuccess] = useState<boolean|undefined>(undefined);
   const [data, setData] = useState<T|undefined>(undefined);
-  
+
   const getData = async (): Promise<void> => {
     setUninitialized(false);
     setFetching(true);
@@ -81,7 +81,7 @@ function useGenericQuery<T>(fetchT: () => Promise<T>, skip?: boolean): GenericQu
     isError: isError,
     isSuccess: isSuccess,
     refetch: getData
-  }; 
+  };
 }
 
 export default useGenericQuery;

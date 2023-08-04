@@ -21,14 +21,14 @@
  *
  */
 
-import React from "react";
+import React from 'react';
 
-import StoresContext from "../Contexts/StoresContext";
+import StoresContext from '../Contexts/StoresContext';
 
 const useStores = () => {
   const store = React.useContext(StoresContext);
   if (!store) {
-    throw new Error("useStores must be used within a StoreProvider.");
+    throw new Error('useStores must be used within a StoreProvider.');
   }
   return store;
 };

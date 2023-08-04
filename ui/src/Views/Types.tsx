@@ -21,16 +21,17 @@
  *
  */
 
-import React, { useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import Button from "react-bootstrap/Button"
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
 
-import useStores from "../Hooks/useStores";
-import { Space as SpaceType } from "../types";
+import ErrorPanel from '../Components/ErrorPanel';
+import SpinnerPanel from '../Components/SpinnerPanel';
+import useListTypesQuery from '../Hooks/useListTypesQuery';
+import useStores from '../Hooks/useStores';
+import type { Space as SpaceType } from '../types';
 
-import SpinnerPanel from "../Components/SpinnerPanel";
-import ErrorPanel from "../Components/ErrorPanel";
 
 interface TypesProps {
   children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
@@ -40,35 +41,35 @@ const Types = observer(({ children }: TypesProps) => {
 
   const { appStore, typeStore } = useStores();
 
-  const currentSpace = appStore.currentSpace as SpaceType|null;
+  const space = (appStore.currentSpace as SpaceType|null)?.id??'';
 
-  const handeRetry = () => currentSpace && typeStore.fetch(currentSpace.id);
+  const isReady = !!space && typeStore.space === space;
+
+  const {
+    data: types,
+    error,
+    isUninitialized,
+    isFetching,
+    isSuccess,
+    isError,
+    refetch,
+  } = useListTypesQuery(space, !space || isReady);
+
+  //console.log("Types.tsx", space, typeStore.space, isUninitialized, isFetching);
 
   useEffect(() => {
-    currentSpace && typeStore.fetch(currentSpace.id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentSpace?.id]);
+    if (isFetching) {
+      typeStore.clear();
+    } else if (isSuccess) {
+      if(types) {
+        typeStore.setTypes(space, types);
+      }
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [space, isFetching, isSuccess, types]);
 
-  if (!currentSpace) {
-    return null;
-  }
 
-  if (typeStore.space === currentSpace.id && typeStore.fetchError) {
-    return (
-      <ErrorPanel>
-        {typeStore.fetchError}<br /><br />
-        <Button variant={"primary"} onClick={handeRetry}>
-          <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
-        </Button>
-      </ErrorPanel>
-    );
-  }
-
-  if (typeStore.isFetching) {
-    return <SpinnerPanel text="Retrieving types..." />;
-  }
-
-  if (currentSpace && typeStore.space === currentSpace.id && typeStore.isFetched) {
+  if (isReady) {
     return (
       <>
         {children}
@@ -76,8 +77,23 @@ const Types = observer(({ children }: TypesProps) => {
     );
   }
 
+  if (isError) {
+    return (
+      <ErrorPanel>
+        {error}<br /><br />
+        <Button variant={'primary'} onClick={refetch}>
+          <FontAwesomeIcon icon={'redo-alt'} /> &nbsp; Retry
+        </Button>
+      </ErrorPanel>
+    );
+  }
+
+  if (space && (isUninitialized || isFetching)) {
+    return <SpinnerPanel text={`Retrieving types for space "${space}"...`} />;
+  }
+
   return null;
 });
-Types.displayName = "Types";
+Types.displayName = 'Types';
 
 export default Types;

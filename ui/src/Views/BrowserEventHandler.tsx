@@ -21,11 +21,11 @@
  *
  */
 
-import { useEffect } from "react";
-import { observer } from "mobx-react-lite";
-import { useNavigate, useLocation } from "react-router-dom";
+import { observer } from 'mobx-react-lite';
+import { useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 
-import useStores from "../Hooks/useStores";
+import useStores from '../Hooks/useStores';
 
 const BrowserEventHandler = observer(() => {
   const location = useLocation();
@@ -36,8 +36,8 @@ const BrowserEventHandler = observer(() => {
   useEffect(() => {
     window.onpopstate = () => {
       const path = location.pathname;
-      if(path.startsWith("/instance")) {
-        const id = path.split("/")[2];
+      if(path.startsWith('/instance')) {
+        const id = path.split('/')[2];
         const instance = instanceStore?.instances.get(id);
         const currentSpace = appStore.currentSpace as { id: string}|null;
         if (!instance || instance.space !== currentSpace?.id) {
@@ -45,12 +45,12 @@ const BrowserEventHandler = observer(() => {
           window.location.replace(location.pathname);
         }
       }
-    }
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return null;
 });
-BrowserEventHandler.displayName = "BrowserEventHandler";
+BrowserEventHandler.displayName = 'BrowserEventHandler';
 
 export default BrowserEventHandler;

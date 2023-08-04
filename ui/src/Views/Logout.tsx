@@ -33,27 +33,27 @@
  *
  */
 
-import React from "react";
-import { useNavigate } from "react-router-dom";
-import Panel from "../Components/Panel";
-import Button from "react-bootstrap/Button";
+import React from 'react';
+import Button from 'react-bootstrap/Button';
+import { useNavigate } from 'react-router-dom';
+import Panel from '../Components/Panel';
 
-import Matomo from "../Services/Matomo";
+import Matomo from '../Services/Matomo';
 
 const Logout = () => {
 
   const navigate = useNavigate();
-  
+
   const handleLogin = () =>  {
-    Matomo.trackEvent("User", "Login");
-    navigate("/");
+    Matomo.trackEvent('User', 'Login');
+    navigate('/');
   };
 
   return (
     <Panel icon={undefined}>
       <h3>You are logged out of the application</h3>
-      <p></p>
-      <Button variant={"primary"} onClick={handleLogin}>Login</Button>
+      <p />
+      <Button variant={'primary'} onClick={handleLogin}>Login</Button>
     </Panel>
   );
 

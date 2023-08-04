@@ -21,17 +21,17 @@
  *
  */
 
-import React, { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { observer } from "mobx-react-lite";
-import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import Button from "react-bootstrap/Button";
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect } from 'react';
+import Button from 'react-bootstrap/Button';
+import { useNavigate, useParams } from 'react-router-dom';
 
-import useStores from "../Hooks/useStores";
-import { UUID } from "../types";
+import ErrorPanel from '../Components/ErrorPanel';
+import SpinnerPanel from '../Components/SpinnerPanel';
+import useStores from '../Hooks/useStores';
+import type { UUID } from '../types';
 
-import SpinnerPanel from "../Components/SpinnerPanel";
-import ErrorPanel from "../Components/ErrorPanel";
 
 interface RawInstanceProps {
   children: (instanceId: UUID, space: string) => null|undefined|string|JSX.Element|(null|undefined|string|JSX.Element)[];
@@ -46,16 +46,19 @@ const RawInstance = observer(({ children }: RawInstanceProps) => {
   const {instanceStore, userProfileStore} = useStores();
 
   useEffect(() => {
-    const instance = instanceStore.createInstanceOrGet(instanceId);
-    instance.fetchRaw();
+    if(instanceId) {
+      const instance = instanceStore.createInstanceOrGet(instanceId);
+      instance?.fetchRaw();
+    }
+
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [instanceId]);
 
-  const handleRetry = () => instance.fetchRaw();
+  const handleRetry = () => instance?.fetchRaw();
 
-  const handleContinue = () => navigate("/browse");
+  const handleContinue = () => navigate('/browse');
 
-  const instance = instanceStore.instances.get(instanceId);
+  const instance =  instanceId ? instanceStore.instances.get(instanceId):undefined;
 
   if(!instance) {
     return null;
@@ -67,10 +70,10 @@ const RawInstance = observer(({ children }: RawInstanceProps) => {
         There was a network problem retrieving the instance.<br />
         If the problem persists, please contact the support.<br />
         <small>{instance.rawFetchError}</small><br /><br />
-        <Button variant={"primary"} onClick={handleRetry}>
-          <FontAwesomeIcon icon={"redo-alt"} />&nbsp;&nbsp; Retry
+        <Button variant={'primary'} onClick={handleRetry}>
+          <FontAwesomeIcon icon={'redo-alt'} />&nbsp;&nbsp; Retry
         </Button>
-        <Button variant={"primary"} onClick={handleContinue}>Continue</Button>
+        <Button variant={'primary'} onClick={handleContinue}>Continue</Button>
       </ErrorPanel>
     );
   }
@@ -85,7 +88,7 @@ const RawInstance = observer(({ children }: RawInstanceProps) => {
     return (
       <ErrorPanel>
         You do not have permission to access the space &quot;<i>{instance.space}&quot;</i>.<br /><br />
-        <Button variant={"primary"} onClick={handleContinue}>Continue</Button>
+        <Button variant={'primary'} onClick={handleContinue}>Continue</Button>
       </ErrorPanel>
     );
   }
@@ -96,6 +99,6 @@ const RawInstance = observer(({ children }: RawInstanceProps) => {
     </>
   );
 });
-RawInstance.displayName = "RawInstance";
+RawInstance.displayName = 'RawInstance';
 
 export default RawInstance;

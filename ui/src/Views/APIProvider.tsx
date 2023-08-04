@@ -33,9 +33,9 @@
  *
  */
 
-import React from "react";
-import API from "../Services/API";
-import APIContext from "../Contexts/APIContext";
+import React from 'react';
+import APIContext from '../Contexts/APIContext';
+import type API from '../Services/API';
 
 interface APIProviderProps {
   api: API;

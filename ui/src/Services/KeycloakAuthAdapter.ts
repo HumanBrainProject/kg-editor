@@ -32,69 +32,69 @@
  *   limitations under the License.
  *
  */
-import { KeycloakInstance, KeycloakConfig, KeycloakInitOptions, KeycloakOnLoad } from "keycloak-js";
-import KeyCloakTokenProvider from "./KeycloakTokenProvider";
-import UnauthorizedRequestResponseHandlerProvider from "./UnauthorizedRequestResponseHandlerProvider";
-import AuthAdapter from "./AuthAdapter";
+import KeyCloakTokenProvider from './KeycloakTokenProvider';
+import UnauthorizedRequestResponseHandlerProvider from './UnauthorizedRequestResponseHandlerProvider';
+import type AuthAdapter from './AuthAdapter';
+import type { KeycloakInstance, KeycloakConfig, KeycloakInitOptions, KeycloakOnLoad } from 'keycloak-js';
 
 class KeycloakAuthAdapter implements AuthAdapter {
-    private _tokenProvider: KeyCloakTokenProvider;
-    private _unauthorizedRequestResponseHandlerProvider: UnauthorizedRequestResponseHandlerProvider;
-    private _initOptions: KeycloakInitOptions | undefined;
-    private _redirectUri: string | undefined;
-    private _config: KeycloakConfig | undefined = undefined;
-    private _keycloak: KeycloakInstance | undefined = undefined;
+  private _tokenProvider: KeyCloakTokenProvider;
+  private _unauthorizedRequestResponseHandlerProvider: UnauthorizedRequestResponseHandlerProvider;
+  private _initOptions: KeycloakInitOptions | undefined;
+  private _redirectUri: string | undefined;
+  private _config: KeycloakConfig | undefined = undefined;
+  private _keycloak: KeycloakInstance | undefined = undefined;
 
-    constructor(initOptions?: KeycloakInitOptions, redirectUri?: string) {
-        this._tokenProvider = new KeyCloakTokenProvider();
-        this._unauthorizedRequestResponseHandlerProvider = new UnauthorizedRequestResponseHandlerProvider;
-        this._initOptions = initOptions;
-        this._redirectUri = redirectUri;
-    }
-      
-    get tokenProvider() {
-        return this._tokenProvider;
-    }
- 
-    get unauthorizedRequestResponseHandlerProvider() {
-        return this._unauthorizedRequestResponseHandlerProvider;
-    }
+  constructor(initOptions?: KeycloakInitOptions, redirectUri?: string) {
+    this._tokenProvider = new KeyCloakTokenProvider();
+    this._unauthorizedRequestResponseHandlerProvider = new UnauthorizedRequestResponseHandlerProvider;
+    this._initOptions = initOptions;
+    this._redirectUri = redirectUri;
+  }
 
-    setOnLoad(onLoad: KeycloakOnLoad) {
-        if (this._initOptions) {
-            this._initOptions = {
-                ...this._initOptions,
-                onLoad: onLoad
-            };
-        } else {
-            throw new Error("setOnLoad cannot be called when KeycloakAuthAdapter is not initialized with initOptions");
-        }
-    }
+  get tokenProvider() {
+    return this._tokenProvider;
+  }
 
-    get initOptions(): KeycloakInitOptions | undefined {
-        return this._initOptions?{...this._initOptions}:undefined;
-    }
- 
-    get redirectUri(): string | undefined {
-        return this._redirectUri;
-    }
+  get unauthorizedRequestResponseHandlerProvider() {
+    return this._unauthorizedRequestResponseHandlerProvider;
+  }
 
-    get config(): KeycloakConfig | undefined {
-        return this._config?{...this._config}:undefined;
+  setOnLoad(onLoad: KeycloakOnLoad) {
+    if (this._initOptions) {
+      this._initOptions = {
+        ...this._initOptions,
+        onLoad: onLoad
+      };
+    } else {
+      throw new Error('setOnLoad cannot be called when KeycloakAuthAdapter is not initialized with initOptions');
     }
+  }
 
-    setConfig(config: KeycloakConfig | undefined) {
-        this._config = config;
-    }
+  get initOptions(): KeycloakInitOptions | undefined {
+    return this._initOptions?{...this._initOptions}:undefined;
+  }
 
-    get keycloak(): KeycloakInstance | undefined {
-        return this._keycloak;
-    }
+  get redirectUri(): string | undefined {
+    return this._redirectUri;
+  }
 
-    setKeycloak(keycloak: KeycloakInstance) {
-        this._tokenProvider.setKeycloak(keycloak);
-        this._keycloak = keycloak;
-    }
+  get config(): KeycloakConfig | undefined {
+    return this._config?{...this._config}:undefined;
+  }
+
+  setConfig(config: KeycloakConfig | undefined) {
+    this._config = config;
+  }
+
+  get keycloak(): KeycloakInstance | undefined {
+    return this._keycloak;
+  }
+
+  setKeycloak(keycloak: KeycloakInstance) {
+    this._tokenProvider.setKeycloak(keycloak);
+    this._keycloak = keycloak;
+  }
 }
 
 export default KeycloakAuthAdapter;

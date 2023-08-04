@@ -20,19 +20,19 @@
  * (Human Brain Project SGA1, SGA2 and SGA3).
  *
  */
-import API from "../Services/API";
-import { AppStore } from "./AppStore";
-import { UserProfileStore } from "./UserProfileStore";
-import { HistoryStore } from "./HistoryStore";
-import { TypeStore } from "./TypeStore";
-import { BrowseStore } from "./BrowseStore";
-import { InstanceStore } from "./InstanceStore";
-import { StatusStore } from "./StatusStore";
-import { ViewStore } from "./ViewStore";
-import { GraphStore } from "./GraphStore";
-import { ReleaseStore } from "./ReleaseStore";
-import { UserStore } from "./UserStore";
-import { InvitedUsersStore } from "./InvitedUsersStore";
+import { AppStore } from './AppStore';
+import { BrowseStore } from './BrowseStore';
+import { GraphStore } from './GraphStore';
+import { HistoryStore } from './HistoryStore';
+import { InstanceStore } from './InstanceStore';
+import { InvitedUsersStore } from './InvitedUsersStore';
+import { ReleaseStore } from './ReleaseStore';
+import { StatusStore } from './StatusStore';
+import { TypeStore } from './TypeStore';
+import { UserProfileStore } from './UserProfileStore';
+import { UserStore } from './UserStore';
+import { ViewStore } from './ViewStore';
+import type API from '../Services/API';
 
 class RootStore {
 
@@ -52,12 +52,12 @@ class RootStore {
   constructor(api: API) {
 
     if (!api) {
-      throw new Error("no api provided!");
+      throw new Error('no api provided!');
     }
 
     // Domain stores
     this.historyStore = new HistoryStore(api, this);
-    this.typeStore = new TypeStore(api, this);
+    this.typeStore = new TypeStore();
     this.browseStore = new BrowseStore(api, this);
     this.instanceStore = new InstanceStore(api, this);
     this.statusStore = new StatusStore(api);
@@ -66,7 +66,7 @@ class RootStore {
     this.releaseStore = new ReleaseStore(api, this);
     this.userStore = new UserStore(api);
     this.userProfileStore = new UserProfileStore();
-    this.invitedUsersStore = new InvitedUsersStore(api)
+    this.invitedUsersStore = new InvitedUsersStore(api);
 
     // UI stores
     this.appStore = new AppStore(api, this);

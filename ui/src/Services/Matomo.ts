@@ -32,19 +32,20 @@
  *   limitations under the License.
  *
  */
-import ReactPiwik, { PiwikOptions } from "react-piwik";
+import ReactPiwik from 'react-piwik';
+import type { PiwikOptions } from 'react-piwik';
 
-const style = "color: #f88900;";
+const style = 'color: #f88900;';
 
 class Matomo {
   private reactPiwik?: ReactPiwik;
-  
+
   constructor() {
     this.reactPiwik = undefined;
   }
 
   initialize(settings?: PiwikOptions): void {
-    if (settings?.url && settings?.siteId && !this.reactPiwik && !window.location.host.startsWith("localhost")) {
+    if (settings?.url && settings?.siteId && !this.reactPiwik && !window.location.host.startsWith('localhost')) {
       this.reactPiwik = new ReactPiwik({
         url: settings.url,
         siteId:settings.siteId
@@ -54,15 +55,15 @@ class Matomo {
 
   trackPageView(): void {
     if (this.reactPiwik) {
-      ReactPiwik.push(["trackPageView"]);
+      ReactPiwik.push(['trackPageView']);
     } else {
-      console.info("%c[Matomo] trackPageView", style);
+      console.info('%c[Matomo] trackPageView', style);
     }
   }
 
   trackCustomUrl(url: string): void {
     if (this.reactPiwik && url) {
-      ReactPiwik.push(["setCustomUrl", url]);
+      ReactPiwik.push(['setCustomUrl', url]);
     } else {
       console.info(`%c[Matomo] trackCustomUrl: ${url}`, style);
     }
@@ -70,7 +71,7 @@ class Matomo {
 
   trackEvent(category: string, name: string, value?: string): void {
     if (this.reactPiwik) {
-      ReactPiwik.push(["trackEvent", category, name, value]);
+      ReactPiwik.push(['trackEvent', category, name, value]);
     } else {
       console.info(`%c[Matomo] trackEvent: category="${category}", name="${name}", value="${value}"`, style);
     }
@@ -78,7 +79,7 @@ class Matomo {
 
   trackLink(category: string, name: string): void {
     if (this.reactPiwik) {
-      ReactPiwik.push(["trackLink", category, name]);
+      ReactPiwik.push(['trackLink', category, name]);
     } else {
       console.info(`%c[Matomo] trackLink: category="${category}", name="${name}"`, style);
     }

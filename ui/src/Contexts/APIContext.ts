@@ -32,8 +32,8 @@
  *   limitations under the License.
  *
  */
-import React from "react";
-import API from "../Services/API";
+import React from 'react';
+import type API from '../Services/API';
 
 const APIContext = React.createContext<API|undefined>(undefined);
 

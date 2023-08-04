@@ -21,15 +21,15 @@
  *
  */
 
-import React, { useEffect, useRef } from "react";
-import { observer } from "mobx-react-lite";
-import Button from "react-bootstrap/Button";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { observer } from 'mobx-react-lite';
+import React, { useEffect, useRef } from 'react';
+import Button from 'react-bootstrap/Button';
 
-import useAuth from "../Hooks/useAuth";
-import SpinnerPanel from "../Components/SpinnerPanel";
-import ErrorPanel from "../Components/ErrorPanel";
-import Matomo from "../Services/Matomo";
+import ErrorPanel from '../Components/ErrorPanel';
+import SpinnerPanel from '../Components/SpinnerPanel';
+import useAuth from '../Hooks/useAuth';
+import Matomo from '../Services/Matomo';
 
 interface AuthenticateProps {
   children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
@@ -60,7 +60,7 @@ const Authenticate = observer(({children}: AuthenticateProps) => {
   }, []);
 
   const handleLogin = () =>  {
-    Matomo.trackEvent("User", "Login");
+    Matomo.trackEvent('User', 'Login');
     login();
   };
 
@@ -78,7 +78,7 @@ const Authenticate = observer(({children}: AuthenticateProps) => {
             Your session token has expired or has become invalid.<br/>
             Click on the following button to ask a new one and continue with your session.
         </p>
-        <Button variant={"primary"} onClick={handleLogin}>Re-Login</Button>
+        <Button variant={'primary'} onClick={handleLogin}>Re-Login</Button>
       </ErrorPanel>
     );
   }
@@ -88,10 +88,10 @@ const Authenticate = observer(({children}: AuthenticateProps) => {
       <ErrorPanel>
       There was a problem authenticating ({error}).
         If the problem persists, please contact the support.<br /><br />
-      <Button variant={"primary"} onClick={authenticate}>
-        <FontAwesomeIcon icon={"redo-alt"} /> &nbsp; Retry
-      </Button>
-    </ErrorPanel>
+        <Button variant={'primary'} onClick={authenticate}>
+          <FontAwesomeIcon icon={'redo-alt'} /> &nbsp; Retry
+        </Button>
+      </ErrorPanel>
     );
   }
 
@@ -104,6 +104,6 @@ const Authenticate = observer(({children}: AuthenticateProps) => {
   }
   return null;
 });
-Authenticate.displayName = "Authenticate";
+Authenticate.displayName = 'Authenticate';
 
 export default Authenticate;

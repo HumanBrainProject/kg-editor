@@ -32,7 +32,7 @@
  *   limitations under the License.
  *
  */
-import { Settings, UserProfile, KGCoreResult, UUID, Stage, StructureOfType, InstanceLabel, InstanceFull, InstanceSummary, SuggestionStructure, Neighbor, Scope, UserSummary, IncomingLink } from "../types";
+import type { Settings, UserProfile, KGCoreResult, UUID, Stage, StructureOfType, InstanceFull, InstanceSummary, SuggestionStructure, Neighbor, Scope, UserSummary, IncomingLink, InstanceRawStructure, InstanceLabelData, InstanceSummaryData, InstanceFullData } from '../types';
 
 interface APIErrorResponse {
   status: number;
@@ -45,7 +45,7 @@ export interface APIError {
   response?: APIErrorResponse;
 }
 
-export default interface API {
+interface API {
 
   getSettings(): Promise<Settings>;
 
@@ -55,11 +55,11 @@ export default interface API {
 
   getInstance(instanceId: UUID): Promise<KGCoreResult<InstanceFull>>;
 
-  getRawInstance(instanceId: UUID): Promise<Map<string, unknown>>;
+  getRawInstance(instanceId: UUID): Promise<InstanceRawStructure>;
 
   deleteInstance(instanceId: UUID): Promise<void>;
 
-  createInstance(space: string, instanceId: UUID, payload: object): Promise<KGCoreResult<InstanceFull>>;
+  createInstance(space: string, instanceId: UUID|undefined, payload: object): Promise<KGCoreResult<InstanceFull>>;
 
   moveInstance(instanceId: UUID, space: string): Promise<void>;
 
@@ -67,17 +67,17 @@ export default interface API {
 
   searchInstancesByType(space: string, type: string, from: number, size: number, search: string): Promise<KGCoreResult<InstanceSummary[]>>;
 
-  getSuggestions(instanceId: UUID, field: string, sourceType: string, targetType: string, from: number, size: number, search: string, payload: object): Promise<KGCoreResult<SuggestionStructure>>;
+  getSuggestions(instanceId: UUID, field: string, sourceType: string|undefined, targetType: string|undefined, from: number|undefined, size: number|undefined, search: string|undefined, payload?: {[key: string]: any}): Promise<KGCoreResult<SuggestionStructure>>;
 
-  getInstanceNeighbors(instanceId: UUID): Promise<KGCoreResult<Neighbor[]>>;
+  getInstanceNeighbors(instanceId: UUID): Promise<KGCoreResult<Neighbor>>;
 
   getInstanceScope(instanceId: UUID): Promise<KGCoreResult<Scope>>;
 
-  getInstancesLabel(stage: Stage, instanceIds: UUID[]): Promise<KGCoreResult<Map<string, InstanceLabel>>>;
+  getInstancesLabel(stage: Stage | undefined, instanceIds: UUID[]): Promise<KGCoreResult<InstanceLabelData>>;
 
-  getInstancesSummary(stage: Stage, instanceIds: UUID[]): Promise<KGCoreResult<Map<string, InstanceSummary>>>;
+  getInstancesSummary(stage: Stage|undefined, instanceIds: UUID[]): Promise<KGCoreResult<InstanceSummaryData>>;
 
-  getInstancesList(stage: Stage, instanceIds: UUID[]): Promise<KGCoreResult<Map<string, InstanceFull>>>;
+  getInstancesList(stage: Stage | undefined, instanceIds: UUID[]): Promise<KGCoreResult<InstanceFullData>>;
 
   getInvitedUsers(instanceId: UUID): Promise<KGCoreResult<UserSummary[]>>;
 
@@ -97,3 +97,5 @@ export default interface API {
 
   getMoreIncomingLinks(instanceId: UUID, property: string, type: string, from: number, size: number): Promise<KGCoreResult<IncomingLink[]>>;
 }
+
+export default API;

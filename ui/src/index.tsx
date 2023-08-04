@@ -20,15 +20,16 @@
  * (Human Brain Project SGA1, SGA2 and SGA3).
  *
  */
-import React from "react";
+import axios from 'axios';
+import React from 'react';
 import { createRoot } from 'react-dom/client';
-import axios, { InternalAxiosRequestConfig } from "axios";
 // import { configure } from "mobx"; //NOSONAR
 
-import RootStore from "./Stores/RootStore";
-import KeycloakAuthAdapter from "./Services/KeycloakAuthAdapter";
-import APIBackendAdapter from "./Services/APIBackendAdapter";
-import App from "./App";
+import App from './App';
+import APIBackendAdapter from './Services/APIBackendAdapter';
+import KeycloakAuthAdapter from './Services/KeycloakAuthAdapter';
+import RootStore from './Stores/RootStore';
+import type { InternalAxiosRequestConfig } from 'axios';
 
 /* //NOSONAR React debug flags
 configure({
@@ -40,12 +41,12 @@ configure({
 });
 */
 
-const rootPath = window.rootPath || "";
+const rootPath = window.rootPath || '';
 
 const authAdapter = new KeycloakAuthAdapter({
-  onLoad: "login-required",
-  flow: "standard",
-  pkceMethod: "S256",
+  onLoad: 'login-required',
+  flow: 'standard',
+  pkceMethod: 'S256',
   checkLoginIframe: false,
   enableLogging: true
 }, `${window.location.protocol}//${window.location.host}${rootPath}/logout`);
@@ -54,18 +55,18 @@ const authAdapter = new KeycloakAuthAdapter({
 const axiosInstance = axios.create({});
 axiosInstance.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
   if (authAdapter.tokenProvider?.token && config.headers) {
-      config.headers.Authorization = `Bearer ${authAdapter.tokenProvider.token}`;
+    config.headers.Authorization = `Bearer ${authAdapter.tokenProvider.token}`;
   }
   return Promise.resolve(config);
 });
 axiosInstance.interceptors.response.use(undefined, (error) => {
   if (error.response && error.response.status === 401 && !error.config._isRetry) {
-      authAdapter.unauthorizedRequestResponseHandlerProvider.unauthorizedRequestResponseHandler && authAdapter.unauthorizedRequestResponseHandlerProvider.unauthorizedRequestResponseHandler();
-      return axios.request(error.config);
+    authAdapter.unauthorizedRequestResponseHandlerProvider.unauthorizedRequestResponseHandler && authAdapter.unauthorizedRequestResponseHandlerProvider.unauthorizedRequestResponseHandler();
+    return axios.request(error.config);
   } else {
-      return Promise.reject(error);
+    return Promise.reject(error);
   }
-  });
+});
 
 const api = new APIBackendAdapter(axiosInstance);
 
@@ -73,7 +74,7 @@ const stores = new RootStore(api);
 
 const container = document.getElementById('root');
 if (!container) {
-  throw new Error("Failed to find the root element");
+  throw new Error('Failed to find the root element');
 }
 const root = createRoot(container);
 root.render(

@@ -133,7 +133,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => fieldStore.setValue(e.target.value);
 
-  const handleSelectAlternative = (val: any) => fieldStore.setValue(val); //TODO: Check if this can be typed!
+  const handleSelectAlternative = (val: any) => fieldStore.setValue(val);
 
   const handleRemoveMySuggestion = () => fieldStore.setValue(null);
 

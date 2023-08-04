@@ -61,7 +61,6 @@ class LinkStore extends FieldStore {
   optionsSize = 0;
   optionsTotal = Infinity;
   fetchingCounter = 0;
-  isLink = true; //TODO: could be removed after typscript complete refactoring
   targetTypes: SimpleType[] = [];
   targetType?: SimpleType;
   mappingValue = '@id';

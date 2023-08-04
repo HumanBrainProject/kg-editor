@@ -113,8 +113,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
 
   const handleOnAddValue = (value: string) => fieldStore.addValue(value);
 
-  const handleSelectAlternative = (values: any) => fieldStore.setValues([...values]); //TODO: Check if this can be typed!
-
+  const handleSelectAlternative = (values: any) => fieldStore.setValues([...values]);
   const handleRemoveMySuggestion = () => fieldStore.removeAllValues();
 
   const handleDeleteLastValue = () => fieldStore.removeLastValue();
@@ -233,7 +232,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
         <input type="text" className={classes.userInput}
           title="value"
           disabled={isDisabled}
-          onDrop={handleDropAtTheEnd} //TODO: Again! This is currently not working! Fix or drop ?
+          onDrop={handleDropAtTheEnd}
           onDragOver={e => e.preventDefault()}
           onKeyDown={handleKeyStrokes}
           onBlur={handleBlur}

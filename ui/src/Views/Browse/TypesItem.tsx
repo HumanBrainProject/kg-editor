@@ -162,7 +162,7 @@ interface CreateInstanceProps {
   canCreate: boolean;
   isCreatingNewInstance: boolean;
   classes: any;
-  onClick: () => void; // TODO: fix me
+  onClick: () => void;
   cannotCreateTooltip?: string;
   label: string;
 }

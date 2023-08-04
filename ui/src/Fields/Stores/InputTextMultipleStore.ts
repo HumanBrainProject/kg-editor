@@ -67,7 +67,6 @@ class InputTextMultipleStore extends FieldStore {
     this.maxItems = definition.maxItems;
     this.maxLength = definition.maxLength;
     this.regexRules = getRegexRules(definition.validation);
-    //TODO: remove backward compatibility for deprecated regex property
     if (
       definition.regex &&
       !(Array.isArray(definition.validation) && definition.validation.length)

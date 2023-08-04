@@ -247,7 +247,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
           title="value"
           className={classes.userInput}
           disabled={isDisabled}
-          onDrop={handleDropAtTheEnd} //TODO: Again, is this really needed? What is it doing ?
+          onDrop={handleDropAtTheEnd}
           onDragOver={e => e.preventDefault()}
           onKeyDown={handleKeyStrokes}
           onBlur={handleBlur}

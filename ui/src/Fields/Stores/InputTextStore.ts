@@ -79,7 +79,6 @@ class InputTextStore extends FieldStore {
     this.maxLength = definition.maxLength;
     this.markdown = !!definition.markdown;
     this.regexRules = getRegexRules(definition.validation);
-    //TODO: remove backward compatibility for deprecated regex property
     if (
       definition.regex &&
       !(Array.isArray(definition.validation) && definition.validation.length)
@@ -140,7 +139,7 @@ class InputTextStore extends FieldStore {
   get regexWarning(): string | undefined {
     //NOSONAR by design return null when no warning
     return this.regexRules.reduce((message, rule) =>
-      message || rule.regex.test(this.value) ? message : rule.errorMessage, //TODO: What is this code doing ?? It looks like a hack!
+      message || rule.regex.test(this.value) ? message : rule.errorMessage,
       undefined as string | undefined
     );
   }

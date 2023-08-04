@@ -195,7 +195,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     instanceStore.togglePreviewInstance();
   };
 
-  const handleSelectAlternative = (val:any) => { //TODO: Check if this can be strongly typed!
+  const handleSelectAlternative = (val:any) => {
     fieldStore.addValue({[mappingValue]: val.id});
     instanceStore.togglePreviewInstance();
   };

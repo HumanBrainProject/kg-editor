@@ -114,14 +114,14 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
 
   const handleOnAddValue = (value?: string|null) => {
     if(value !== undefined && value !== null) {
-      const val = parseFloat(value);
+      const val = parseFloat(value); // ensure that the string contains a number
       if(!isNaN(val)) {
-        fieldStore.addValue(value); //TODO: Why are we doing this ? We are parsing first and then adding the string value
+        fieldStore.addValue(value);
       }
     }
   };
 
-  const handleSelectAlternative = (values: any) => fieldStore.setValues([...values]); //TODO: check if this can be typed!
+  const handleSelectAlternative = (values: any[]) => fieldStore.setValues([...values]);
 
   const handleRemoveMySuggestion = () => fieldStore.removeAllValues();
 
@@ -236,12 +236,12 @@ const InputNumberMultiple = observer(({className, fieldStore, readMode, showIfNo
           onDragEnd={handleDragEnd}
           onDragStart={handleDragStart}
           onDrop={handleDrop}
-          onKeyDown={handleKeyDown} // TODO: Again! Check if this is still needed! It is currently not working!
+          onKeyDown={handleKeyDown}
         />
         <input type="number" className={classes.userInput}
           title="value"
           disabled={isDisabled}
-          onDrop={handleDropAtTheEnd} // TODO: Again! Check if this is still needed! It is currently not working!
+          onDrop={handleDropAtTheEnd}
           onDragOver={e => e.preventDefault()}
           onKeyDown={handleKeyStrokes}
           onBlur={handleBlur}

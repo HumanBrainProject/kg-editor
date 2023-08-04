@@ -79,7 +79,6 @@ const Links = observer(({ instanceId }: LinksProps) => {
   };
 
   const view = viewStore.selectedView as View;
-  //TODO: Check this logic still works with the current changes made!
   const path = view?.instancePath;
   const index = path?.findIndex(id => id === instanceId);
   const instancePath = index !== undefined && index > 0?path?.slice(0, index):[instanceId];

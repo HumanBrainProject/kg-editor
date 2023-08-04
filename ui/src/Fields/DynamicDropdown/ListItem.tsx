@@ -165,7 +165,7 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
     if(enablePointerEvents) {
       e.stopPropagation();
       if(index) {
-        onKeyDown && onKeyDown(index, e); //TODO: Fix me. This is not working.
+        onKeyDown && onKeyDown(index, e);
       }
     }
   };

@@ -58,7 +58,7 @@ const useStyles = createUseStyles({
 });
 
 export interface ValueRendererProps {
-  alternative: any; //TODO: Check if this is actually any !
+  alternative: any;
 }
 
 

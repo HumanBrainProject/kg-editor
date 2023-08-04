@@ -579,7 +579,7 @@ export class InstanceStore {
       permissions: toJS(this.rootStore.appStore.currentSpacePermissions),
       possibleIncomingLinks: type.incomingLinks,
       labelField: ''
-    }; //TODO: Fix me!
+    };
     if (type.labelField) {
       data.labelField = type.labelField;
     }

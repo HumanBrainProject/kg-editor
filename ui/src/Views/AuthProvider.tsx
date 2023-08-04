@@ -40,6 +40,7 @@ import KeycloakAuthAdapter from '../Services/KeycloakAuthAdapter';
 import KeycloakAuthProvider from './KeycloakAuthProvider';
 import type Auth from '../Services/Auth';
 import type AuthAdapter from '../Services/AuthAdapter';
+import type { JSX } from 'react';
 
 /* For debugging purpose only, when running the ui app locally but connecting to
  * backend prod (where keycloak is not allowing localhost),

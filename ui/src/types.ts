@@ -146,7 +146,7 @@ export interface StructureOfType extends SimpleType {
   isSupported?: boolean;
 }
 
-export type StructureOfIncomingLinkByFieldName = Record<string,StructureOfIncomingLink>; // by fieldName //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+export type StructureOfIncomingLinkByFieldName = Record<string,StructureOfIncomingLink>; // by fieldName
 
 export interface StructureOfField {
   isPublic?: boolean;
@@ -196,7 +196,7 @@ export interface InstanceLabel {
   error: Error;
 }
 
-export type Fields = Record<string,StructureOfField>; // by fieldName //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+export type Fields = Record<string,StructureOfField>; // by fieldName
 
 export interface InstanceSummary extends InstanceLabel {
   permissions: Permissions;
@@ -211,7 +211,7 @@ export interface InstanceFull extends InstanceSummary {
   possibleIncomingLinks: StructureOfIncomingLink[];
 }
 
-export type Alternatives = Record<string,Alternative[]>; // by fieldName //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+export type Alternatives = Record<string,Alternative[]>; // by fieldName
 
 export interface Alternative {
   value: any;
@@ -219,9 +219,9 @@ export interface Alternative {
   users: UserSummary[];
 }
 
-export type IncomingLinksByField = Record<string,IncomingLinksByType[]>; // by fieldName //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+export type IncomingLinksByField = Record<string,IncomingLinksByType[]>; // by fieldName
 
-export type IncomingLinksByType = Record<string,InstanceIncomingLinkFull>; // by type //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+export type IncomingLinksByType = Record<string,InstanceIncomingLinkFull>; // by type
 
 export interface IncomingLinks {
   label: string;
@@ -272,17 +272,17 @@ export interface SuggestionSimpleTypeWithSpaces extends SimpleType {
   space: string[];
 }
 
-export type SuggestionsTypes = Record<string,SuggestionSimpleTypeWithSpaces>; // by typeName //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+export type SuggestionsTypes = Record<string,SuggestionSimpleTypeWithSpaces>; // by typeName
 
-export type InstanceRawData = { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+export type InstanceRawData = {
   [fieldName:string]: unknown;
 }
 
-export type InstanceLabelData = Record<UUID,InstanceLabel>; // by instanceId //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+export type InstanceLabelData = Record<UUID,InstanceLabel>; // by instanceId
 
-export type InstanceSummaryData = Record<UUID,InstanceSummary>; // by instanceId //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+export type InstanceSummaryData = Record<UUID,InstanceSummary>; // by instanceId
 
-export type InstanceFullData = Record<UUID,InstanceFull>; // by instanceId //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+export type InstanceFullData = Record<UUID,InstanceFull>; // by instanceId
 
 export interface InstanceRawStructure {
   data: InstanceRawData;
@@ -347,9 +347,9 @@ export interface GraphNode extends NodeObject {
   labelLines: string[];
 }
 
-export type GraphNodes = Record<string,GraphNode>; //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+export type GraphNodes = Record<string,GraphNode>;
 
-export type GraphGroups = Record<string,GraphGroup>; //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+export type GraphGroups = Record<string,GraphGroup>;
 
 export interface GraphLink extends LinkObject {
   id: string;
@@ -358,7 +358,7 @@ export interface GraphLink extends LinkObject {
   target: GraphNode;
 }
 
-export type GraphLinks = Record<string,GraphLink>; //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+export type GraphLinks = Record<string,GraphLink>;
 
 export interface GraphGroup extends GraphNode {
   types: SimpleType[];

@@ -162,7 +162,7 @@ class SingleNestedFieldStore extends FieldStore {
   }
 
   delete() {
-    this._setValue(undefined);
+    this._setValue();
   }
 
   reset() {

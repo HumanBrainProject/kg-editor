@@ -137,7 +137,7 @@ export class View {
   }
 
   resetInstanceHighlight() {
-    this.setInstanceHighlight(undefined, undefined, undefined);
+    this.setInstanceHighlight();
   }
 
   setNameAndColor(name: string, color: string) {

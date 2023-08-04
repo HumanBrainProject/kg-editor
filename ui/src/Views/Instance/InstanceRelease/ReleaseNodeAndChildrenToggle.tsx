@@ -82,7 +82,7 @@ const ReleaseNodeAndChildrenToggle = observer(() => {
   const handleMarkAllNodeToCurrentState = () => {
     const node = releaseStore.instancesTree;
     if(node) {
-      releaseStore.markAllNodeForChange(node, undefined);
+      releaseStore.markAllNodeForChange(node);
     }
   };
 

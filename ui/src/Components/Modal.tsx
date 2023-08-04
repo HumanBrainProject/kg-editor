@@ -24,6 +24,7 @@
 import React from 'react';
 import ModalComponent from 'react-bootstrap/Modal';
 import { createUseStyles } from 'react-jss';
+import type { JSX } from 'react';
 
 const useStyles = createUseStyles({
   modal: {

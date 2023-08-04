@@ -36,6 +36,7 @@
 import React from 'react';
 import StoresContext from '../Contexts/StoresContext';
 import type RootStore from '../Stores/RootStore';
+import type { JSX } from 'react';
 
 interface StoresProviderProps {
   stores: RootStore;

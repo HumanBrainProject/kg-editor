@@ -32,6 +32,7 @@ import Modal from '../Components/Modal';
 import useAuth from '../Hooks/useAuth';
 import useStores from '../Hooks/useStores';
 import type { Space as SpaceType } from '../types';
+import type { JSX } from 'react';
 
 
 const hasSpace = (spaces: SpaceType[], name?: string|null) => !!name && spaces.find(s => s.id === name);

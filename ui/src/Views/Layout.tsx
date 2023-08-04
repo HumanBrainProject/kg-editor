@@ -29,6 +29,7 @@ import Copyright from './Copyright';
 import Logo from './Logo';
 import Nav from './Nav';
 import type { Theme } from '../Themes/Theme';
+import type { JSX } from 'react';
 import type { DefaultTheme} from 'react-jss';
 
 const getBackgroundSize = (theme: Jss.Theme) => {

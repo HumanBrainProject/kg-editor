@@ -33,16 +33,16 @@
  *
  */
 import type TokenProvider from './TokenProvider';
-import type { KeycloakInstance } from 'keycloak-js';
+import type Keycloak from 'keycloak-js';
 
 class KeycloakTokenProvider implements TokenProvider {
-  private _keycloak: KeycloakInstance | undefined = undefined;
+  private _keycloak: Keycloak | undefined = undefined;
 
   get token() {
     return this._keycloak?.token;
   }
 
-  setKeycloak(keycloak: KeycloakInstance) {
+  setKeycloak(keycloak: Keycloak) {
     this._keycloak = keycloak;
   }
 }

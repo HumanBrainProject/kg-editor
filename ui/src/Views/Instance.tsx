@@ -31,6 +31,7 @@ import ErrorPanel from '../Components/ErrorPanel';
 import SpinnerPanel from '../Components/SpinnerPanel';
 import useStores from '../Hooks/useStores';
 import type { UUID } from '../types';
+import type { JSX } from 'react';
 
 
 interface InstanceProps {

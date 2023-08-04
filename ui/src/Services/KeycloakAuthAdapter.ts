@@ -35,7 +35,8 @@
 import KeyCloakTokenProvider from './KeycloakTokenProvider';
 import UnauthorizedRequestResponseHandlerProvider from './UnauthorizedRequestResponseHandlerProvider';
 import type AuthAdapter from './AuthAdapter';
-import type { KeycloakInstance, KeycloakConfig, KeycloakInitOptions, KeycloakOnLoad } from 'keycloak-js';
+import type Keycloak from 'keycloak-js';
+import type { KeycloakConfig, KeycloakInitOptions, KeycloakOnLoad } from 'keycloak-js';
 
 class KeycloakAuthAdapter implements AuthAdapter {
   private _tokenProvider: KeyCloakTokenProvider;
@@ -43,7 +44,7 @@ class KeycloakAuthAdapter implements AuthAdapter {
   private _initOptions: KeycloakInitOptions | undefined;
   private _redirectUri: string | undefined;
   private _config: KeycloakConfig | undefined = undefined;
-  private _keycloak: KeycloakInstance | undefined = undefined;
+  private _keycloak: Keycloak | undefined = undefined;
 
   constructor(initOptions?: KeycloakInitOptions, redirectUri?: string) {
     this._tokenProvider = new KeyCloakTokenProvider();
@@ -87,11 +88,11 @@ class KeycloakAuthAdapter implements AuthAdapter {
     this._config = config;
   }
 
-  get keycloak(): KeycloakInstance | undefined {
+  get keycloak(): Keycloak | undefined {
     return this._keycloak;
   }
 
-  setKeycloak(keycloak: KeycloakInstance) {
+  setKeycloak(keycloak: Keycloak) {
     this._tokenProvider.setKeycloak(keycloak);
     this._keycloak = keycloak;
   }

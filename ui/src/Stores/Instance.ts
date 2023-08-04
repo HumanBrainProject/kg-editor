@@ -28,7 +28,6 @@ import LinkStore from '../Fields/Stores/LinkStore';
 import LinksStore from '../Fields/Stores/LinksStore';
 import type RootStore from './RootStore';
 import type FieldStore from '../Fields/Stores/FieldStore';
-import type { Value } from '../Fields/Stores/LinksStore';
 import type NestedFieldStore from '../Fields/Stores/NestedFieldStore';
 import type SingleNestedFieldStore from '../Fields/Stores/SingleNestedFieldStore';
 import type { NestedInstanceFieldStores, NestedInstanceStores } from '../Fields/Stores/SingleNestedFieldStore';
@@ -195,20 +194,18 @@ const getChildrenIds = (fields: NestedInstanceFieldStores): Set<UUID> => {
       );
       idsOfNestedFields.forEach(id => acc.add(id));
     } else if (field instanceof LinksStore) {
-      const linksField = field as LinksStore;
-      const values = linksField.returnValue;
+      const values = field.returnValue;
       if (Array.isArray(values)) {
         values
-          .map(obj => obj && (obj as Value)[linksField.mappingValue])
+          .map(obj => obj?.[field.mappingValue])
           .filter(id => !!id && typeof id === 'string')
           .forEach(id => acc.add(id as UUID));
       }
     } else if (field instanceof LinkStore) {
-      const linkField = field as LinkStore;
-      const value = linkField.returnValue;
-      const id = !!value && typeof value !== 'string' ? value[linkField.mappingValue]:undefined;
+      const value = field.returnValue;
+      const id = !!value && typeof value !== 'string' ? value[field.mappingValue]:undefined;
       if (id && typeof id === 'string') {
-        acc.add(id as UUID);
+        acc.add(id);
       }
     }
     return acc;

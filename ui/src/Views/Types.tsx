@@ -31,6 +31,7 @@ import SpinnerPanel from '../Components/SpinnerPanel';
 import useListTypesQuery from '../Hooks/useListTypesQuery';
 import useStores from '../Hooks/useStores';
 import type { Space as SpaceType } from '../types';
+import type { JSX } from 'react';
 
 
 interface TypesProps {

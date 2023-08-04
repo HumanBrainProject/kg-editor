@@ -133,7 +133,7 @@ class FieldStore {
   }
 
   clearWarning() {
-    this.setWarning(undefined);
+    this.setWarning();
   }
 
   get hasWarning() {
@@ -146,7 +146,7 @@ class FieldStore {
   }
 
   clearError() {
-    this.setError(undefined, undefined);
+    this.setError();
   }
 
   get hasError() {

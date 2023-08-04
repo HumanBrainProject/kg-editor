@@ -34,6 +34,7 @@ import KeycloakAuthAdapter from '../Services/KeycloakAuthAdapter';
 import Matomo from '../Services/Matomo';
 import Sentry from '../Services/Sentry';
 import type AuthAdapter from '../Services/AuthAdapter';
+import type { JSX } from 'react';
 
 interface SettingsProps {
   authAdapter?: AuthAdapter;

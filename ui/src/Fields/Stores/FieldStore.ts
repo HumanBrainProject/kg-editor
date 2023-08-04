@@ -32,6 +32,11 @@ import type { ErrorInfo } from 'react';
 
 export type FieldStores = Record<string,FieldStore>; // by fieldName
 
+export interface NestedInstanceStores {
+  stores: FieldStores;
+  '@type': string[];
+}
+
 class FieldStore {
   value: any;
   label?:string;

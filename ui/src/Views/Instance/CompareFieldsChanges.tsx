@@ -33,8 +33,8 @@ import LinkStore from '../../Fields/Stores/LinkStore';
 import LinksStore from '../../Fields/Stores/LinksStore';
 import CompareValue from './CompareValue';
 import type FieldStore from '../../Fields/Stores/FieldStore';
+import type { NestedInstanceStores } from '../../Fields/Stores/FieldStore';
 import type NestedFieldStore from '../../Fields/Stores/NestedFieldStore';
-import type { NestedInstanceStores } from '../../Fields/Stores/SingleNestedFieldStore';
 import type Instance from '../../Stores/Instance';
 import type InstanceStore from '../../Stores/InstanceStore';
 

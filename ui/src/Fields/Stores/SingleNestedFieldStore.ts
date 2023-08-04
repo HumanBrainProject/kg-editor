@@ -24,7 +24,7 @@
 import { observable, action, computed, makeObservable, toJS } from 'mobx';
 import { fieldsMapping } from '..';
 import FieldStore from './FieldStore';
-import type { FieldStores } from './FieldStore';
+import type { FieldStores, NestedInstanceStores } from './FieldStore';
 import type { WidgetOptions} from '..';
 import type API from '../../Services/API';
 import type Instance from '../../Stores/Instance';
@@ -33,11 +33,6 @@ import type { FieldStoreDefinition, SimpleType, StructureOfField } from '../../t
 
 interface Value {
   [key: string]: any;
-}
-
-export interface NestedInstanceStores {
-  stores: FieldStores;
-  '@type': string[];
 }
 
 class SingleNestedFieldStore extends FieldStore {

@@ -28,10 +28,9 @@ import LinkStore from '../Fields/Stores/LinkStore';
 import LinksStore from '../Fields/Stores/LinksStore';
 import type RootStore from './RootStore';
 import type FieldStore from '../Fields/Stores/FieldStore';
-import type { FieldStores } from '../Fields/Stores/FieldStore';
+import type { FieldStores, NestedInstanceStores } from '../Fields/Stores/FieldStore';
 import type NestedFieldStore from '../Fields/Stores/NestedFieldStore';
 import type SingleNestedFieldStore from '../Fields/Stores/SingleNestedFieldStore';
-import type { NestedInstanceStores } from '../Fields/Stores/SingleNestedFieldStore';
 import type API from '../Services/API';
 import type { APIError } from '../Services/API';
 import type {

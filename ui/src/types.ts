@@ -146,9 +146,7 @@ export interface StructureOfType extends SimpleType {
   isSupported?: boolean;
 }
 
-export interface StructureOfIncomingLinkByFieldName { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
-  [fieldName: string]: StructureOfIncomingLink;
-}
+export type StructureOfIncomingLinkByFieldName = Record<string,StructureOfIncomingLink>; // by fieldName //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
 
 export interface StructureOfField {
   isPublic?: boolean;
@@ -190,7 +188,6 @@ export interface ValidationRule {
   errorMessage: string;
 }
 
-
 export interface InstanceLabel {
   space: string;
   types: SimpleType[];
@@ -199,9 +196,8 @@ export interface InstanceLabel {
   error: Error;
 }
 
-export interface Fields { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
-  [fieldName: string]: StructureOfField
-}
+export type Fields = Record<string,StructureOfField>; // by fieldName //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+
 export interface InstanceSummary extends InstanceLabel {
   permissions: Permissions;
   fields: Fields;
@@ -215,9 +211,7 @@ export interface InstanceFull extends InstanceSummary {
   possibleIncomingLinks: StructureOfIncomingLink[];
 }
 
-export interface Alternatives { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
-  [fieldName: string]: Alternative[];
-}
+export type Alternatives = Record<string,Alternative[]>; // by fieldName //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
 
 export interface Alternative {
   value: any;
@@ -225,13 +219,9 @@ export interface Alternative {
   users: UserSummary[];
 }
 
-export interface IncomingLinksByField { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
-  [fieldName: string]: IncomingLinksByType;
-}
+export type IncomingLinksByField = Record<string,IncomingLinksByType[]>; // by fieldName //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
 
-export interface IncomingLinksByType { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
-  [type: string]: InstanceIncomingLinkFull;
-}
+export type IncomingLinksByType = Record<string,InstanceIncomingLinkFull>; // by type //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
 
 export interface IncomingLinks {
   label: string;
@@ -282,25 +272,17 @@ export interface SuggestionSimpleTypeWithSpaces extends SimpleType {
   space: string[];
 }
 
-export type SuggestionsTypes = { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
-  [typeName:string]: SuggestionSimpleTypeWithSpaces;
-}
+export type SuggestionsTypes = Record<string,SuggestionSimpleTypeWithSpaces>; // by typeName //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
 
 export type InstanceRawData = { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
   [fieldName:string]: unknown;
 }
 
-export type InstanceLabelData = { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
-  [uuid:UUID]: InstanceLabel;
-}
+export type InstanceLabelData = Record<UUID,InstanceLabel>; // by instanceId //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
 
-export type InstanceSummaryData = { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
-  [uuid:UUID]: InstanceSummary;
-}
+export type InstanceSummaryData = Record<UUID,InstanceSummary>; // by instanceId //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
 
-export type InstanceFullData = { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
-  [uuid:UUID]: InstanceFull;
-}
+export type InstanceFullData = Record<UUID,InstanceFull>; // by instanceId //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
 
 export interface InstanceRawStructure {
   data: InstanceRawData;
@@ -365,13 +347,10 @@ export interface GraphNode extends NodeObject {
   labelLines: string[];
 }
 
-export interface GraphNodes { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
-  [key: string]: GraphNode;
-}
+export type GraphNodes = Record<string,GraphNode>; //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
 
-export interface GraphGroups { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
-  [key: string]: GraphGroup;
-}
+export type GraphGroups = Record<string,GraphGroup>; //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
+
 export interface GraphLink extends LinkObject {
   id: string;
   highlighted: boolean;
@@ -379,9 +358,7 @@ export interface GraphLink extends LinkObject {
   target: GraphNode;
 }
 
-export interface GraphLinks { //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
-  [key: string]: GraphLink;
-}
+export type GraphLinks = Record<string,GraphLink>; //TODO: replace by a Map in APIBackendAdapter and change code where it is used accordingly
 
 export interface GraphGroup extends GraphNode {
   types: SimpleType[];

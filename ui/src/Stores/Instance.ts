@@ -291,9 +291,7 @@ interface NonNormalizedIncomingLinksByType {
   total: number;
 }
 
-interface NonNormalizedIncomingLinksForField {
-  [typeName: string]: NonNormalizedIncomingLinksByType;
-}
+type NonNormalizedIncomingLinksForField = Record<string,NonNormalizedIncomingLinksByType>; // by typeName
 
 interface NonNormalizedIncomingLinks {
   [fieldName: string]: NonNormalizedIncomingLinksForField;

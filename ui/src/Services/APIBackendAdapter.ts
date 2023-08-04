@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 /*  Copyright 2018 - 2021 Swiss Federal Institute of Technology Lausanne (EPFL)
  *
  *  Licensed under the Apache License, Version 2.0 (the "License");

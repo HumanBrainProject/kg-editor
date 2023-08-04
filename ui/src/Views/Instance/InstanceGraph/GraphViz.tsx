@@ -21,7 +21,6 @@
  *
  */
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Color from 'color';
 import debounce from 'lodash/debounce';
 import { observer } from 'mobx-react-lite';
@@ -33,7 +32,6 @@ import useStores from '../../../Hooks/useStores';
 
 import type { GraphGroup, GraphLink, GraphNode } from '../../../types';
 import type { ForceGraphInstance, LinkObject, NodeObject } from 'force-graph';
-import type { MouseEvent } from 'react';
 
 const useStyles = createUseStyles({
   graph: {
@@ -50,11 +48,6 @@ const useStyles = createUseStyles({
     position: 'absolute',
     bottom: '10px',
     right: '0px'
-  },
-  capture: {
-    position: 'absolute',
-    top: '10px',
-    right: '10px'
   },
   settings: {
     position: 'absolute',
@@ -223,15 +216,6 @@ const GraphViz = observer(() => {
 
   const getLinkWidth = (link: LinkObject) => (graphStore.highlightedNode && (link as GraphLink).highlighted)?2:1;
 
-  const handleCapture = (e: MouseEvent<HTMLButtonElement>) => {
-    const canvas = wrapperRef?.current && wrapperRef.current.querySelector('canvas');
-    if (canvas) {
-      const target = e.target as HTMLAnchorElement;
-      target.href = canvas.toDataURL('image/png');
-      target.download = 'test.png';
-    }
-  };
-
   return (
     <div className={classes.graph} ref={wrapperRef}>
       <ForceGraph2D
@@ -250,7 +234,6 @@ const GraphViz = observer(() => {
         nodeRelSize={7}
         linkDirectionalArrowLength={3}
       />
-      <button className={`${classes.capture} btn btn-primary`} onClick={handleCapture} title="capture"><FontAwesomeIcon icon="camera" /></button>
     </div>
   );
 });

@@ -61,7 +61,6 @@ class LinksStore extends FieldStore {
   lazyShowLinks = false;
   visibleLinks = new Set();
   initialValue: Value[] = [];
-  isLink = true; //TODO: could be removed after typscript complete refactoring
   targetTypes: SimpleType[] = [];
   targetType?: SimpleType;
   mappingValue = '@id';
@@ -83,13 +82,13 @@ class LinksStore extends FieldStore {
         this.targetType = defaultTargetType;
       }
     }
-    this.sourceType = options && options.sourceType;
+    this.sourceType = options?.sourceType;
     if (definition.allowCustomValues !== undefined) {
       this.allowCustomValues = !!definition.allowCustomValues;
     }
     if (definition.lazyShowLinks !== undefined) {
       this.lazyShowLinks = !!definition.lazyShowLinks;
-    } else if (options && options.lazyShowLinks !== undefined) {
+    } else if (options?.lazyShowLinks !== undefined) {
       this.lazyShowLinks = !!options.lazyShowLinks;
     }
 

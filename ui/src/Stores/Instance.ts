@@ -465,10 +465,7 @@ const getGroupsForField = (field: FieldStore): Group[] => {
       (field as SingleNestedFieldStore).nestedFieldsStores
     );
     groups.push(...nestedGroups);
-  } else if (
-    (field instanceof LinksStore || field instanceof LinkStore) &&
-    field.isLink
-  ) {
+  } else if (field instanceof LinksStore || field instanceof LinkStore) {
     const group = getGroup(field);
     if (group) {
       groups.push(group);

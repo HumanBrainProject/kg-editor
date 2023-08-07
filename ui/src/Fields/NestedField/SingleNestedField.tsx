@@ -126,19 +126,16 @@ interface ItemProps {
   itemFieldStores: FieldStores;
   readMode: boolean;
   active: boolean;
-  index?: number;
-  onDelete: (v:number) => void;
+  onDelete: () => void;
 }
 
 
-const Item = ({ itemFieldStores, readMode, active, index, onDelete }: ItemProps) => {
+const Item = ({ itemFieldStores, readMode, active, onDelete }: ItemProps) => {
 
   const classes = useStyles();
 
   const view = React.useContext(ViewContext);
   const pane = React.useContext(PaneContext);
-
-  const handleDelete = () => index !== undefined && onDelete(index);
 
   const sortedStores = Object.values(itemFieldStores).sort((a, b) => compareField(a, b, true));
 
@@ -149,7 +146,7 @@ const Item = ({ itemFieldStores, readMode, active, index, onDelete }: ItemProps)
       ))}
       {!readMode && active && (
         <div className={classes.actions} >
-          <Action icon="times" onClick={handleDelete} title="Delete" />
+          <Action icon="times" onClick={onDelete} title="Delete" />
         </div>
       )}
     </div>

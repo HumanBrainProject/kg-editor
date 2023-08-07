@@ -135,12 +135,12 @@ class SingleNestedFieldStore extends FieldStore {
       this.nestedFieldsStores = undefined;
     } else {
       const nestedFieldsStores = {stores: {}, '@type': value['@type']} as NestedInstanceStores;
-      this.nestedFieldsStores = nestedFieldsStores;
       const type = this.getType(value['@type']);
       if (type) {
         const fieldsTemplate = type.fields;
         Object.entries(fieldsTemplate).forEach(([name, template]) => this._addNestedStore(nestedFieldsStores.stores, name, template, value));
       }
+      this.nestedFieldsStores = nestedFieldsStores;
     }
   }
 

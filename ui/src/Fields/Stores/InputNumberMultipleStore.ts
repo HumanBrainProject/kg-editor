@@ -29,7 +29,9 @@ import type Instance from '../../Stores/Instance';
 import type RootStore from '../../Stores/RootStore';
 import type { FieldStoreDefinition } from '../../types';
 
-const normalizeValues = (values: string[]|null|undefined) => {
+type MultipleValues = string[] | null | undefined;
+
+const normalizeValues = (values: MultipleValues) => {
   if (Array.isArray(values)) {
     return values;
   }
@@ -116,7 +118,7 @@ class InputNumberMultipleStore extends FieldStore {
     return this.value.length === 0;
   }
 
-  updateValue(value: string[]|null|undefined) {
+  updateValue(value: MultipleValues) {
     this.returnAsNull = false;
     const values = normalizeValues(value);
     this.initialValue = [...values];
@@ -206,7 +208,7 @@ class InputNumberMultipleStore extends FieldStore {
     this.insertValue(value);
   }
 
-  setValues(values: string[]|null|undefined) {
+  setValues(values: MultipleValues) {
     if (values !== null && values !== undefined) {
       if (values.length  || !this.returnAsNull) {
         this.returnAsNull = false;

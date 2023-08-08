@@ -21,6 +21,7 @@
  *
  */
 
+import {faPlus} from '@fortawesome/free-solid-svg-icons/faPlus';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -69,7 +70,7 @@ const Add = observer(({ className, types, onClick }: AddProps) => {
         onClick={handleSingleTypeAdd}
         title="Add"
       >
-        <FontAwesomeIcon icon="plus" />
+        <FontAwesomeIcon icon={faPlus} />
       </Button>
     );
   }
@@ -81,7 +82,7 @@ const Add = observer(({ className, types, onClick }: AddProps) => {
       id="dropdown-button-drop-right"
       drop="end"
       variant="primary"
-      title={<FontAwesomeIcon icon="plus" />}
+      title={<FontAwesomeIcon icon={faPlus} />}
       className={`${classes.dropdownBtn} ${className ? className : ''}`}
     >
       {types.map(type => (

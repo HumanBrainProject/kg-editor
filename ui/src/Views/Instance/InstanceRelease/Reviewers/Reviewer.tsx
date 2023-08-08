@@ -21,6 +21,7 @@
  *
  */
 
+import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -105,7 +106,7 @@ const Reviewer = observer(({ review, onRemoveInvitation }: ReviewerProps) => {
   return (
     <div className={classes.container}>
       <User userId={review.id} name={review.name} title={review.name} />
-      <button title="remove invitation" onClick={handleRemoveInvitation}><FontAwesomeIcon icon="times"/></button>
+      <button title="remove invitation" onClick={handleRemoveInvitation}><FontAwesomeIcon icon={faTimes}/></button>
     </div>
   );
 });

@@ -21,6 +21,7 @@
  *
  */
 
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
@@ -73,7 +74,7 @@ const Settings = observer(({ authAdapter, children }: SettingsProps) => {
       <ErrorPanel>
         The service is temporary unavailable. Please retry in a moment. ({error}).<br /><br />
         <Button variant={'primary'} onClick={refetch}>
-          <FontAwesomeIcon icon={'redo-alt'} /> &nbsp; Retry
+          <FontAwesomeIcon icon={faRedoAlt} /> &nbsp; Retry
         </Button>
       </ErrorPanel>
     );

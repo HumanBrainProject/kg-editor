@@ -21,6 +21,7 @@
  *
  */
 
+import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
@@ -227,7 +228,7 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
         title="This link points to itself!"
       >
         <span className={classes.valueLabel}>{label}</span>
-        {!disabled && <FontAwesomeIcon className={classes.remove} icon="times" onClick={handleDelete} />}
+        {!disabled && <FontAwesomeIcon className={classes.remove} icon={faTimes} onClick={handleDelete} />}
       </div>
     );
   }
@@ -248,7 +249,7 @@ const ListItem = observer(({ index, instanceId, readOnly, disabled, isCircular, 
       title={label}
     >
       <span className={classes.valueLabel}>{label}</span>
-      {!disabled && <FontAwesomeIcon className={classes.remove} icon="times" onClick={handleDelete} />}
+      {!disabled && <FontAwesomeIcon className={classes.remove} icon={faTimes} onClick={handleDelete} />}
     </div>
   );
 });

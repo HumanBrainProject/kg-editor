@@ -21,6 +21,9 @@
  *
  */
 
+import {faCogs} from '@fortawesome/free-solid-svg-icons/faCogs';
+import {faGlobe} from '@fortawesome/free-solid-svg-icons/faGlobe';
+import {faInfoCircle} from '@fortawesome/free-solid-svg-icons/faInfoCircle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import uniqueId from 'lodash/uniqueId';
 import React from 'react';
@@ -46,7 +49,7 @@ const LabelTooltip = ({tooltip, icon}:LabelTooltipProps) => (
   <>
   &nbsp;
     <OverlayTrigger placement="top" overlay={<Tooltip id={uniqueId('label-tooltip')}>{tooltip}</Tooltip>}>
-      <span><FontAwesomeIcon icon={icon?icon:'info-circle'}/></span>
+      <span><FontAwesomeIcon icon={icon??faInfoCircle}/></span>
     </OverlayTrigger>
   </>
 );
@@ -64,10 +67,10 @@ interface LabelProps {
 const Label = ({ className, label, labelTooltip, labelTooltipIcon, isReadOnly, isRequired, isPublic }: LabelProps) => {
   const classes = useStyles();
   return (
-    <Form.Label className={`${classes.label} ${className?className:''}`}>
+    <Form.Label className={`${classes.label} ${className??''}`}>
       {label}{isRequired && ' *'}
-      {isReadOnly && <LabelTooltip tooltip="This value is populated automatically by the automation system" icon="cogs" />}
-      {isPublic && <LabelTooltip tooltip="This field will be publicly accessible for every user. (Even for users without read access)" icon="globe" />}
+      {isReadOnly && <LabelTooltip tooltip="This value is populated automatically by the automation system" icon={faCogs} />}
+      {isPublic && <LabelTooltip tooltip="This field will be publicly accessible for every user. (Even for users without read access)" icon={faGlobe} />}
       {labelTooltip && <LabelTooltip tooltip={labelTooltip} icon={labelTooltipIcon} />}
     </Form.Label>
   );

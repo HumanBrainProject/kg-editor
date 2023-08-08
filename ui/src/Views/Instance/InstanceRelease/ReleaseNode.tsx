@@ -21,6 +21,8 @@
  *
  */
 
+import {faEye} from '@fortawesome/free-solid-svg-icons/faEye';
+import {faGlasses} from '@fortawesome/free-solid-svg-icons/faGlasses';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -152,7 +154,7 @@ const ReleaseNode = observer(({ node, level = 0 }: ReleaseNodeProps) => {
   const { instanceStore, releaseStore } = useStores();
 
   const handleOptionPreview = (e: MouseEvent<HTMLDivElement>) => {
-    e && e.stopPropagation();
+    e?.stopPropagation();
     if(!node.isAssociation) {
       const options = { showEmptyFields:false, showAction:true, showType:true, showStatus:false };
       instanceStore.togglePreviewInstance(node.id, node.label, options );
@@ -160,7 +162,7 @@ const ReleaseNode = observer(({ node, level = 0 }: ReleaseNodeProps) => {
   };
 
   const handleShowCompare = (e: MouseEvent<HTMLDivElement>) => {
-    e && e.stopPropagation();
+    e?.stopPropagation();
     if(!node.isAssociation) {
       releaseStore.setComparedInstance(node);
     }
@@ -189,12 +191,12 @@ const ReleaseNode = observer(({ node, level = 0 }: ReleaseNodeProps) => {
           <div className={`node-action ${node.isAssociation ? 'disabled' : ''}`}
             onClick={handleOptionPreview}
             title={node.isAssociation ? 'linking instances are not available for preview' : `view ${node.typesName} ${node.label}`}>
-            <FontAwesomeIcon icon="eye" />
+            <FontAwesomeIcon icon={faEye} />
           </div>
           <div className={`node-action ${node.isAssociation ? 'disabled' : ''}`}
             onClick={handleShowCompare}
             title={node.isAssociation? 'linking instances are not available for comparison': 'compare the changes with released vesion'}>
-            <FontAwesomeIcon icon="glasses" />
+            <FontAwesomeIcon icon={faGlasses} />
           </div>
         </div>)}
     </div>

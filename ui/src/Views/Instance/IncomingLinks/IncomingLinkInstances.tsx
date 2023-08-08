@@ -21,6 +21,9 @@
  *
  */
 
+import {faCircle} from '@fortawesome/free-solid-svg-icons/faCircle';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
+import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons/faExclamationTriangle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Color from 'color';
 import { observer } from 'mobx-react-lite';
@@ -77,7 +80,7 @@ const ShowMore = observer(({ link, classes, onClick }: ShowMoreProps) => {
   if (link.fetchError) {
     return (
       <li className={classes.showMoreError}>
-        <FontAwesomeIcon icon="exclamation-triangle" /> {link.fetchError}.{' '}
+        <FontAwesomeIcon icon={faExclamationTriangle}/> {link.fetchError}.{' '}
         <Button variant="primary" onClick={onClick}>
           Retry
         </Button>
@@ -87,7 +90,7 @@ const ShowMore = observer(({ link, classes, onClick }: ShowMoreProps) => {
   if (link.isFetching) {
     return (
       <li className={classes.showMoreLoading}>
-        <FontAwesomeIcon icon="circle-notch" spin /> Loading more incoming
+        <FontAwesomeIcon icon={faCircleNotch} spin /> Loading more incoming
         links...
       </li>
     );
@@ -137,7 +140,7 @@ const IncomingLinkInstances = observer(({ link, readMode }: IncomingLinkInstance
               {link.total}
             </span>
           ) : (
-            <FontAwesomeIcon icon={'circle'} color={badgeColor} />
+            <FontAwesomeIcon icon={faCircle} color={badgeColor} />
           )}
           &nbsp;&nbsp;
           <span>{link.type.label ? link.type.label : link.type.name}</span>

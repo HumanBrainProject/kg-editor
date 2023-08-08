@@ -21,6 +21,10 @@
  *
  */
 
+import {faCheck} from '@fortawesome/free-solid-svg-icons/faCheck';
+import {faPencilAlt} from '@fortawesome/free-solid-svg-icons/faPencilAlt';
+import {faQuestion} from '@fortawesome/free-solid-svg-icons/faQuestion';
+import {faUnlink} from '@fortawesome/free-solid-svg-icons/faUnlink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import uniqueId from 'lodash/uniqueId';
 import React from 'react';
@@ -28,6 +32,7 @@ import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
 import Tooltip from 'react-bootstrap/Tooltip';
 import { createUseStyles } from 'react-jss';
 import { ReleaseStatus as Status } from '../types';
+import type { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 const useStyles = createUseStyles({
   status: {
@@ -75,14 +80,14 @@ const useStyles = createUseStyles({
   }
 });
 
-const getIconStatus = (status?: string) => {
+const getIconStatus = (status?: string): IconProp => {
   switch (status) {
-  case Status.UNRELEASED: return 'unlink';
-  case Status.HAS_CHANGED: return 'pencil-alt';
-  case Status.RELEASED: return 'check';
+  case Status.UNRELEASED: return faUnlink;
+  case Status.HAS_CHANGED: return faPencilAlt;
+  case Status.RELEASED: return faCheck;
   default: break;
   }
-  return 'question';
+  return faQuestion;
 };
 
 interface MessageStatusProps {

@@ -21,6 +21,8 @@
  *
  */
 
+import {faCircle} from '@fortawesome/free-solid-svg-icons/faCircle';
+import {faInfoCircle} from '@fortawesome/free-solid-svg-icons/faInfoCircle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -56,12 +58,12 @@ const TypeComponent = ({ item: type }: { item: StructureOfType }) => {
   return (
     <div className={classes.type} title={type.description??type.name}>
       <div className={classes.icon} style={type.color ? { color: type.color } : {}} >
-        <FontAwesomeIcon fixedWidth icon="circle" />
+        <FontAwesomeIcon fixedWidth icon={faCircle} />
       </div>
       <span>
         {type.label}
         {!!type.description && (
-          <FontAwesomeIcon className={classes.infoCircle} icon="info-circle" />
+          <FontAwesomeIcon className={classes.infoCircle} icon={faInfoCircle} />
         )}
       </span>
     </div>

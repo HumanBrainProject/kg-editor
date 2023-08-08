@@ -21,6 +21,8 @@
  *
  */
 
+import {faCircle} from '@fortawesome/free-solid-svg-icons/faCircle';
+import {faEye} from '@fortawesome/free-solid-svg-icons/faEye';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { createUseStyles } from 'react-jss';
@@ -82,14 +84,14 @@ const Option = ({ item }: OptionProps) => {
   return(
     <div title={item.type.name} tabIndex={-1} className={classes.option}>
       <span className={classes.icon} style={style}>
-        <FontAwesomeIcon fixedWidth icon="circle" />
+        <FontAwesomeIcon fixedWidth icon={faCircle} />
       </span>
       <span>{item.name}</span>
       {item.additionalInformation && (
         <span className={classes.additionalInformation}>{item.additionalInformation}</span>
       )}
       <div className={classes.preview} title="preview" onClick={handlePreview}>
-        <FontAwesomeIcon icon="eye" />
+        <FontAwesomeIcon icon={faEye} />
       </div>
     </div>
   );

@@ -21,6 +21,19 @@
  *
  */
 
+import {faCircle} from '@fortawesome/free-solid-svg-icons/faCircle';
+import {faCloudUploadAlt} from '@fortawesome/free-solid-svg-icons/faCloudUploadAlt';
+import {faCodeBranch} from '@fortawesome/free-solid-svg-icons/faCodeBranch';
+//import {faChartBar} from '@fortawesome/free-solid-svg-icons/faChartBar';
+//import {faCog} from '@fortawesome/free-solid-svg-icons/faCog';
+import {faEnvelope} from '@fortawesome/free-solid-svg-icons/faEnvelope';
+import {faEye} from '@fortawesome/free-solid-svg-icons/faEye';
+import {faPencilAlt} from '@fortawesome/free-solid-svg-icons/faPencilAlt';
+import {faPlus} from '@fortawesome/free-solid-svg-icons/faPlus';
+import {faProjectDiagram} from '@fortawesome/free-solid-svg-icons/faProjectDiagram';
+import {faQuestionCircle} from '@fortawesome/free-solid-svg-icons/faQuestionCircle';
+import {faSave} from '@fortawesome/free-solid-svg-icons/faSave';
+import {faSearch} from '@fortawesome/free-solid-svg-icons/faSearch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, {useEffect} from 'react';
 import { Scrollbars } from 'react-custom-scrollbars-2';
@@ -115,32 +128,32 @@ const Help = () => {
     <div className={classes.container}>
       <div className={classes.navigation}>
         <ul>
-          <li><NavLink to={'introduction'}><FontAwesomeIcon fixedWidth icon="question-circle"/>Introduction</NavLink></li>
+          <li><NavLink to={'introduction'}><FontAwesomeIcon fixedWidth icon={faQuestionCircle} />Introduction</NavLink></li>
           <li>
-            <NavLink to={'browse'}><FontAwesomeIcon fixedWidth icon="search"/>Browse the Knowledge Graph</NavLink>
+            <NavLink to={'browse'}><FontAwesomeIcon fixedWidth icon={faSearch} />Browse the Knowledge Graph</NavLink>
             <ul>
-              <li><NavLink to={'browse/nodetypes'}><FontAwesomeIcon fixedWidth icon="code-branch" transform={'flip-h rotate--90'}/>Nodetypes</NavLink></li>
+              <li><NavLink to={'browse/nodetypes'}><FontAwesomeIcon fixedWidth icon={faCodeBranch} transform={'flip-h rotate--90'}/>Nodetypes</NavLink></li>
             </ul>
           </li>
-          <li><NavLink to={'create'}><FontAwesomeIcon fixedWidth icon="plus"/>Create an instance</NavLink></li>
+          <li><NavLink to={'create'}><FontAwesomeIcon fixedWidth icon={faPlus}/>Create an instance</NavLink></li>
           <li>
-            <NavLink to={'instance'}><FontAwesomeIcon fixedWidth icon="circle"/>Open an instance</NavLink>
+            <NavLink to={'instance'}><FontAwesomeIcon fixedWidth icon={faCircle}/>Open an instance</NavLink>
             <ul>
-              <li><NavLink to={'instance/view'}><FontAwesomeIcon fixedWidth icon="eye"/>View</NavLink></li>
+              <li><NavLink to={'instance/view'}><FontAwesomeIcon fixedWidth icon={faEye}/>View</NavLink></li>
               <li>
-                <NavLink to={'instance/edit'}><FontAwesomeIcon fixedWidth icon="pencil-alt"/>Edit</NavLink>
+                <NavLink to={'instance/edit'}><FontAwesomeIcon fixedWidth icon={faPencilAlt} />Edit</NavLink>
                 <ul>
-                  <li><NavLink to={'instance/edit/save'}><FontAwesomeIcon fixedWidth icon="save"/>Save</NavLink></li>
+                  <li><NavLink to={'instance/edit/save'}><FontAwesomeIcon fixedWidth icon={faSave} />Save</NavLink></li>
                 </ul>
               </li>
-              <li><NavLink to={'instance/graph'}><FontAwesomeIcon fixedWidth icon="project-diagram"/>Explore</NavLink></li>
-              <li><NavLink to={'instance/release'}><FontAwesomeIcon fixedWidth icon="cloud-upload-alt"/>Release</NavLink></li>
+              <li><NavLink to={'instance/graph'}><FontAwesomeIcon fixedWidth icon={faProjectDiagram} />Explore</NavLink></li>
+              <li><NavLink to={'instance/release'}><FontAwesomeIcon fixedWidth icon={faCloudUploadAlt} />Release</NavLink></li>
             </ul>
           </li>
-          {/*<li><NavLink to={"statistics"}><FontAwesomeIcon fixedWidth icon="chart-bar"/>Statistics</NavLink></li>*/}
-          {/*<li><NavLink to={"settings"}><FontAwesomeIcon fixedWidth icon="cog"/>Settings</NavLink></li>*/}
-          <li><NavLink to={'faq'}><FontAwesomeIcon fixedWidth icon="question-circle"/>F.A.Q</NavLink></li>
-          <li><NavLink to={'contact'}><FontAwesomeIcon fixedWidth icon="envelope"/>Contact the support</NavLink></li>
+          {/*<li><NavLink to={"statistics"}><FontAwesomeIcon fixedWidth icon={faChartBar} />Statistics</NavLink></li>*/}
+          {/*<li><NavLink to={"settings"}><FontAwesomeIcon fixedWidth icon={faCog} />Settings</NavLink></li>*/}
+          <li><NavLink to={'faq'}><FontAwesomeIcon fixedWidth icon={faQuestionCircle} />F.A.Q</NavLink></li>
+          <li><NavLink to={'contact'}><FontAwesomeIcon fixedWidth icon={faEnvelope} />Contact the support</NavLink></li>
         </ul>
       </div>
       <div className={classes.content}>

@@ -21,6 +21,8 @@
  *
  */
 
+import {faBan} from '@fortawesome/free-solid-svg-icons/faBan';
+import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import {observer} from 'mobx-react-lite';
 import React from 'react';
@@ -196,7 +198,7 @@ const NoPermissionForView = observer(({instance, mode}: NoPermissionForViewProps
 
   return (
     <div className={classes.errorMessage} >
-      <BGMessage icon={'ban'}>
+      <BGMessage icon={faBan}>
       You do not have permission to {getActionLabel(mode)} the instance &quot;<i>{instance.id}&quot;</i>.<br /><br />
         {instance.permissions?.canRead?
           <Link className="btn btn-primary" to={`/instances/${instance.id}`}>Go to view</Link>:
@@ -246,7 +248,7 @@ const Instance = observer(({ instance, mode }: InstanceProps) =>  {
               showTypes={previewOptions.showType}
               showStatus={previewOptions.showStatus} />
             <div className={classes.closePreviewBtn} title="close preview" onClick={handleHidePreview}>
-              <FontAwesomeIcon icon={'times'} />
+              <FontAwesomeIcon icon={faTimes} />
             </div>
           </>
         )}

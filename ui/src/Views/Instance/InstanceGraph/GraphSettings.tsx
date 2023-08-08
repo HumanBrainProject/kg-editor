@@ -21,6 +21,7 @@
  *
  */
 
+import {faArrowRight} from '@fortawesome/free-solid-svg-icons/faArrowRight';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Color from 'color';
 import { observer } from 'mobx-react-lite';
@@ -318,7 +319,7 @@ const Group = ({ group }:GroupProps) => {
 
   return (
     <div className={`${classes.group} ${expanded ? 'expanded' : ''}`}>
-      <FontAwesomeIcon icon="arrow-right" className={classes.expandButton} onClick={handleClick} />
+      <FontAwesomeIcon icon={faArrowRight} className={classes.expandButton} onClick={handleClick} />
       <GroupLabel className={classes.groupLabel} group={group} />
       <Actions className={classes.groupActions} group={group} />
       {expanded && (

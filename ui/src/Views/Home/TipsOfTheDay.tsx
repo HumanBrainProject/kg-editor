@@ -21,6 +21,8 @@
  *
  */
 
+import {faAngleRight} from '@fortawesome/free-solid-svg-icons/faAngleRight';
+import {faLightbulb} from '@fortawesome/free-solid-svg-icons/faLightbulb';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useState } from 'react';
 import { createUseStyles } from 'react-jss';
@@ -106,10 +108,10 @@ const TipsOfTheDay = () => {
 
   return (
     <div className={classes.container}>
-      <FontAwesomeIcon icon={'lightbulb'} />
+      <FontAwesomeIcon icon={faLightbulb} />
       <h3>Tips of the day:</h3>
       <div className={classes.tip}>{tips[currentIndex]}</div>
-      <button onClick={handleShowNextTip} title="show next tip"><FontAwesomeIcon icon="angle-right" /></button>
+      <button onClick={handleShowNextTip} title="show next tip"><FontAwesomeIcon icon={faAngleRight} /></button>
     </div>
   );
 };

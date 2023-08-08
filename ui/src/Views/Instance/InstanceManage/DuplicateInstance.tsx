@@ -21,6 +21,7 @@
  *
  */
 
+import {faCopy} from '@fortawesome/free-solid-svg-icons/faCopy';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -65,7 +66,7 @@ const DuplicateInstance = observer(({ instance, className }: DuplicateInstancePr
         <li>After duplication you should update the name &amp; description fields.</li>
       </ul>
       <Button variant={'primary'} onClick={handleDuplicateInstance}>
-        <FontAwesomeIcon icon={'copy'} /> &nbsp; Duplicate this instance
+        <FontAwesomeIcon icon={faCopy} /> &nbsp; Duplicate this instance
       </Button>
     </div>
   );

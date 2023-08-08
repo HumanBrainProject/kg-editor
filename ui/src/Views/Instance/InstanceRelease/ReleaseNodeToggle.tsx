@@ -21,6 +21,10 @@
  *
  */
 
+import {faBan} from '@fortawesome/free-solid-svg-icons/faBan';
+import {faCheck} from '@fortawesome/free-solid-svg-icons/faCheck';
+import {faDotCircle} from '@fortawesome/free-solid-svg-icons/faDotCircle';
+import {faUnlink} from '@fortawesome/free-solid-svg-icons/faUnlink';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -78,7 +82,7 @@ const ReleaseNodeToggle = observer(({ node }: ReleaseNodeToggleProps) => {
   if(!node.permissions.canRelease || node.status === null) {
     return (
       <div className={`${classes.container} status-${node.status}`} title={node.status === null ? 'Unknown entity': 'You do not have permission to release the instance.'} >
-        <span className="ban"><FontAwesomeIcon  icon="ban" /></span>
+        <span className="ban"><FontAwesomeIcon  icon={faBan} /></span>
       </div>
     );
   }
@@ -90,20 +94,20 @@ const ReleaseNodeToggle = observer(({ node }: ReleaseNodeToggleProps) => {
           <MultiToggle.Toggle
             color={'#3498db'}
             value={ReleaseStatus.RELEASED}
-            icon="check"
+            icon={faCheck}
           />
         )}
         <MultiToggle.Toggle
           color={'#999'}
           value={node.status as string}
-          icon="dot-circle"
+          icon={faDotCircle}
           noscale
         />
         {node.status !== ReleaseStatus.UNRELEASED && (
           <MultiToggle.Toggle
             color={'#e74c3c'}
             value={ReleaseStatus.UNRELEASED}
-            icon="unlink"
+            icon={faUnlink}
           />
         )}
       </MultiToggle>

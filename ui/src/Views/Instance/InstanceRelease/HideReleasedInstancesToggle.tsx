@@ -21,6 +21,8 @@
  *
  */
 
+import {faEye} from '@fortawesome/free-solid-svg-icons/faEye';
+import {faEyeSlash} from '@fortawesome/free-solid-svg-icons/faEyeSlash';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { createUseStyles } from 'react-jss';
@@ -57,8 +59,8 @@ const HideReleasedInstancesToggle = observer(() => {
     <div className={classes.container}>
       <div className={classes.toggle}>
         <MultiToggle selectedValue={releaseStore.hideReleasedInstances} onChange={handleClick}>
-          <MultiToggle.Toggle color={releaseStore.hideReleasedInstances?'var(--ft-color-normal)':'var(--ft-color-loud)'} icon={'eye'} value={false} />
-          <MultiToggle.Toggle color={releaseStore.hideReleasedInstances?'var(--ft-color-loud)':'var(--ft-color-normal)'} icon={'eye-slash'} value={true} />
+          <MultiToggle.Toggle color={releaseStore.hideReleasedInstances?'var(--ft-color-normal)':'var(--ft-color-loud)'} icon={faEye} value={false} />
+          <MultiToggle.Toggle color={releaseStore.hideReleasedInstances?'var(--ft-color-loud)':'var(--ft-color-normal)'} icon={faEyeSlash} value={true} />
         </MultiToggle>
       </div>
       <span className={classes.text}>{releaseStore.hideReleasedInstances?'Hide': 'Show'} released instances</span>

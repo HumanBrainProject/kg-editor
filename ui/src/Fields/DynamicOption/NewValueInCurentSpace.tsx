@@ -21,6 +21,7 @@
  *
  */
 
+import {faCircle} from '@fortawesome/free-solid-svg-icons/faCircle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { createUseStyles } from 'react-jss';
@@ -47,7 +48,7 @@ const NewValueInCurentSpace = ({ item, searchTerm }: DynamicOptionProps) => {
     <span className={classes.container}>
       <em>Add a new&nbsp;
         <span style={style}>
-          <FontAwesomeIcon fixedWidth icon="circle" />
+          <FontAwesomeIcon fixedWidth icon={faCircle} />
         </span>{item.type.label}
       </em>&nbsp;
       {!!typeDefinition && !!typeDefinition.labelField && (

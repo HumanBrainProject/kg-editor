@@ -21,6 +21,8 @@
  *
  */
 
+import {faMoon} from '@fortawesome/free-solid-svg-icons/faMoon';
+import {faSun} from '@fortawesome/free-solid-svg-icons/faSun';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {observer} from 'mobx-react-lite';
 import React from 'react';
@@ -53,12 +55,12 @@ const ThemeSwitcher = observer(() => {
   return (
     <div className={classes.container}>
       <div className={classes.icon}>
-        <FontAwesomeIcon icon={appStore.currentTheme.name === 'bright'? 'sun': 'moon'}/>
+        <FontAwesomeIcon icon={appStore.currentTheme.name === 'bright'? faSun: faMoon}/>
       </div>
       <div>
         <MultiToggle selectedValue={appStore.currentTheme.name} onChange={handleChange}>
-          <MultiToggle.Toggle color={'var(--ft-color-loud)'} icon={'moon'} value="default"/>
-          <MultiToggle.Toggle color={'var(--ft-color-loud)'} icon={'sun'} value="bright"/>
+          <MultiToggle.Toggle color={'var(--ft-color-loud)'} icon={faMoon} value="default"/>
+          <MultiToggle.Toggle color={'var(--ft-color-loud)'} icon={faSun} value="bright"/>
         </MultiToggle>
       </div>
     </div>

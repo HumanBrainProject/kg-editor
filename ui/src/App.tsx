@@ -30,8 +30,6 @@ import { BrowserRouter, Navigate, useSearchParams, Route, Routes } from 'react-r
 import 'react-virtualized/styles.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import './Services/IconsImport';
-
 import SpinnerPanel from './Components/SpinnerPanel';
 import APIProvider from './Views/APIProvider';
 

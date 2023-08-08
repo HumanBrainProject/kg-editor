@@ -21,6 +21,7 @@
  *
  */
 
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
@@ -83,7 +84,7 @@ const Types = observer(({ children }: TypesProps) => {
       <ErrorPanel>
         {error}<br /><br />
         <Button variant={'primary'} onClick={refetch}>
-          <FontAwesomeIcon icon={'redo-alt'} /> &nbsp; Retry
+          <FontAwesomeIcon icon={faRedoAlt} /> &nbsp; Retry
         </Button>
       </ErrorPanel>
     );

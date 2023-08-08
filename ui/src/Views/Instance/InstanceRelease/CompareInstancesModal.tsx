@@ -21,6 +21,7 @@
  *
  */
 
+import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -88,7 +89,7 @@ const CompareInstancesModal = observer(() => {
       </Modal.Body>
       <Modal.Footer>
         <Button size="sm" onClick={handleHideCompare} >
-          <FontAwesomeIcon icon="times" />&nbsp;Close
+          <FontAwesomeIcon icon={faTimes} />&nbsp;Close
         </Button>
       </Modal.Footer>
     </Modal>

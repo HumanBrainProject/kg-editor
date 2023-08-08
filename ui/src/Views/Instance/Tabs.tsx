@@ -21,6 +21,12 @@
  *
  */
 
+import {faCloudUploadAlt} from '@fortawesome/free-solid-svg-icons/faCloudUploadAlt';
+import {faCode} from '@fortawesome/free-solid-svg-icons/faCode';
+import {faCog} from '@fortawesome/free-solid-svg-icons/faCog';
+import {faEye} from '@fortawesome/free-solid-svg-icons/faEye';
+import {faPencilAlt} from '@fortawesome/free-solid-svg-icons/faPencilAlt';
+import {faProjectDiagram} from '@fortawesome/free-solid-svg-icons/faProjectDiagram';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -148,7 +154,7 @@ const Tabs = observer(({ instance, mode }: TabsProps) => {
     <div className={classes.tabs}>
       <Tab
         className={classes.tab}
-        icon="eye"
+        icon={faEye}
         mode={ViewMode.VIEW}
         label="View"
         disabled={mode ===  ViewMode.CREATE}
@@ -158,7 +164,7 @@ const Tabs = observer(({ instance, mode }: TabsProps) => {
       />
       <Tab
         className={classes.tab}
-        icon="pencil-alt"
+        icon={faPencilAlt}
         mode={ViewMode.EDIT}
         label="Edit"
         disabled={false}
@@ -170,7 +176,7 @@ const Tabs = observer(({ instance, mode }: TabsProps) => {
       />
       <Tab
         className={classes.tab}
-        icon="project-diagram"
+        icon={faProjectDiagram}
         mode={ViewMode.GRAPH}
         label="Explore"
         disabled={mode === ViewMode.CREATE}
@@ -180,7 +186,7 @@ const Tabs = observer(({ instance, mode }: TabsProps) => {
       />
       <Tab
         className={classes.tab}
-        icon="cloud-upload-alt"
+        icon={faCloudUploadAlt}
         mode={ViewMode.RELEASE}
         label="Release"
         disabled={mode === ViewMode.CREATE}
@@ -190,7 +196,7 @@ const Tabs = observer(({ instance, mode }: TabsProps) => {
       />
       <Tab
         className={classes.tab}
-        icon="cog"
+        icon={faCog}
         mode={ViewMode.MANAGE}
         label="Manage"
         disabled={mode === ViewMode.CREATE}
@@ -200,7 +206,7 @@ const Tabs = observer(({ instance, mode }: TabsProps) => {
       />
       <Tab
         className={classes.tab}
-        icon="code"
+        icon={faCode}
         mode={ViewMode.RAW}
         label="Raw view"
         disabled={mode === ViewMode.CREATE}

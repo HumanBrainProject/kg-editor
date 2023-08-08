@@ -21,6 +21,9 @@
  *
  */
 
+import {faBan} from '@fortawesome/free-solid-svg-icons/faBan';
+import {faCircle} from '@fortawesome/free-solid-svg-icons/faCircle';
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
@@ -150,7 +153,7 @@ const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, sho
   if(instance.hasFetchError) {
     return(
       <div className={classes.container}>
-        <BGMessage icon={'ban'}>
+        <BGMessage icon={faBan} >
                 There was a network problem retrieving the instance &quot;<i>{instanceId}&quot;</i>.
           <br />
                 If the problem persists, please contact the support.
@@ -159,7 +162,7 @@ const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, sho
           <br />
           <br />
           <Button variant={'primary'} onClick={handleRetry}>
-            <FontAwesomeIcon icon={'redo-alt'} /> &nbsp; Retry
+            <FontAwesomeIcon icon={faRedoAlt} /> &nbsp; Retry
           </Button>
         </BGMessage>
       </div>
@@ -181,7 +184,7 @@ const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, sho
         <Form className={`${classes.container} ${classes.noPermission}`} >
           <Field name={instance.labelField} fieldStore={fieldStore} readMode={true} className={classes.field} />
           <div className={classes.errorMessage}>
-            <FontAwesomeIcon icon="ban" /> You do not have permission to view the instance.
+            <FontAwesomeIcon icon={faBan} /> You do not have permission to view the instance.
           </div>
         </Form>
       );
@@ -193,7 +196,7 @@ const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, sho
             <div>Space: {instance.space}</div>
           </div>
           <div className={classes.errorMessage}>
-            <FontAwesomeIcon icon="ban" /> You do not have permission to view the instance.
+            <FontAwesomeIcon icon={faBan} /> You do not have permission to view the instance.
           </div>
         </Form>
       );
@@ -210,7 +213,7 @@ const Preview  = observer(({ instanceId, instanceName, showEmptyFields=true, sho
           <div className={classes.titlePanel}>
             {showTypes && (
               <div className={classes.type} style={instance.primaryType.color ? { color: instance.primaryType.color } : {}} title={instance.primaryType.name}>
-                <FontAwesomeIcon fixedWidth icon="circle" />
+                <FontAwesomeIcon fixedWidth icon={faCircle} />
               </div>
             )}
             <span className={classes.title}>

@@ -21,6 +21,7 @@
  *
  */
 
+import {faSave} from '@fortawesome/free-solid-svg-icons/faSave';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -96,7 +97,7 @@ const ExternalCreateModal = observer(() => {
             <>
               <p>{`Change to space "${appStore.externalCreateModal.space}" to create a new instance "${appStore.externalCreateModal.value}" of type "${appStore.externalCreateModal.type}" ?`}</p>
               <Button variant="primary" onClick={handleCancel}>Cancel</Button>
-              <Button className={classes.save} variant="primary" onClick={handleSaveAllAndChangeSpace}><FontAwesomeIcon icon="save"/>&nbsp;Save and Continue</Button>
+              <Button className={classes.save} variant="primary" onClick={handleSaveAllAndChangeSpace}><FontAwesomeIcon icon={faSave} />&nbsp;Save and Continue</Button>
             </>
           }
         </Modal.Body>

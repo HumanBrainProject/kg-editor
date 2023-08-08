@@ -21,6 +21,9 @@
  *
  */
 
+import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons/faExclamationTriangle';
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt';
+import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import uniqueId from 'lodash/uniqueId';
 import { observer } from 'mobx-react-lite';
@@ -153,7 +156,7 @@ const PopOverButton = observer(({ buttonTitle, children, onOk }: PopOverButtonPr
   return(
     <div className={classes.container}>
       <button className={classes.button} onClick={handleButtonClick} title={buttonTitle} ref={buttonRef}>
-        <FontAwesomeIcon icon="exclamation-triangle" className={classes.fetchErrorIcon}/>
+        <FontAwesomeIcon icon={faExclamationTriangle} className={classes.fetchErrorIcon}/>
       </button>
       <Overlay
         show={showPopOver}
@@ -169,9 +172,9 @@ const PopOverButton = observer(({ buttonTitle, children, onOk }: PopOverButtonPr
               {children}
             </div>
             <div className={classes.popOverFooterBar}>
-              <Button variant="primary" size="sm" onClick={handleOkClick}><FontAwesomeIcon icon="redo-alt"/>&nbsp;Retry</Button>
+              <Button variant="primary" size="sm" onClick={handleOkClick}><FontAwesomeIcon icon={faRedoAlt} />&nbsp;Retry</Button>
             </div>
-            <button className={classes.popOverCloseButton} onClick={handlePopOverClose} title="close"><FontAwesomeIcon icon="times" /></button>
+            <button className={classes.popOverCloseButton} onClick={handlePopOverClose} title="close"><FontAwesomeIcon icon={faTimes} /></button>
           </PopOverContent>
         </Popover>
       </Overlay>

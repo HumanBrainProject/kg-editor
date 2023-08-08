@@ -157,7 +157,7 @@ class FieldStore {
   }
 
   get hasError() {
-    return this.errorMessage || this.errorInfo;
+    return this.errorMessage??this.errorInfo;
   }
 
   setAlternatives(alternatives: Alternative[]) {

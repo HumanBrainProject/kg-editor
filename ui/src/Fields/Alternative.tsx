@@ -21,6 +21,8 @@
  *
  */
 
+import {faCheck} from '@fortawesome/free-solid-svg-icons/faCheck';
+import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useRef, useEffect } from 'react';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -140,11 +142,11 @@ const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect
           ))
         }<div className="parenthesis">)</div></em>
         {alternative.selected?
-          <FontAwesomeIcon icon="check" className="selected" />
+          <FontAwesomeIcon icon={faCheck} className="selected" />
           :null
         }
         {isOwnAlternative && (
-          <span className={classes.removeIcon}><FontAwesomeIcon onClick={handleRemoveClick} icon="times" /></span>
+          <span className={classes.removeIcon}><FontAwesomeIcon onClick={handleRemoveClick} icon={faTimes} /></span>
         )}
       </div>
     </Dropdown.Item>

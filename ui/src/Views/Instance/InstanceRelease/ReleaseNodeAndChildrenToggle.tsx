@@ -21,6 +21,8 @@
  *
  */
 
+import {faCheck} from '@fortawesome/free-solid-svg-icons/faCheck';
+import {faDotCircle} from '@fortawesome/free-solid-svg-icons/faDotCircle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -89,10 +91,10 @@ const ReleaseNodeAndChildrenToggle = observer(() => {
   return (
     <div className={classes.container}>
       <div onClick={handleMarkAllNodeForRelease} className={classes.releaseBtn} title="release all">
-        <FontAwesomeIcon icon="check"/>
+        <FontAwesomeIcon icon={faCheck}/>
       </div>
       <div onClick={handleMarkAllNodeToCurrentState} className={classes.doNothingBtn} title="do nothing">
-        <FontAwesomeIcon icon="dot-circle"/>
+        <FontAwesomeIcon icon={faDotCircle}/>
       </div>
     </div>
   );

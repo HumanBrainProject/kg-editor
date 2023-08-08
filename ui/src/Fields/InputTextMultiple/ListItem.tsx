@@ -21,6 +21,7 @@
  *
  */
 
+import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -138,7 +139,7 @@ const ListItem = observer(
         <span className={classes.valueLabel}>{value}</span>
         <FontAwesomeIcon
           className={classes.remove}
-          icon="times"
+          icon={faTimes}
           onClick={handleDelete}
         />
       </div>

@@ -21,6 +21,8 @@
  *
  */
 
+import {faCircle} from '@fortawesome/free-solid-svg-icons/faCircle';
+import {faInfoCircle} from '@fortawesome/free-solid-svg-icons/faInfoCircle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
@@ -83,7 +85,7 @@ const TargetTypeSelection = observer(({ types, selectedType, id, onSelect }: Tar
   return (
     <Dropdown className={classes.targetTypes} onSelect={onSelect}>
       <Dropdown.Toggle id={id}>
-        <FontAwesomeIcon icon={'circle'} color={selectedType?.color} />
+        <FontAwesomeIcon icon={faCircle} color={selectedType?.color} />
           &nbsp;&nbsp;
         {selectedType?.label ? selectedType.label : selectedType?.name}
       </Dropdown.Toggle>
@@ -107,13 +109,10 @@ const TargetTypeSelection = observer(({ types, selectedType, id, onSelect }: Tar
             eventKey={type.name}
             title={type.description ? type.description : type.name}
           >
-            <FontAwesomeIcon icon={'circle'} color={type.color} />
+            <FontAwesomeIcon icon={faCircle} color={type.color} />
               &nbsp;&nbsp;{type.label ? type.label : type.name}
             {type.description && (
-              <FontAwesomeIcon
-                className={classes.infoCircle}
-                icon="info-circle"
-              />
+              <FontAwesomeIcon className={classes.infoCircle} icon={faInfoCircle} />
             )}
           </Dropdown.Item>
         ))}

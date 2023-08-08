@@ -21,6 +21,7 @@
  *
  */
 
+import {faCircle} from '@fortawesome/free-solid-svg-icons/faCircle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -84,7 +85,7 @@ const InstanceRaw = observer(({instance}: InstanceRawProps) => {
         {instance.types && !!instance.types.length && (
           <h6 className={classes.types}>
             {instance.types && instance.types.map(({name, label, color}) => (
-              <span key={name} className={classes.type} title={name}><FontAwesomeIcon icon={'circle'} color={color}/>&nbsp;&nbsp;<span>{label?label:name}</span></span>
+              <span key={name} className={classes.type} title={name}><FontAwesomeIcon icon={faCircle} color={color}/>&nbsp;&nbsp;<span>{label??name}</span></span>
             ))}
           </h6>
         )}

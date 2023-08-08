@@ -21,7 +21,7 @@
  *
  */
 
-
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { createUseStyles } from 'react-jss';
@@ -94,7 +94,7 @@ const MenuItems = ({
       </ul>
       {loading && (
         <div tabIndex={-1} className={classes.loading}>
-          <FontAwesomeIcon spin icon="circle-notch"/>
+          <FontAwesomeIcon spin icon={faCircleNotch}/>
         </div>
       )}
     </div>

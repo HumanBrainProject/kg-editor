@@ -21,6 +21,10 @@
  *
  */
 
+import {faAngleDoubleRight} from '@fortawesome/free-solid-svg-icons/faAngleDoubleRight';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
+import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons/faExclamationTriangle';
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useState, useEffect } from 'react';
@@ -118,22 +122,22 @@ const Status = observer(({
   variant,
   isDisabled
 }: StatusProps) => {
-  if (status && status.hasFetchError) {
+  if (status?.hasFetchError) {
     return (
       <div className={classes.error}>
-        <FontAwesomeIcon icon={'exclamation-triangle'} />
+        <FontAwesomeIcon icon={faExclamationTriangle} />
         &nbsp;&nbsp;{status.fetchError}&nbsp;&nbsp;
         <Button variant="primary" onClick={fetchStatus}>
-          <FontAwesomeIcon icon="redo-alt" />
+          <FontAwesomeIcon icon={faRedoAlt} />
           &nbsp;Retry
         </Button>
       </div>
     );
   }
-  if (!status || !status.isFetched) {
+  if (!status?.isFetched) {
     return (
       <>
-        <FontAwesomeIcon icon={'circle-notch'} spin />
+        <FontAwesomeIcon icon={faCircleNotch} spin />
         &nbsp;&nbsp;Retrieving instance release status
       </>
     );
@@ -154,7 +158,7 @@ const Status = observer(({
         className={classes.btn}
         onClick={onClick}
       >
-        <FontAwesomeIcon icon={'angle-double-right'} /> &nbsp; Move this
+        <FontAwesomeIcon icon={faAngleDoubleRight} /> &nbsp; Move this
         instance
       </Button>
     </>
@@ -259,7 +263,7 @@ const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
           <div className={classes.moveErrorMessage}>{appStore.instanceMovingError}</div>
           <div className={classes.moveErrorActions}>
             <Button onClick={handleCancelMoveInstance}>Cancel</Button>
-            <Button variant="primary" onClick={handleRetryMoveInstance}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
+            <Button variant="primary" onClick={handleRetryMoveInstance}><FontAwesomeIcon icon={faRedoAlt} />&nbsp;Retry</Button>
           </div>
         </ErrorModal>
       )}

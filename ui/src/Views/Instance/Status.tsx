@@ -21,6 +21,8 @@
  *
  */
 
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
+import {faQuestionCircle} from '@fortawesome/free-solid-svg-icons/faQuestionCircle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
@@ -77,14 +79,14 @@ const InstanceStatus = observer(({ instanceStatus, classes, darkmode }: Instance
   if (instanceStatus?.hasFetchError) {
     return (
       <div className={classes.loader}>
-        <FontAwesomeIcon icon={'question-circle'} />
+        <FontAwesomeIcon icon={faQuestionCircle} />
       </div>
     );
   }
   if (!instanceStatus?.isFetched) {
     return (
       <div className={classes.loader}>
-        <FontAwesomeIcon icon={'circle-notch'} spin />
+        <FontAwesomeIcon icon={faCircleNotch} spin />
       </div>
     );
   }
@@ -103,7 +105,7 @@ const InstanceChildrenStatus = observer(({ instanceStatus, classes, darkmode }: 
   if (instanceStatus?.hasFetchErrorChildren) {
     return (
       <div className={classes.loader}>
-        <FontAwesomeIcon icon={'question-circle'} />
+        <FontAwesomeIcon icon={faQuestionCircle} />
       </div>
     );
   }
@@ -111,7 +113,7 @@ const InstanceChildrenStatus = observer(({ instanceStatus, classes, darkmode }: 
   if (!instanceStatus?.isFetchedChildren) {
     return (
       <div className={classes.loader}>
-        <FontAwesomeIcon icon={'circle-notch'} spin />
+        <FontAwesomeIcon icon={faCircleNotch} spin />
       </div>
     );
   }

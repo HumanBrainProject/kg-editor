@@ -21,6 +21,8 @@
  *
  */
 
+import {faCircle} from '@fortawesome/free-solid-svg-icons/faCircle';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 import { createUseStyles } from 'react-jss';
@@ -135,7 +137,7 @@ const InstanceTab = observer(({view, pathname}: InstanceTabProps) => {
 
   return (
     <Tab
-      icon={instance?.isFetching ? 'circle-notch' : 'circle'}
+      icon={instance?.isFetching ? faCircleNotch : faCircle}
       iconSpin={instance?.isFetching}
       iconColor={color}
       active={!!isCurrent(view.instanceId, view.mode)}

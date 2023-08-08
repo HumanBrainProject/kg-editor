@@ -21,6 +21,7 @@
  *
  */
 
+import {faCheck} from '@fortawesome/free-solid-svg-icons/faCheck';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import uniqueId from 'lodash/uniqueId';
 import { observer } from 'mobx-react-lite';
@@ -310,7 +311,7 @@ const UserProfileTab = observer(
                 }`}
               >
                 <div className={classes.tokenCopied}>
-                  <FontAwesomeIcon icon={'check'} />
+                  <FontAwesomeIcon icon={faCheck} />
                   &nbsp;Token copied to clipboard!
                 </div>
               </div>

@@ -21,6 +21,7 @@
  *
  */
 
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useRef } from 'react';
@@ -90,7 +91,7 @@ const Authenticate = observer(({children}: AuthenticateProps) => {
       There was a problem authenticating ({error}).
         If the problem persists, please contact the support.<br /><br />
         <Button variant={'primary'} onClick={authenticate}>
-          <FontAwesomeIcon icon={'redo-alt'} /> &nbsp; Retry
+          <FontAwesomeIcon icon={faRedoAlt} /> &nbsp; Retry
         </Button>
       </ErrorPanel>
     );

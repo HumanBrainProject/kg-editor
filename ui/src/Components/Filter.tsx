@@ -21,6 +21,7 @@
  *
  */
 
+import {faSearch} from '@fortawesome/free-solid-svg-icons/faSearch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React, { useRef, useEffect } from 'react';
 import Form from 'react-bootstrap/Form';
@@ -64,7 +65,7 @@ interface FilterProps {
   onChange: (value: string) => void;
 }
 
-const Filter = ({ value, placeholder='filter...', icon='search', onChange }: FilterProps) => {
+const Filter = ({ value, placeholder='filter...', icon=faSearch, onChange }: FilterProps) => {
 
   const classes = useStyles();
 

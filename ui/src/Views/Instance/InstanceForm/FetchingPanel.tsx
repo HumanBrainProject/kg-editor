@@ -21,6 +21,7 @@
  *
  */
 
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { createUseStyles } from 'react-jss';
@@ -78,7 +79,7 @@ const FetchingPanel = ({ id, show, inline }: FetchingPanelProps) => {
 
   return(
     <div className={`${classes.panel} ${inline?'':'block'} `}>
-      <FontAwesomeIcon icon="circle-notch" spin/>
+      <FontAwesomeIcon icon={faCircleNotch} spin/>
       <span className={classes.label}>Retrieving instance...</span>
       <small>ID: {id}</small>
     </div>

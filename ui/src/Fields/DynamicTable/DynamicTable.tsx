@@ -21,6 +21,7 @@
  *
  */
 
+import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useRef } from 'react';
@@ -312,7 +313,7 @@ const DynamicTable = observer(({ className, fieldStore, view, pane, readMode, sh
       {!isDisabled && (view && view.currentInstanceId === instance?.id) && (
         <div className={classes.deleteBtn}>
           <Button size="sm" variant={'primary'} onClick={handleDeleteAll} disabled={links.length === 0}>
-            <FontAwesomeIcon icon="times"/>
+            <FontAwesomeIcon icon={faTimes}/>
           </Button>
         </div>
       )}

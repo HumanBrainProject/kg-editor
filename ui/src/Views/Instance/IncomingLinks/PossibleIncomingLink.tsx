@@ -21,6 +21,7 @@
  *
  */
 
+import {faCircle} from '@fortawesome/free-solid-svg-icons/faCircle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -72,8 +73,8 @@ const PossibleIncomingLink = observer(({ type, spaces }: PossibleIncomingLinkPro
   return(
     <>
       {spaces.map(space => (
-        <Button key={`${space}-${type.label}`} className={classes.btn}  onClick={() => handleLinkFrom(space)} variant="outline-secondary">
-          <FontAwesomeIcon icon={'circle'} color={type.color}/>&nbsp;&nbsp;<span>{type.label} <strong title="space"><i>({space})</i></strong></span>
+        <Button key={`${space}-${type.label}`} className={classes.btn} onClick={() => handleLinkFrom(space)} variant="outline-secondary">
+          <FontAwesomeIcon icon={faCircle} color={type.color}/>&nbsp;&nbsp;<span>{type.label} <strong title="space"><i>({space})</i></strong></span>
         </Button>
       ))}
     </>

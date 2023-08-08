@@ -21,6 +21,12 @@
  *
  */
 
+import {faCloudUploadAlt} from '@fortawesome/free-solid-svg-icons/faCloudUploadAlt';
+import {faCode} from '@fortawesome/free-solid-svg-icons/faCode';
+import {faCog} from '@fortawesome/free-solid-svg-icons/faCog';
+import {faEye} from '@fortawesome/free-solid-svg-icons/faEye';
+import {faPencilAlt} from '@fortawesome/free-solid-svg-icons/faPencilAlt';
+import {faProjectDiagram} from '@fortawesome/free-solid-svg-icons/faProjectDiagram';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -124,7 +130,7 @@ const Actions = observer(({ instance }: ActionsProps) => {
       <Action
         className={classes.action}
         show={permissions?.canRead}
-        icon="eye"
+        icon={faEye}
         label="Open"
         mode={ViewMode.VIEW}
         onClick={handleClick}
@@ -133,7 +139,7 @@ const Actions = observer(({ instance }: ActionsProps) => {
       <Action
         className={classes.action}
         show={permissions?.canWrite}
-        icon="pencil-alt"
+        icon={faPencilAlt}
         label="Edit"
         mode={ViewMode.EDIT}
         onClick={handleClick}
@@ -142,7 +148,7 @@ const Actions = observer(({ instance }: ActionsProps) => {
       <Action
         className={classes.action}
         show={permissions?.canRead}
-        icon="project-diagram"
+        icon={faProjectDiagram}
         label="Explore"
         mode={ViewMode.GRAPH}
         onClick={handleClick}
@@ -151,7 +157,7 @@ const Actions = observer(({ instance }: ActionsProps) => {
       <Action
         className={classes.action}
         show={permissions?.canRelease}
-        icon="cloud-upload-alt"
+        icon={faCloudUploadAlt}
         label="Release"
         mode={ViewMode.RELEASE}
         onClick={handleClick}
@@ -160,7 +166,7 @@ const Actions = observer(({ instance }: ActionsProps) => {
       <Action
         className={classes.action}
         show={permissions?.canDelete || permissions?.canCreate}
-        icon="cog"
+        icon={faCog}
         label="Manage"
         mode={ViewMode.MANAGE}
         onClick={handleClick}
@@ -169,7 +175,7 @@ const Actions = observer(({ instance }: ActionsProps) => {
       <Action
         className={classes.action}
         show={permissions?.canRead}
-        icon="code"
+        icon={faCode}
         label="Raw view"
         mode={ViewMode.RAW}
         onClick={handleClick}

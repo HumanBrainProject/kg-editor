@@ -21,6 +21,8 @@
  *
  */
 
+import {faPlus} from '@fortawesome/free-solid-svg-icons/faPlus';
+import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Color from 'color';
 import { observer } from 'mobx-react-lite';
@@ -128,7 +130,7 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue }:
       <Form.Group className={className}>
         <Label className={classes.label} label={label} />
         <Button className={classes.addColorBtn} size="sm" variant="primary" onClick={handleAddColor} title="Set color" >
-          <FontAwesomeIcon icon="plus"/>
+          <FontAwesomeIcon icon={faPlus}/>
         </Button>
       </Form.Group>
     );
@@ -150,7 +152,7 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue }:
           className={`${classes.inputColor} ${hasValidationWarnings?classes.warning:''}`}
         />
         <Button className={classes.removeColorBtn} size="sm" variant="secondary" onClick={handleRemoveColor} title="Remove color" >
-          <FontAwesomeIcon icon="times"/>
+          <FontAwesomeIcon icon={faTimes}/>
         </Button>
       </div>
       <Invalid show={hasValidationWarnings} messages={fieldStore.validationWarnings} />

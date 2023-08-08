@@ -21,6 +21,7 @@
  *
  */
 
+import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useRef } from 'react';
@@ -146,7 +147,7 @@ const Item = ({ itemFieldStores, readMode, active, onDelete }: ItemProps) => {
       ))}
       {!readMode && active && (
         <div className={classes.actions} >
-          <Action icon="times" onClick={onDelete} title="Delete" />
+          <Action icon={faTimes} onClick={onDelete} title="Delete" />
         </div>
       )}
     </div>

@@ -21,6 +21,7 @@
  *
  */
 
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
@@ -72,7 +73,7 @@ const RawInstance = observer(({ children }: RawInstanceProps) => {
         If the problem persists, please contact the support.<br />
         <small>{instance.rawFetchError}</small><br /><br />
         <Button variant={'primary'} onClick={handleRetry}>
-          <FontAwesomeIcon icon={'redo-alt'} />&nbsp;&nbsp; Retry
+          <FontAwesomeIcon icon={faRedoAlt} />&nbsp;&nbsp; Retry
         </Button>
         <Button variant={'primary'} onClick={handleContinue}>Continue</Button>
       </ErrorPanel>

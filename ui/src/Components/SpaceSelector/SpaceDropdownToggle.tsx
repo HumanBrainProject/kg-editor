@@ -21,6 +21,7 @@
  *
  */
 
+import {faCaretDown} from '@fortawesome/free-solid-svg-icons/faCaretDown';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { createUseStyles } from 'react-jss';
@@ -57,7 +58,7 @@ const SpaceDropdownToggle = React.forwardRef<RefType,  SpaceDropdownToggleProps>
 
   return (
     <button onClick={handleClick} className={classes.dropdownLink} ref={ref}>
-      {children} <FontAwesomeIcon icon={'caret-down'} />
+      {children} <FontAwesomeIcon icon={faCaretDown} />
     </button>
   );
 });

@@ -21,6 +21,7 @@
  *
  */
 
+import {faFile} from '@fortawesome/free-solid-svg-icons/faFile';
 import { observer } from 'mobx-react-lite';
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -61,7 +62,7 @@ const NewInstanceTab = observer(() => {
 
   return (
     <>
-      <Tab icon="file" onClick={handleCreateInstance} hideLabel label="New instance" />
+      <Tab icon={faFile} onClick={handleCreateInstance} hideLabel label="New instance" />
       <Modal title="Create a new instance" show={showTypeSelection} onHide={handleClose}>
         <TypeSelection onSelect={handleTypeSelection} />
       </Modal>

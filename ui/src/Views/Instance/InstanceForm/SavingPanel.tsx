@@ -21,6 +21,7 @@
  *
  */
 
+import {faDotCircle} from '@fortawesome/free-solid-svg-icons/faDotCircle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { createUseStyles } from 'react-jss';
@@ -111,7 +112,7 @@ const SavingPanel = ({ id, show, inline }: SavingPanelProps) => {
   return (
     <div className={`${classes.container} ${inline?'':'block'}`}>
       <div className={classes.panel} >
-        <FontAwesomeIcon className={classes.icon} icon="dot-circle"/>
+        <FontAwesomeIcon className={classes.icon} icon={faDotCircle}/>
         <span className={classes.label}>Saving instance...</span>
         <small>ID: {id}</small>
       </div>

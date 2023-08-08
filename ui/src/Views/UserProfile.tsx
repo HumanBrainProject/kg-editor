@@ -21,6 +21,7 @@
  *
  */
 
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
@@ -66,7 +67,7 @@ const UserProfile = observer(({ children }: UserProfileProps) => {
         There was a problem retrieving the user profile ({error}).
           If the problem persists, please contact the support.<br /><br />
         <Button variant={'primary'} onClick={refetch}>
-          <FontAwesomeIcon icon={'redo-alt'} /> &nbsp; Retry
+          <FontAwesomeIcon icon={faRedoAlt} /> &nbsp; Retry
         </Button>
       </ErrorPanel>
     );

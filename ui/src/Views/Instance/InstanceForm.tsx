@@ -21,6 +21,7 @@
  *
  */
 
+import {faArrowRight} from '@fortawesome/free-solid-svg-icons/faArrowRight';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Color from 'color';
 import { observer } from 'mobx-react-lite';
@@ -268,7 +269,7 @@ const InstanceForm = observer(({ id, view, pane, provenance }: InstanceFormProps
           <CreatingChildInstancePanel show={appStore.isCreatingNewInstance} />
           <SaveErrorPanel show={instance.hasSaveError} error={instance.saveError} onCancel={handleCancelSave} onRetry={handleSave} inline={!isMainInstance} />
         </div>
-        <FontAwesomeIcon className="highlightArrow" icon="arrow-right" />
+        <FontAwesomeIcon className="highlightArrow" icon={faArrowRight} />
       </div>
     );
   }

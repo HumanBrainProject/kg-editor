@@ -21,6 +21,7 @@
  *
  */
 
+import {faBan} from '@fortawesome/free-solid-svg-icons/faBan';
 import React from 'react';
 import Panel from './Panel';
 import type { ReactNode } from 'react';
@@ -30,7 +31,7 @@ interface ErrorPanelProps {
 }
 
 const ErrorPanel = ({children}: ErrorPanelProps) => (
-  <Panel icon="ban" >
+  <Panel icon={faBan} >
     {children}
   </Panel>
 );

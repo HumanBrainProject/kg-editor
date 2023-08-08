@@ -21,6 +21,7 @@
  *
  */
 
+import {faDotCircle} from '@fortawesome/free-solid-svg-icons/faDotCircle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { createUseStyles } from 'react-jss';
@@ -107,7 +108,7 @@ const Toggle = ({onSelect, value, selectedValue, noscale, icon, color}: TogglePr
 
   return(
     <div onClick={handleClick} className={`${classes.container}${selectedValue === value?' selected':''}${noscale !== undefined?' noscale':''}`} style={{color:color}}>
-      <FontAwesomeIcon icon={icon || 'dot-circle'}/>
+      <FontAwesomeIcon icon={icon || faDotCircle}/>
     </div>
   );
 };

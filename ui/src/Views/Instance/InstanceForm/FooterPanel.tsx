@@ -21,6 +21,7 @@
  *
  */
 
+import {faFolderOpen} from '@fortawesome/free-solid-svg-icons/faFolderOpen';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -131,7 +132,7 @@ const FooterPanel = observer(({ className, instance, showOpenActions }: FooterPa
           <div className={classes.actions}>
             {instance.permissions?.canRead && (
               <div className={classes.action} onClick={handleOpenInstance}>
-                <FontAwesomeIcon icon="folder-open"/>
+                <FontAwesomeIcon icon={faFolderOpen}/>
               </div>
             )}
           </div>

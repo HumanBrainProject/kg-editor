@@ -21,6 +21,7 @@
  *
  */
 
+import {faBan} from '@fortawesome/free-solid-svg-icons/faBan';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -79,7 +80,7 @@ const NoPermissionForView = observer(({ instance, mode }: NoPermissionForViewPro
     <>
       <Label className={classes.label} label="Name" />{instance.name}
       <div className={classes.errorMessage}>
-        <FontAwesomeIcon icon="ban" /> You do not have permission to {mode} the instance.
+        <FontAwesomeIcon icon={faBan} /> You do not have permission to {mode} the instance.
       </div>
     </>
   );

@@ -21,6 +21,14 @@
  *
  */
 
+import {faBan} from '@fortawesome/free-solid-svg-icons/faBan';
+import {faCircle} from '@fortawesome/free-solid-svg-icons/faCircle';
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
+import {faCode} from '@fortawesome/free-solid-svg-icons/faCode';
+import {faCodeBranch} from '@fortawesome/free-solid-svg-icons/faCodeBranch';
+import {faMoneyCheck} from '@fortawesome/free-solid-svg-icons/faMoneyCheck';
+import {faPlus} from '@fortawesome/free-solid-svg-icons/faPlus';
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
@@ -228,14 +236,14 @@ const InstancesResult = observer(
 
     if (!browseStore.selectedType) {
       return (
-        <BGMessage icon={'code-branch'} transform={'flip-h rotate--90'}>
+        <BGMessage icon={faCodeBranch} transform={'flip-h rotate--90'}>
           Select a instance type in the left panel
         </BGMessage>
       );
     }
     if (browseStore.fetchError) {
       return (
-        <BGMessage icon={'ban'}>
+        <BGMessage icon={faBan}>
           There was a network problem retrieving{' '}
           {browseStore.selectedType.label} instances.
           <br />
@@ -243,7 +251,7 @@ const InstancesResult = observer(
           <br />
           <br />
           <Button variant={'primary'} onClick={onRetry}>
-            <FontAwesomeIcon icon={'redo-alt'} /> &nbsp; Retry
+            <FontAwesomeIcon icon={faRedoAlt} /> &nbsp; Retry
           </Button>
         </BGMessage>
       );
@@ -269,7 +277,7 @@ const InstancesResult = observer(
               No&nbsp;
               <FontAwesomeIcon
                 fixedWidth
-                icon="circle"
+                icon={faCircle}
                 className={classes.typIcon}
                 style={
                   browseStore.selectedType.color
@@ -297,13 +305,13 @@ const InstancesResult = observer(
               onClick={handleCreateInstance}
             >
               <div className={classes.createFirstInstanceIcon}>
-                <FontAwesomeIcon icon="plus" />
+                <FontAwesomeIcon icon={faPlus} />
               </div>
               <div className={classes.createFirstInstanceText}>
                 Create a new&nbsp;
                 <FontAwesomeIcon
                   fixedWidth
-                  icon="circle"
+                  icon={faCircle}
                   className={classes.typIcon}
                   style={
                     browseStore.selectedType.color
@@ -326,7 +334,7 @@ const InstancesResult = observer(
         hasMore={browseStore.canLoadMoreInstances}
         loader={
           <div className={classes.loader} key={0}>
-            <FontAwesomeIcon icon={'circle-notch'} spin />
+            <FontAwesomeIcon icon={faCircleNotch} spin />
             &nbsp;&nbsp;
             <span>
               Loading more {browseStore.selectedType.label} instances...
@@ -356,13 +364,13 @@ const InstancesResult = observer(
             onClick={handleCreateInstance}
           >
             <div className={classes.createInstanceIcon}>
-              <FontAwesomeIcon icon="plus" />
+              <FontAwesomeIcon icon={faPlus} />
             </div>
             <div className={classes.createInstanceText}>
               Create a new&nbsp;
               <FontAwesomeIcon
                 fixedWidth
-                icon="circle"
+                icon={faCircle}
                 className={classes.typIcon}
                 style={
                   browseStore.selectedType.color
@@ -404,7 +412,7 @@ const Instances = observer(() => {
   };
 
   const handleInstanceCtrlClick = (instance: Instance) => {
-    if (instance && instance.id) {
+    if (instance?.id) {
       Matomo.trackEvent('Browse', 'InstanceOpenTabInBackground', instance.id);
       const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
       appStore.openInstance(
@@ -485,12 +493,12 @@ const Instances = observer(() => {
               instanceName={browseStore.selectedInstance.name}
             />
           ) : (
-            <BGMessage icon={'code'}>
+            <BGMessage icon={faCode}>
               This instance doesn&apos;t support preview.
             </BGMessage>
           )
         ) : (
-          <BGMessage icon={'money-check'}>
+          <BGMessage icon={faMoneyCheck}>
             Select an instance to display its preview here.
           </BGMessage>
         )}

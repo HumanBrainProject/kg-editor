@@ -21,6 +21,9 @@
  *
  */
 
+import {faBan} from '@fortawesome/free-solid-svg-icons/faBan';
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt';
+import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
@@ -181,12 +184,12 @@ const CompareFieldsChanges = observer(({ instanceId, leftInstance, rightInstance
   if (leftStatus.hasFetchError || rightStatus.hasFetchError) {
     return (
       <div className={classes.container}>
-        <BGMessage icon={'ban'}>
+        <BGMessage icon={faBan}>
             There was a network problem retrieving the links of instance &quot;<i>{instanceId}</i>&quot;.<br/>
             If the problem persists, please contact the support.<br/><br/>
           <div>
-            <Button onClick={onClose}><FontAwesomeIcon icon={'times'}/>&nbsp;&nbsp; Cancel</Button>
-            <Button variant={'primary'} onClick={handleRetryFetchInstances}><FontAwesomeIcon icon={'redo-alt'}/>&nbsp;&nbsp; Retry</Button>
+            <Button onClick={onClose}><FontAwesomeIcon icon={faTimes} />&nbsp;&nbsp; Cancel</Button>
+            <Button variant={'primary'} onClick={handleRetryFetchInstances}><FontAwesomeIcon icon={faRedoAlt} />&nbsp;&nbsp; Retry</Button>
           </div>
         </BGMessage>
       </div>

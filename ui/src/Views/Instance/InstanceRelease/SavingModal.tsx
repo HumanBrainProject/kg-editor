@@ -21,6 +21,8 @@
  *
  */
 
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
+import {faTimesCircle} from '@fortawesome/free-solid-svg-icons/faTimesCircle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
@@ -81,7 +83,7 @@ const AfterSave = observer(({ hasSavingErrors, className }:AfterSaveProps) => {
   }
   return (
     <div className={className}>
-      <FontAwesomeIcon icon={'circle-notch'} spin />
+      <FontAwesomeIcon icon={faCircleNotch} spin />
       &nbsp;&nbsp;Reloading current instance release status
     </div>
   );
@@ -139,7 +141,7 @@ const SavingModal = observer(() => {
           <div className={classes.errors}>
             {releaseStore.savingErrors.map((error) => (
               <div key={error.node.id} className={classes.error}>
-                <FontAwesomeIcon icon={'times-circle'} />
+                <FontAwesomeIcon icon={faTimesCircle} />
                   &nbsp; ({error.node.typesName}) {error.node.label}
                 <br />
                 <br />

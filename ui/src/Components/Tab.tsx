@@ -21,6 +21,7 @@
  *
  */
 
+import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { createUseStyles } from 'react-jss';
@@ -146,7 +147,7 @@ const Tab = ({label, description, disabled, active, icon, iconColor, iconSpin, h
       }
       {closeable?
         <div className={classes.close} onClick={handleClose}>
-          <FontAwesomeIcon icon={'times'}/>
+          <FontAwesomeIcon icon={faTimes} />
         </div>
         :null}
     </div>

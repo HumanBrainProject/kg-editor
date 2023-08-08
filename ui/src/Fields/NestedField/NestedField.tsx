@@ -21,6 +21,9 @@
  *
  */
 
+import {faArrowDown} from '@fortawesome/free-solid-svg-icons/faArrowDown';
+import {faArrowUp} from '@fortawesome/free-solid-svg-icons/faArrowUp';
+import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useRef } from 'react';
@@ -178,12 +181,12 @@ const Item = ({ itemFieldStores, readMode, active, index, total, onDelete, onMov
       ))}
       {!readMode && active && (
         <div className={classes.actions} >
-          <Action icon="times" onClick={handleDelete} single={total === 1} title="Delete" />
+          <Action icon={faTimes} onClick={handleDelete} single={total === 1} title="Delete" />
           {index !== 0 && (
-            <Action icon="arrow-up" onClick={handleMoveUp} title="Move up" />
+            <Action icon={faArrowUp} onClick={handleMoveUp} title="Move up" />
           )}
           {index < total - 1 && (
-            <Action icon="arrow-down" onClick={handleMoveDown} title="Move down" />
+            <Action icon={faArrowDown} onClick={handleMoveDown} title="Move down" />
           )}
         </div>
       )}
@@ -220,9 +223,9 @@ const NestedField = observer(({className, fieldStore, readMode, showIfNoValue}: 
   const handleMoveItemUp = (index: number) => fieldStore.moveItemUpByIndex(index);
   const handleMoveItemDown = (index: number) => fieldStore.moveItemDownByIndex(index);
 
-  const active = view && view.currentInstanceId === instance?.id?true: false;
+  const active = !!view && view.currentInstanceId === instance?.id;
 
-  if(readMode && !showIfNoValue && (!initialValue || !initialValue.length )) {
+  if(readMode && !showIfNoValue && !initialValue?.length) {
     return null;
   }
 

@@ -21,6 +21,12 @@
  *
  */
 
+import {faCheck} from '@fortawesome/free-solid-svg-icons/faCheck';
+import {faDotCircle} from '@fortawesome/free-solid-svg-icons/faDotCircle';
+import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons/faExclamationTriangle';
+import {faGlasses} from '@fortawesome/free-solid-svg-icons/faGlasses';
+import {faSave} from '@fortawesome/free-solid-svg-icons/faSave';
+import {faUndo} from '@fortawesome/free-solid-svg-icons/faUndo';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
@@ -163,8 +169,8 @@ const CompareModal = ({ instance, onSave, onReset, onClose }: CompareModalProps)
         </Scrollbars>
       </Modal.Body>
       <Modal.Footer>
-        <Button size="sm" onClick={handleReset}><FontAwesomeIcon icon="undo"/>&nbsp;Revert the changes</Button>
-        <Button variant="primary" size="sm" onClick={handleSave}><FontAwesomeIcon icon="save"/>&nbsp;Save this instance</Button>
+        <Button size="sm" onClick={handleReset}><FontAwesomeIcon icon={faUndo} />&nbsp;Revert the changes</Button>
+        <Button variant="primary" size="sm" onClick={handleSave}><FontAwesomeIcon icon={faSave}/>&nbsp;Save this instance</Button>
       </Modal.Footer>
     </Modal>
   );
@@ -194,12 +200,12 @@ const Instance = observer(({ instance, onSave, onReset, onCompare, onDismissSave
       </div>
       <div className={classes.actions}>
         {instance.isSaving?
-          <FontAwesomeIcon className={classes.saveIcon} icon="dot-circle"/>
+          <FontAwesomeIcon className={classes.saveIcon} icon={faDotCircle}/>
           :
           <ButtonGroup vertical>
-            <Button variant="primary" size="sm" onClick={handleSave} title="save this instance"><FontAwesomeIcon icon="save"/></Button>
-            {!instance.isNew && <Button size="sm" onClick={handleReset} title="revert the changes"><FontAwesomeIcon icon="undo"/></Button>}
-            <Button size="sm" onClick={handleCompare} title="compare the changes"><FontAwesomeIcon icon="glasses"/></Button>
+            <Button variant="primary" size="sm" onClick={handleSave} title="save this instance"><FontAwesomeIcon icon={faSave} /></Button>
+            {!instance.isNew && <Button size="sm" onClick={handleReset} title="revert the changes"><FontAwesomeIcon icon={faUndo} /></Button>}
+            <Button size="sm" onClick={handleCompare} title="compare the changes"><FontAwesomeIcon icon={faGlasses} /></Button>
           </ButtonGroup>
         }
       </div>
@@ -211,7 +217,7 @@ const Instance = observer(({ instance, onSave, onReset, onCompare, onDismissSave
       </div>
       {instance.hasSaveError && (
         <div className={classes.errors}>
-          {instance.saveError} <Button size="sm" variant={'link'} onClick={handleDismissSaveError}><FontAwesomeIcon icon="check"/></Button>
+          {instance.saveError} <Button size="sm" variant={'link'} onClick={handleDismissSaveError}><FontAwesomeIcon icon={faCheck}/></Button>
         </div>
       )}
     </div>
@@ -277,14 +283,14 @@ const SaveBar = observer(() => {
     <div className={classes.container}>
       <Scrollbars autoHide>
         {appStore.currentSpace?.autorelease && (
-          <div className={`alert alert-warning ${classes.autoreleaseWarning}`} role="alert"><FontAwesomeIcon icon="exclamation-triangle"  /> Saved changes will be released automatically.</div>
+          <div className={`alert alert-warning ${classes.autoreleaseWarning}`} role="alert"><FontAwesomeIcon icon={faExclamationTriangle} /> Saved changes will be released automatically.</div>
         )}
-        <h4>Unsaved instances &nbsp;{instanceStore.hasUnsavedChanges && <Button variant="primary" onClick={handleSaveAll}><FontAwesomeIcon icon="save"/>&nbsp;Save All</Button>}</h4>
+        <h4>Unsaved instances &nbsp;{instanceStore.hasUnsavedChanges && <Button variant="primary" onClick={handleSaveAll}><FontAwesomeIcon icon={faSave} />&nbsp;Save All</Button>}</h4>
         <div className={classes.instances} >
           <CompareModal instance={comparedInstance} onSave={handleSave} onReset={handleReset} onClose={handleCloseCompararison} />
           {!instanceStore.hasUnsavedChanges &&
               <div className={classes.noChanges}>
-                <div className={classes.allGreenIcon}><FontAwesomeIcon icon="check"/></div>
+                <div className={classes.allGreenIcon}><FontAwesomeIcon icon={faCheck}/></div>
                 <div className={classes.allGreenText}>You have no unsaved modifications !</div>
               </div>
           }

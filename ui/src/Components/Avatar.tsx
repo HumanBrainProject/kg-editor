@@ -21,6 +21,7 @@
  *
  */
 
+import {faUser} from '@fortawesome/free-solid-svg-icons/faUser';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { createUseStyles } from 'react-jss';
@@ -67,12 +68,12 @@ const Avatar = ({userId, name, picture, title, size=20}:AvatarProps) => {
   if (picture) {
     const imgTitle = getImageTitle(title, name, userId);
     return (
-      <img alt={name?name:userId} width={size} height={size} src={picture} title={imgTitle} className={`${classes.avatar} avatar picture`} />
+      <img alt={name??userId} width={size} height={size} src={picture} title={imgTitle} className={`${classes.avatar} avatar picture`} />
     );
   }
 
   return (
-    <FontAwesomeIcon icon="user" title={name?name:userId} className={`${classes.avatar} avatar default`} />
+    <FontAwesomeIcon icon={faUser} title={name??userId} className={`${classes.avatar} avatar default`} />
   );
 };
 

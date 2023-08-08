@@ -21,6 +21,7 @@
  *
  */
 
+import {faEnvelope} from '@fortawesome/free-solid-svg-icons/faEnvelope';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import Button from 'react-bootstrap/Button';
@@ -44,7 +45,7 @@ const ContactTheSupport = () => {
       <h1>Contact us</h1>
       <p>Should you encounter any problem with this application, please contact our team by email at : <a href={'mailto:kg@ebrains.eu'}>kg@ebrains.eu</a></p>
       <Button variant={'warning'} onClick={handleErrorReport}>
-        <FontAwesomeIcon icon={'envelope'} /> &nbsp; Send an error report
+        <FontAwesomeIcon icon={faEnvelope} /> &nbsp; Send an error report
       </Button>
     </div>
   );

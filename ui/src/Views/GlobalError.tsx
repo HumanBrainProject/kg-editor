@@ -21,6 +21,8 @@
  *
  */
 
+import {faCheck} from '@fortawesome/free-solid-svg-icons/faCheck';
+import {faExclamationCircle} from '@fortawesome/free-solid-svg-icons/faExclamationCircle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import Button from 'react-bootstrap/Button';
@@ -49,12 +51,12 @@ const GlobalError = () => {
 
   return (
     <div className={classes.container}>
-      <BGMessage icon={'exclamation-circle'}>
+      <BGMessage icon={faExclamationCircle}>
           An unexpected error has occured.<br />
           We recommend you to save all your changes and reload the application in your browser.<br />
           If the problem persists, please contact the support.<br /><br />
         <Button variant={'primary'} onClick={handleDismiss}>
-          <FontAwesomeIcon icon={'check'} /> &nbsp; Dismiss
+          <FontAwesomeIcon icon={faCheck} /> &nbsp; Dismiss
         </Button>
       </BGMessage>
     </div >

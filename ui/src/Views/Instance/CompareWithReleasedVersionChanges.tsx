@@ -21,6 +21,9 @@
  *
  */
 
+import {faBan} from '@fortawesome/free-solid-svg-icons/faBan';
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt';
+import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useState } from 'react';
@@ -120,13 +123,13 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }: Comp
   if(instance.fetchError) {
     return(
       <div className={classes.container}>
-        <BGMessage icon={'ban'}>
+        <BGMessage icon={faBan}>
             There was a network problem retrieving instance &quot;<i>{instanceId}&quot;</i>.<br/>
             If the problem persists, please contact the support.<br/>
           <small>{instance.fetchError}</small><br/><br/>
           <div>
-            <Button onClick={handleCloseComparison}><FontAwesomeIcon icon={'times'}/>&nbsp;&nbsp; Cancel</Button>
-            <Button variant={'primary'} onClick={handleRetryFetchInstance}><FontAwesomeIcon icon={'redo-alt'}/>&nbsp;&nbsp; Retry</Button>
+            <Button onClick={handleCloseComparison}><FontAwesomeIcon icon={faTimes} />&nbsp;&nbsp; Cancel</Button>
+            <Button variant={'primary'} onClick={handleRetryFetchInstance}><FontAwesomeIcon icon={faRedoAlt} />&nbsp;&nbsp; Retry</Button>
           </div>
         </BGMessage>
       </div>
@@ -136,13 +139,13 @@ const CompareWithReleasedVersionChanges = observer(({ instanceId, status }: Comp
   if(releasedInstance && releasedInstance.fetchError) {
     return(
       <div className={classes.container}>
-        <BGMessage icon={'ban'}>
+        <BGMessage icon={faBan}>
             There was a network problem retrieving the released instance &quot;<i>{instanceId}&quot;</i>.<br/>
             If the problem persists, please contact the support.<br/>
           <small>{releasedInstance.fetchError}</small><br/><br/>
           <div>
-            <Button onClick={handleCloseComparison}><FontAwesomeIcon icon={'times'}/>&nbsp;&nbsp; Cancel</Button>
-            <Button variant={'primary'} onClick={handleRetryFetchReleasedInstance}><FontAwesomeIcon icon={'redo-alt'}/>&nbsp;&nbsp; Retry</Button>
+            <Button onClick={handleCloseComparison}><FontAwesomeIcon icon={faTimes} />&nbsp;&nbsp; Cancel</Button>
+            <Button variant={'primary'} onClick={handleRetryFetchReleasedInstance}><FontAwesomeIcon icon={faRedoAlt} />&nbsp;&nbsp; Retry</Button>
           </div>
         </BGMessage>
       </div>

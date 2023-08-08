@@ -22,6 +22,9 @@
  */
 
 
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
+import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons/faExclamationTriangle';
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
@@ -102,7 +105,7 @@ const Reviewers = observer(({ id }: ReviewersProps) => {
       <div className={classes.container}>
         <h5 className={classes.title}>Reviewers:</h5>
         <div>
-          <FontAwesomeIcon icon="circle-notch" spin/>
+          <FontAwesomeIcon icon={faCircleNotch} spin/>
           <span className={classes.fetchingLabel}>&nbsp;&nbsp;
           Retrieving reviewers...
           </span>
@@ -116,8 +119,8 @@ const Reviewers = observer(({ id }: ReviewersProps) => {
       <div className={classes.container}>
         <h5 className={classes.title}>Reviewers:</h5>
         <div>
-          <FontAwesomeIcon icon="exclamation-triangle" style={{color: 'var(--ft-color-error)'}}/>&nbsp;&nbsp;<small>{invitedUsersStore.fetchError}</small>
-          &nbsp;&nbsp;<FontAwesomeIcon icon="redo-alt" style={{cursor: 'pointer'}} title="retry" onClick={fetchInstanceReviews}/>
+          <FontAwesomeIcon icon={faExclamationTriangle}style={{color: 'var(--ft-color-error)'}}/>&nbsp;&nbsp;<small>{invitedUsersStore.fetchError}</small>
+          &nbsp;&nbsp;<FontAwesomeIcon icon={faRedoAlt} style={{cursor: 'pointer'}} title="retry" onClick={fetchInstanceReviews}/>
         </div>
       </div>
     );
@@ -128,7 +131,7 @@ const Reviewers = observer(({ id }: ReviewersProps) => {
       <div className={classes.container}>
         <h5 className={classes.title}>Reviewers:</h5>
         <div>
-          <FontAwesomeIcon icon="exclamation-triangle" style={{color: 'var(--ft-color-error)'}}/>&nbsp;&nbsp;<small>{invitedUsersStore.error}</small>
+          <FontAwesomeIcon icon={faExclamationTriangle}style={{color: 'var(--ft-color-error)'}}/>&nbsp;&nbsp;<small>{invitedUsersStore.error}</small>
         </div>
       </div>
     );

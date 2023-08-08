@@ -21,6 +21,10 @@
  *
  */
 
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
+import {faInfoCircle} from '@fortawesome/free-solid-svg-icons/faInfoCircle';
+import {faPlus} from '@fortawesome/free-solid-svg-icons/faPlus';
+import {faQuestionCircle} from '@fortawesome/free-solid-svg-icons/faQuestionCircle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import uniqueId from 'lodash/uniqueId';
 import { observer } from 'mobx-react-lite';
@@ -179,7 +183,7 @@ const CreateInstance = observer(({
     if (isCreatingNewInstance) {
       return (
         <div className={classes.createInstance}>
-          <FontAwesomeIcon icon={'circle-notch'} spin />
+          <FontAwesomeIcon icon={faCircleNotch} spin />
         </div>
       );
     }
@@ -190,7 +194,7 @@ const CreateInstance = observer(({
           onClick={onClick}
           title={`create a new ${label}`}
         >
-          <FontAwesomeIcon icon={'plus'} />
+          <FontAwesomeIcon icon={faPlus} />
         </div>
       </div>
     );
@@ -206,7 +210,7 @@ const CreateInstance = observer(({
         }
       >
         <span>
-          <FontAwesomeIcon icon="question-circle" />
+          <FontAwesomeIcon icon={faQuestionCircle} />
         </span>
       </OverlayTrigger>
     </div>
@@ -267,7 +271,7 @@ const TypesItem = observer(({ type }: TypesItemProps) => {
       <span>
         {type.label}
         {type.description && (
-          <FontAwesomeIcon className={classes.infoCircle} icon="info-circle" />
+          <FontAwesomeIcon className={classes.infoCircle} icon={faInfoCircle} />
         )}
       </span>
       <CreateInstance

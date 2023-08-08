@@ -21,6 +21,7 @@
  *
  */
 
+import {faGlobe} from '@fortawesome/free-solid-svg-icons/faGlobe';
 import { observable, action, computed, makeObservable, toJS } from 'mobx';
 import { fieldsMapping } from '..';
 import FieldStore from './FieldStore';
@@ -102,7 +103,7 @@ class SingleNestedFieldStore extends FieldStore {
     let warning = null;
     if(name === this.labelField) {
       field.labelTooltip = 'This field will be publicly accessible for every user. (Even for users without read access)';
-      field.labelTooltipIcon = 'globe';
+      field.labelTooltipIcon = faGlobe;
     }
     if (!stores[name]) {
       if (!field.widget) {

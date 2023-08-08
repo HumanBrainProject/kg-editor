@@ -21,6 +21,11 @@
  *
  */
 
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
+import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons/faExclamationTriangle';
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt';
+import {faSearch} from '@fortawesome/free-solid-svg-icons/faSearch';
+import {faUserPlus} from '@fortawesome/free-solid-svg-icons/faUserPlus';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useRef } from 'react';
@@ -188,7 +193,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
     if(e &&  e.key === 'ArrowDown'){ // Down
       event.preventDefault();
       const users = usersRef.current?.querySelectorAll('.option');
-      if (users && users.length) {
+      if (users?.length) {
         let index = Array.prototype.indexOf.call(users, event.target) + 1;
         if (index >= users.length) {
           index = 0;
@@ -198,7 +203,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
     } else if(e && e.key === 'ArrowUp'){ // Up
       event.preventDefault();
       const users = usersRef.current?.querySelectorAll('.option');
-      if (users && users.length) {
+      if (users?.length) {
         let index = Array.prototype.indexOf.call(users, event.target) - 1;
         if (index < 0) {
           index = users.length - 1;
@@ -219,7 +224,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
     if(event && event.key === 'ArrowDown' ){ // Down
       event.preventDefault();
       const users = usersRef.current?.querySelectorAll('.option');
-      if (users && users.length) {
+      if (users?.length) {
         let index = Array.prototype.indexOf.call(users, event.target) + 1;
         if (index >= users.length) {
           index = 0;
@@ -229,7 +234,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
     } else if(event && event.key === 'ArrowUp'){ // Up
       event.preventDefault();
       const users = usersRef.current?.querySelectorAll('.option');
-      if (users && users.length) {
+      if (users?.length) {
         let index = Array.prototype.indexOf.call(users, event.target) - 1;
         if (index < 0) {
           index = users.length - 1;
@@ -255,10 +260,10 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
 
   return (
     <div className={classes.container} ref={wrapperRef} >
-      <FontAwesomeIcon icon="user-plus" className={classes.addIcon} />
+      <FontAwesomeIcon icon={faUserPlus} className={classes.addIcon} />
       <div className={classes.search}>
         <input ref={inputRef} className={`form-control ${classes.searchInput}`} placeholder="Invite a user for review" type="text" value={userStore.searchFilter.queryString} onKeyDown={handleInputKeyStrokes} onChange={handleSearchFilterChange} />
-        <FontAwesomeIcon icon="search" className={classes.searchIcon} />
+        <FontAwesomeIcon icon={faSearch} className={classes.searchIcon} />
         <div className={`${classes.searchDropdown} ${userStore.hasSearchFilter?'open':''}`} ref={usersRef}>
           <div className="dropdown-menu">
             <div className="dropdown-list">
@@ -271,7 +276,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
                 <div>
                   { userStore.isFetchingSearch && (
                     <>
-                      <FontAwesomeIcon icon="circle-notch" spin />&nbsp;&nbsp; retrieving...
+                      <FontAwesomeIcon icon={faCircleNotch} spin />&nbsp;&nbsp; retrieving...
                     </>
                   )}
                 </div>
@@ -286,8 +291,8 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
             )}
             {userStore.searchFetchError && (
               <button className={classes.errorPanel} title={userStore.searchFetchError} onClick={handleLoadSearchResults}>
-                <div className="error"><FontAwesomeIcon icon="exclamation-triangle" />&nbsp;&nbsp;<span>{userStore.searchFetchError}</span></div>
-                <div className="retry"><FontAwesomeIcon icon={'redo-alt'}/></div>
+                <div className="error"><FontAwesomeIcon icon={faExclamationTriangle}/>&nbsp;&nbsp;<span>{userStore.searchFetchError}</span></div>
+                <div className="retry"><FontAwesomeIcon icon={faRedoAlt}/></div>
               </button>
             )}
           </div>

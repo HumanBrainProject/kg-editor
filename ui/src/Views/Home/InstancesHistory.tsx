@@ -21,6 +21,7 @@
  *
  */
 
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toJS } from 'mobx';
 import { observer } from 'mobx-react-lite';
@@ -170,7 +171,7 @@ const InstancesHistoryBody = observer(({ onError }: InstancesHistoryBodyProps) =
 
   if (historyStore.isFetching) {
     return (
-      <div className={classes.retrieving}><FontAwesomeIcon icon="circle-notch" spin/><span>Retrieving history instances...</span></div>
+      <div className={classes.retrieving}><FontAwesomeIcon icon={faCircleNotch} spin/><span>Retrieving history instances...</span></div>
     );
   }
 

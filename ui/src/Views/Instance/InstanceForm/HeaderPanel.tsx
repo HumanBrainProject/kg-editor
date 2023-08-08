@@ -21,6 +21,10 @@
  *
  */
 
+import {faCaretRight} from '@fortawesome/free-solid-svg-icons/faCaretRight';
+import {faCircle} from '@fortawesome/free-solid-svg-icons/faCircle';
+import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons/faExclamationTriangle';
+import {faPencilAlt} from '@fortawesome/free-solid-svg-icons/faPencilAlt';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect, useRef } from 'react';
@@ -103,16 +107,16 @@ const HeaderPanel = observer(({ className, types, hasChanged, highlight }: Heade
         <Col xs={12}>
           <h6 ref={scrollIntoViewRef}>
             {types && types.map(({name, label, color}) => (
-              <span key={name} className={classes.type} title={name}><FontAwesomeIcon icon={'circle'} color={color}/>&nbsp;&nbsp;<span>{label?label:name}</span></span>
+              <span key={name} className={classes.type} title={name}><FontAwesomeIcon icon={faCircle} color={color}/>&nbsp;&nbsp;<span>{label?label:name}</span></span>
             ))}
           </h6>
         </Col>
       </Row>
       {hasChanged && (
         <div className={classes.hasChanged}>
-          <FontAwesomeIcon icon={'exclamation-triangle'}/>&nbsp;
-          <FontAwesomeIcon icon={'caret-right'}/>&nbsp;
-          <FontAwesomeIcon icon={'pencil-alt'}/>
+          <FontAwesomeIcon icon={faExclamationTriangle} />&nbsp;
+          <FontAwesomeIcon icon={faCaretRight} />&nbsp;
+          <FontAwesomeIcon icon={faPencilAlt} />
         </div>
       )}
     </div>

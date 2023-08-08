@@ -21,6 +21,10 @@
  *
  */
 
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
+import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons/faExclamationTriangle';
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt';
+import {faTimes} from '@fortawesome/free-solid-svg-icons/faTimes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import debounce from 'lodash/debounce';
 import { observer } from 'mobx-react-lite';
@@ -91,7 +95,7 @@ const LabelCellRenderer = observer(({ instanceId, mainInstanceId, className }: L
   if (instance.fetchError || instance.fetchLabelError) {
     return (
       <span style={{color: 'var(--ft-color-error)'}}>
-        <FontAwesomeIcon icon="exclamation-triangle"/>
+        <FontAwesomeIcon icon={faExclamationTriangle} />
         &nbsp; {instance.fetchError || instance.fetchLabelError}
       </span>
     );
@@ -105,7 +109,7 @@ const LabelCellRenderer = observer(({ instanceId, mainInstanceId, className }: L
   if (instance.isFetching || instance.isLabelFetching) {
     return (
       <span>
-        <FontAwesomeIcon icon="circle-notch" spin/>
+        <FontAwesomeIcon icon={faCircleNotch} spin/>
           &nbsp; retrieving {instance.id}...
       </span>
     );
@@ -148,7 +152,7 @@ const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, on
   if (instance && instance.fetchError) {
     return (
       <Button className={classes.actionBtn} size="sm" variant={'danger'} onClick={handleRetry} >
-        <FontAwesomeIcon icon="redo-alt"/>
+        <FontAwesomeIcon icon={faRedoAlt}/>
       </Button>
     );
   }
@@ -156,7 +160,7 @@ const ActionsCellRenderer = observer(({ index, instanceId, readOnly, onRetry, on
   if (!instance || instance.isFetched || instance.isLabelFetched) {
     return (
       <Button className={classes.actionBtn} size="sm" variant={'primary'} onClick={handleDelete} >
-        <FontAwesomeIcon icon="times"/>
+        <FontAwesomeIcon icon={faTimes}/>
       </Button>
     );
   }

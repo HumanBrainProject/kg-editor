@@ -21,6 +21,9 @@
  *
  */
 
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
+import {faCloudUploadAlt} from '@fortawesome/free-solid-svg-icons/faCloudUploadAlt';
+import {faEye} from '@fortawesome/free-solid-svg-icons/faEye';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useState}  from 'react';
@@ -158,7 +161,7 @@ const ReleaseAction = observer(() => {
   };
 
   const instance = releaseStore.topInstanceId ? instanceStore.instances.get(releaseStore.topInstanceId): undefined;
-  const permissions = instance && instance.permissions;
+  const permissions = instance?.permissions;
   const title = getTitle();
   return (
     <div className={classes.container}>
@@ -173,13 +176,13 @@ const ReleaseAction = observer(() => {
               className={'previewIcon'}
               title="Preview in KG Search"
             >
-              <FontAwesomeIcon style={{ verticalAlign: 'top' }} icon="eye" />
+              <FontAwesomeIcon style={{ verticalAlign: 'top' }} icon={faEye} />
             </div>
           </div>
         </div>
       </div>
       <div className={classes.invite}>
-        {(permissions && permissions.canInviteForSuggestion && releaseStore.topInstanceId) && (
+        {(permissions?.canInviteForSuggestion && releaseStore.topInstanceId) && (
           <Reviewers id={releaseStore.topInstanceId} />
         )}
       </div>
@@ -196,7 +199,7 @@ const ReleaseAction = observer(() => {
           title={title}
         >
           <FontAwesomeIcon
-            icon={releaseStore.isSaving ? 'circle-notch' : 'cloud-upload-alt'}
+            icon={releaseStore.isSaving ? faCircleNotch : faCloudUploadAlt}
             spin={releaseStore.isSaving}
           />
           <div>{releaseStore.isSaving ? 'Saving...' : 'Proceed'}</div>

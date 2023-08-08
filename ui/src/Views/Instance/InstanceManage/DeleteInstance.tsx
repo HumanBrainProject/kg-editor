@@ -21,6 +21,10 @@
  *
  */
 
+import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
+import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons/faExclamationTriangle';
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt';
+import {faTrashAlt} from '@fortawesome/free-solid-svg-icons/faTrashAlt';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
@@ -70,22 +74,22 @@ interface DeleteProps {
 }
 
 const Delete = observer(({ status, onClick, classes, fetchStatus }: DeleteProps) => {
-  if (status && status.hasFetchError) {
+  if (status?.hasFetchError) {
     return (
       <div className={classes.error}>
-        <FontAwesomeIcon icon={'exclamation-triangle'} />
+        <FontAwesomeIcon icon={faExclamationTriangle} />
         &nbsp;&nbsp;{status.fetchError}&nbsp;&nbsp;
         <Button variant="primary" onClick={fetchStatus}>
-          <FontAwesomeIcon icon="redo-alt" />
+          <FontAwesomeIcon icon={faRedoAlt} />
           &nbsp;Retry
         </Button>
       </div>
     );
   }
-  if (!status || !status.isFetched) {
+  if (!status?.isFetched) {
     return (
       <>
-        <FontAwesomeIcon icon={'circle-notch'} spin />
+        <FontAwesomeIcon icon={faCircleNotch} spin />
         &nbsp;&nbsp;Retrieving instance release status
       </>
     );
@@ -113,7 +117,7 @@ const Delete = observer(({ status, onClick, classes, fetchStatus }: DeleteProps)
         className={classes.btn}
         disabled={status.data !== ReleaseStatus.UNRELEASED}
       >
-        <FontAwesomeIcon icon={'trash-alt'} />
+        <FontAwesomeIcon icon={faTrashAlt} />
         &nbsp;&nbsp; Delete this instance
       </Button>
     </>
@@ -177,7 +181,7 @@ const DeleteInstance = observer(({ instance, className }: DeleteInstanceProps) =
           <div className={classes.deleteErrorMessage}>{appStore.deleteInstanceError}</div>
           <div className={classes.deleteErrorActions}>
             <Button onClick={handleCancelDeleteInstance}>Cancel</Button>
-            <Button variant="primary" onClick={handleRetryDeleteInstance}><FontAwesomeIcon icon="redo-alt" />&nbsp;Retry</Button>
+            <Button variant="primary" onClick={handleRetryDeleteInstance}><FontAwesomeIcon icon={faRedoAlt} />&nbsp;Retry</Button>
           </div>
         </ErrorModal>
       )}

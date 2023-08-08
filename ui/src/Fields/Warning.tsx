@@ -21,6 +21,7 @@
  *
  */
 
+import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons/faExclamationTriangle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { createUseStyles } from 'react-jss';
@@ -46,7 +47,7 @@ const Warning = ({ show, message }: WarningProps) => {
   }
 
   return (
-    <div className={classes.warning}><FontAwesomeIcon icon="exclamation-triangle" title="Error"/> {message}</div>
+    <div className={classes.warning}><FontAwesomeIcon icon={faExclamationTriangle}title="Error"/> {message}</div>
   );
 };
 

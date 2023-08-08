@@ -21,6 +21,7 @@
  *
  */
 
+import {faBan} from '@fortawesome/free-solid-svg-icons/faBan';
 import React from 'react';
 import { createUseStyles } from 'react-jss';
 import { Link, useLocation } from 'react-router-dom';
@@ -41,7 +42,7 @@ const NotFound = () => {
 
   return (
     <div className={classes.container} >
-      <BGMessage icon={'ban'}>
+      <BGMessage icon={faBan}>
         The page &quot;<i>{location.pathname}</i>&quot; does not exist.<br /><br />
         <Link className="btn btn-primary" to={'/'}>Go back to the dashboard</Link>
       </BGMessage>

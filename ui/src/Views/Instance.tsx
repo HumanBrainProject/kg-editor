@@ -21,6 +21,7 @@
  *
  */
 
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
@@ -88,7 +89,7 @@ const Instance = observer(({ children }: InstanceProps) => {
           <br />
           <br />
           <Button variant={'primary'} onClick={handleRetry}>
-            <FontAwesomeIcon icon={'redo-alt'} />
+            <FontAwesomeIcon icon={faRedoAlt} />
             &nbsp;&nbsp; Retry
           </Button>
           <Button variant={'primary'} onClick={handleContinue}>

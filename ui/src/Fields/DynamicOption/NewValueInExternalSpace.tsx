@@ -23,7 +23,7 @@
  *
  */
 
-
+import {faCircle} from '@fortawesome/free-solid-svg-icons/faCircle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import React from 'react';
 import { createUseStyles } from 'react-jss';
@@ -54,7 +54,7 @@ const NewValueInExternalSpace = ({item:{space, type}}: NewValueInExternalSpacePr
 
   return (
     <em className={classes.create}>
-        Add a new <span style={style}><FontAwesomeIcon fixedWidth icon="circle" /></span>
+        Add a new <span style={style}><FontAwesomeIcon fixedWidth icon={faCircle} /></span>
       {type.label} in space <strong>{space}</strong>
     </em>
   );

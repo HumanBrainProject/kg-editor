@@ -21,6 +21,13 @@
  *
  */
 
+import {faCircle} from '@fortawesome/free-solid-svg-icons/faCircle';
+import {faCloudUploadAlt} from '@fortawesome/free-solid-svg-icons/faCloudUploadAlt';
+import {faCode} from '@fortawesome/free-solid-svg-icons/faCode';
+import {faCog} from '@fortawesome/free-solid-svg-icons/faCog';
+import {faEye} from '@fortawesome/free-solid-svg-icons/faEye';
+import {faPencilAlt} from '@fortawesome/free-solid-svg-icons/faPencilAlt';
+import {faProjectDiagram} from '@fortawesome/free-solid-svg-icons/faProjectDiagram';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React, { useRef } from 'react';
@@ -275,7 +282,7 @@ const InstanceRow = observer(
             }
             title={instance.primaryType.name}
           >
-            <FontAwesomeIcon fixedWidth icon="circle" />
+            <FontAwesomeIcon fixedWidth icon={faCircle} />
           </div>
           <div className={classes.name}>{instance.name}</div>
         </div>
@@ -294,7 +301,7 @@ const InstanceRow = observer(
           <Action
             className={classes.action}
             show={permissions?.canRead && isTypesSupported}
-            icon="eye"
+            icon={faEye}
             mode={ViewMode.VIEW}
             label="Open"
             onClick={handleActionClick}
@@ -303,7 +310,7 @@ const InstanceRow = observer(
           <Action
             className={classes.action}
             show={permissions?.canWrite && isTypesSupported}
-            icon="pencil-alt"
+            icon={faPencilAlt}
             mode={ViewMode.EDIT}
             label="Edit"
             onClick={handleActionClick}
@@ -312,7 +319,7 @@ const InstanceRow = observer(
           <Action
             className={classes.action}
             show={permissions?.canRead}
-            icon="project-diagram"
+            icon={faProjectDiagram}
             mode={ViewMode.GRAPH}
             label="Explore"
             onClick={handleActionClick}
@@ -321,7 +328,7 @@ const InstanceRow = observer(
           <Action
             className={classes.action}
             show={permissions?.canRelease && isTypesSupported}
-            icon="cloud-upload-alt"
+            icon={faCloudUploadAlt}
             mode={ViewMode.RELEASE}
             label="Release"
             onClick={handleActionClick}
@@ -330,7 +337,7 @@ const InstanceRow = observer(
           <Action
             className={classes.action}
             show={permissions?.canRead}
-            icon="cog"
+            icon={faCog}
             mode={ViewMode.MANAGE}
             label="Manage"
             onClick={handleActionClick}
@@ -339,7 +346,7 @@ const InstanceRow = observer(
           <Action
             className={classes.action}
             show={permissions?.canRead}
-            icon="code"
+            icon={faCode}
             mode={ViewMode.RAW}
             label="Raw view"
             onClick={handleActionClick}

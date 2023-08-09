@@ -20,7 +20,7 @@
  * (Human Brain Project SGA1, SGA2 and SGA3).
  *
  */
-import { observable, toJS, makeObservable, action, computed } from 'mobx';
+import { observable, makeObservable, action, computed } from 'mobx';
 
 import FieldStore from './FieldStore';
 import type { WidgetOptions } from '..';
@@ -34,9 +34,9 @@ interface Messages {
 }
 
 class InputNumberStore extends FieldStore {
-  value: string | null = '';
+  value: number | string | null = '';
   returnAsNull = false;
-  initialValue: string | null = null;
+  initialValue: number | string | null = null;
   inputType = 'number';
   minValue?: number;
   maxValue?: number;
@@ -75,8 +75,8 @@ class InputNumberStore extends FieldStore {
     const messages: Messages = {};
     if (this.shouldCheckValidation) {
       if(this.minMaxValueWarning && this.value !== '') {
-        if(this.value) {
-          const v = parseInt(this.value);
+        if(this.value !== undefined && this.value !== null) {
+          const v = typeof this.value === 'string'?parseInt(this.value as string):this.value;
           if(this.minValue && this.maxValue) {
             if(v < this.minValue || v > this.maxValue) {
               messages.minMaxValue = `Value should be between ${this.minValue} and ${this.maxValue}`;
@@ -103,7 +103,7 @@ class InputNumberStore extends FieldStore {
     if (this.value === '' || this.value === null) {
       return null;
     }
-    const value = parseFloat(toJS(this.value));
+    const value = typeof this.value === 'string'?parseFloat(this.value):this.value;
     if (isNaN(value)) {
       return null;
     }
@@ -120,13 +120,13 @@ class InputNumberStore extends FieldStore {
   get cloneWithInitialValue() {
     return {
       ...this.definition,
-      value: toJS(this.initialValue)
+      value: this.initialValue
     };
   }
 
-  updateValue(value: string | null | undefined) {
+  updateValue(value: number | string | null | undefined) {
     this.returnAsNull = false;
-    this.initialValue = (value !== null && value !== undefined)?value:null;
+    this.initialValue = value !== undefined?value:null;
     this.value = this.initialValue;
   }
 
@@ -146,7 +146,7 @@ class InputNumberStore extends FieldStore {
     return this.initialValue !== null || this.hasChanged;
   }
 
-  setValue(value: string | null | undefined) {
+  setValue(value: number | string | null | undefined) {
     if (value !== null && value !== undefined) {
       if (value !== '' || !this.returnAsNull) {
         this.returnAsNull = false;

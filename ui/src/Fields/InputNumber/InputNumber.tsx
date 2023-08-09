@@ -82,11 +82,11 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => fieldStore.setValue(e.target.value);
 
-  const handleSelectAlternative = (val: any) => fieldStore.setValue(val);
+  const handleSelectAlternative = (val: number | string | null | undefined) => fieldStore.setValue(val);
 
   const handleRemoveMySuggestion = () => fieldStore.setValue(null);
 
-  if(readMode && !value && !showIfNoValue) {
+  if(readMode && (value === null || value === undefined) && !showIfNoValue) {
     return null;
   }
 
@@ -116,7 +116,7 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
         ValueRenderer={AlternativeValue}
       />
       <Form.Control
-        value={value ? value: undefined}
+        value={value===null||value===undefined?'':value}
         type={inputType}
         onChange={handleChange}
         disabled={isDisabled}

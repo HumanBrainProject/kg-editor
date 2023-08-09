@@ -54,6 +54,11 @@ public class RestControllerAdvice {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
+    @ExceptionHandler({WebClientResponseException.BadRequest.class})
+    protected ResponseEntity<?> badRequest(RuntimeException ex, WebRequest request) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
     @ExceptionHandler({IllegalArgumentException.class})
     protected ResponseEntity<Object> illegalArgument(RuntimeException ex, WebRequest request) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());

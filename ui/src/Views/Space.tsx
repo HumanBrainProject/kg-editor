@@ -120,8 +120,11 @@ const Space = observer(({ space, skipHistory, children }: SpaceProps) => {
       const handleSpaceFilter = (list: SpaceType[], term: string) => list.filter(space => space.id.toLowerCase().includes(term));
 
       return (
-        <Modal title={`Welcome ${userProfileStore.firstName}, please select a space:`} show={true} closeButton={false} >
-          <Component list={list} itemComponent={SpaceItem} getKey={space => space.id} onSelect={handleSpaceSelection} onFilter={handleSpaceFilter} filterPlaceholder="Filter spaces" />
+        <Modal show={true} >
+          <Modal.Header title={`Welcome ${userProfileStore.firstName}, please select a space:`} closeButton={false} />
+          <Modal.Body>
+            <Component list={list} itemComponent={SpaceItem} getKey={space => space.id} onSelect={handleSpaceSelection} onFilter={handleSpaceFilter} filterPlaceholder="Filter spaces" />
+          </Modal.Body>
         </Modal>
       );
     }

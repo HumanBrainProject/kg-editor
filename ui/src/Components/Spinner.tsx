@@ -28,29 +28,35 @@ import { createUseStyles } from 'react-jss';
 
 const useStyles = createUseStyles({
   spinnerPanel: {
-    position: 'absolute !important',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
     fontSize: '1.2em',
     fontWeight: 'lighter',
-    width:'100%',
     textAlign:'center'
   },
   spinnerLabel: {
     paddingLeft: '6px',
     display:'inline-block'
+  },
+  centered:{
+    position:'absolute !important',
+    top:'50%',
+    left:'50%',
+    width:'100%',
+    transform:'translate(-50%,-200px)',
+  },
+  withMargin: {
+    margin: '30px'
   }
 });
 
 interface SpinnerProps {
   text: string;
+  centered?: boolean;
 }
 
-const Spinner = ({text}: SpinnerProps) => {
+const Spinner = ({text, centered=true}: SpinnerProps) => {
   const classes = useStyles();
   return (
-    <div className={`${classes.spinnerPanel} spinnerPanel`}>
+    <div className={`${classes.spinnerPanel} ${centered?classes.centered:classes.withMargin} spinnerPanel`}>
       <FontAwesomeIcon icon={faCircleNotch} spin/>
       <span className={`${classes.spinnerLabel} spinnerLabel`}>{text}</span>
     </div>

@@ -21,7 +21,9 @@
  *
  */
 
+import {faCircle} from '@fortawesome/free-solid-svg-icons/faCircle';
 import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
+import {faCodeBranch} from '@fortawesome/free-solid-svg-icons/faCodeBranch';
 import {faInfoCircle} from '@fortawesome/free-solid-svg-icons/faInfoCircle';
 import {faPlus} from '@fortawesome/free-solid-svg-icons/faPlus';
 import {faQuestionCircle} from '@fortawesome/free-solid-svg-icons/faQuestionCircle';
@@ -42,7 +44,7 @@ import type { MouseEvent } from 'react';
 
 const useStyles = createUseStyles({
   container: {
-    padding: '5px 5px 5px 30px',
+    padding: '5px 10px 5px 10px',
     borderLeft: '2px solid transparent',
     color: 'var(--ft-color-normal)',
     cursor: 'pointer',
@@ -264,7 +266,7 @@ const TypesItem = observer(({ type }: TypesItemProps) => {
     >
       <FontAwesomeIcon
         fixedWidth
-        icon={color?'circle':'code-branch'}
+        icon={color?faCircle:faCodeBranch}
         className={classes.icon}
         style={color?{ color: color }:undefined}
       />

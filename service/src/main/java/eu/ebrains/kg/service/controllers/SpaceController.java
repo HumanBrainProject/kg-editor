@@ -38,6 +38,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 public class SpaceController {
@@ -62,31 +63,65 @@ public class SpaceController {
     public void initialize(String name, List<String> types) {
         if (!hasSpace(name)) {
             spaceClient.setSpecification(name);
-            if (!CollectionUtils.isEmpty(types)) {
-                types.forEach(t -> spaceClient.setAssignType(name, t));
-            }
+            addTypesToSpace(name, types);
         }
     }
 
+    // Exceptions are handled globally
+    public void addTypesToSpace(String space, List<String> types) {
+        if (!CollectionUtils.isEmpty(types)) {
+            types.forEach(t -> spaceClient.setAssignType(space, t));
+        }
+    }
+
+    // Exceptions are handled globally
+    public void removeTypeFromSpace(String space, String type) {
+        spaceClient.removeType(space, type);
+    }
+
     public List<StructureOfType> getTypes(String space) {
-        List<StructureOfType> spaceTypes = spaceClient.getSpaceTypes(space);
-        Map<String, StructureOfType> typesMap = spaceTypes.stream().collect(Collectors.toMap(StructureOfType::getName, v -> v));
-        getNestedTypes(typesMap, spaceTypes);
+        List<StructureOfType> types = spaceClient.getSpaceTypes(space);
+        if (CollectionUtils.isEmpty(types)) {
+            return Collections.emptyList();
+        }
+        return getTypesWithNestedTypes(types);
+    }
+
+    public List<StructureOfType> getTypesByName(List<String> typeNames, String space) {
+        if (CollectionUtils.isEmpty(typeNames)) {
+            return Collections.emptyList();
+        }
+        Map<String, KGCoreResult<StructureOfType>> typesByName = spaceClient.getTypesByName(typeNames, true, true, space);
+        List<StructureOfType> types = typesByName.values().stream().map(KGCoreResult::getData).filter(Objects::nonNull).collect(Collectors.toList());
+        if (CollectionUtils.isEmpty(types)) {
+            return Collections.emptyList();
+        }
+        return getTypesWithNestedTypes(types);
+    }
+
+    private List<StructureOfType> getTypesWithNestedTypes(List<StructureOfType> types) {
+        List<StructureOfType> relatedTypes = new ArrayList<>(types);
+        Map<String, StructureOfType> typesMap = relatedTypes.stream().collect(Collectors.toMap(StructureOfType::getName, v -> v));
+        getNestedTypes(typesMap, relatedTypes);
         HashSet<String> spaceTypesName = new HashSet<>();
-        spaceTypes.forEach(w -> spaceTypesName.add(w.getName()));
+        relatedTypes.forEach(w -> spaceTypesName.add(w.getName()));
         typesMap.values().forEach(v -> {
             if (!spaceTypesName.contains(v.getName())) {
                 if(v.getEmbeddedOnly() == null || !v.getEmbeddedOnly()) {
                     v.setEmbeddedOnly(true);
                 }
-                spaceTypes.add(v);
+                relatedTypes.add(v);
             }
         });
-        getTargetTypes(typesMap, spaceTypes);
-        getIncomingLinksTypes(spaceTypes, typesMap);
-        spaceTypes.sort(Comparator.comparing(StructureOfType::getLabel));
-        enrichSpaceTypes(spaceTypes, typesMap);
-        return spaceTypes;
+        getTargetTypes(typesMap, relatedTypes);
+        getIncomingLinksTypes(relatedTypes, typesMap);
+        relatedTypes.sort(Comparator.comparing(StructureOfType::getLabel));
+        enrichSpaceTypes(relatedTypes, typesMap);
+        return relatedTypes;
+    }
+
+    public List<StructureOfType> getSpaceAvailableTypes(String space) {
+        return spaceClient.getSpaceAvailableTypes(space);
     }
 
     private void enrichSpaceTypes(List<StructureOfType> spaceTypes, Map<String, StructureOfType> typesMap) {

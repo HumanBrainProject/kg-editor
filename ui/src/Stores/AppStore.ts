@@ -384,7 +384,7 @@ export class AppStore{
         this.rootStore.browseStore.clearInstancesFilter();
       }
       this.rootStore.instanceStore.flush();
-      this.rootStore.browseStore.clearInstances();
+      this.rootStore.browseStore.clearSelectedType();
       this.setSpace(space.id);
       const path = this.rootStore.viewStore.restoreViews();
       if (path) {

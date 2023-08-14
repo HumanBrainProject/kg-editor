@@ -23,71 +23,64 @@
 
 import { observer } from 'mobx-react-lite';
 import React from 'react';
+import { Scrollbars } from 'react-custom-scrollbars-2';
 import { createUseStyles } from 'react-jss';
-
+import Filter from '../../Components/Filter';
 import useStores from '../../Hooks/useStores';
-
+import AvaiableTypes from './AvailableTypes';
 import TypesItem from './TypesItem';
 
 const useStyles = createUseStyles({
-  folder: {
-    '& .spinnerPanel': {
-      position: 'unset !important',
-      top: 'unset',
-      left: 'unset',
-      transform: 'unset',
-      width: 'auto',
-      margin: '0 33px',
-      padding: '3px 6px',
-      borderRadius: '3px',
-      background: 'rgba(255,255,255, 0.05)',
-      color: 'var(--ft-color-quiet)',
-      fontSize: '1em',
-      textAlign: 'left'
-    }
+  container: {
+    background: 'var(--bg-color-ui-contrast2)',
+    borderRight: '1px solid var(--border-color-ui-contrast1)',
+    color: 'var(--ft-color-loud)',
+    position: 'relative',
+    display: 'grid',
+    gridTemplateRows:'auto auto 1fr'
   },
-  folderName: {
+  header: {
     color: 'var(--ft-color-quiet)',
     textTransform: 'uppercase',
     fontWeight: 'bold',
     fontSize: '0.9em',
-    padding: '10px 10px 5px 10px',
+    padding: '10px 10px 0 10px',
     cursor: 'pointer'
   },
-  fetchErrorPanel: {
-    margin: '0 34px',
-    padding: '3px',
-    borderRadius: '4px',
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    textAlign: 'center',
-    fontSize: '0.9em',
-    wordBreak: 'break-all',
-    '& .btn': {
-      width: '100px',
-      margin: '10px 6px 6px 6px'
-    },
-    color: 'var(--ft-color-error)'
+  filter: {
+    position: 'relative'
+  },
+  noMatch: {
+    padding: '0 15px'
   }
 });
 
 
 const Types = observer(() => {
+
   const classes = useStyles();
 
   const { typeStore, browseStore } = useStores();
 
-  const list = typeStore.filterTypes(browseStore.navigationFilter);
+  const typeList = typeStore.filterTypes(browseStore.navigationFilter);
 
-  if (!list.length) {
-    return null;
-  }
+  const handleFilterChange = (value: string) => browseStore.setNavigationFilterTerm(value);
 
   return (
-    <div className={classes.folder}>
-      <div className={classes.folderName}>
+    <div className={classes.container}>
+      <div className={classes.header}>
         Types
+        <AvaiableTypes />
       </div>
-      {list.map((type) => <TypesItem key={type.name} type={type} />)}
+      <div className={classes.filter}>
+        <Filter value={browseStore.navigationFilter} placeholder="Filter types" onChange={handleFilterChange} />
+      </div>
+      <Scrollbars autoHide>
+        {browseStore.navigationFilter.trim() && typeList.length === 0 && (
+          <em className={classes.noMatch}>No matches found</em>
+        )}
+        {typeList.map((type) => <TypesItem key={type.name} type={type} />)}
+      </Scrollbars>
     </div>
   );
 });

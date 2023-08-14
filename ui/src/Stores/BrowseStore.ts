@@ -76,7 +76,7 @@ export class BrowseStore {
       totalInstances: observable,
       navigationFilter: observable,
       selectType: action,
-      clearInstances: action,
+      clearSelectedType: action,
       setNavigationFilterTerm: action,
       selectInstance: action,
       clearSelectedInstance: action,
@@ -96,11 +96,11 @@ export class BrowseStore {
     this.fetchInstances();
   }
 
-  clearInstances() {
-    this.instances.length = 0;
+  clearSelectedType() {
+    this.selectedType = undefined;
+    this.instances = [];
     this.totalInstances = 0;
     this.clearSelectedInstance();
-    this.selectedType = undefined;
     this.clearInstancesFilter();
   }
 

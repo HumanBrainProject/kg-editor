@@ -21,21 +21,28 @@
  *
  */
 
-import React from 'react';
-import Modal from './Modal';
-import Spinner from './Spinner';
+import { useMemo } from 'react';
+import useAPI from './useAPI';
+import useGenericQuery from './useGenericQuery';
+import type { ListTypesQuery } from './useListTypesQuery';
+import type { StructureOfType } from '../types';
 
-interface SpinnerModalProps {
-  text: string;
-  show?: boolean;
-}
+const useListAvailableTypesQuery = (space: string, skip: boolean): ListTypesQuery => {
 
-const SpinnerModal = ({text, show=true}: SpinnerModalProps) =>(
-  <Modal show={show} size={Modal.size.FIT} backdrop="static" keyboard={false}>
-    <Modal.Body>
-      <Spinner text={text} centered={false} />
-    </Modal.Body>
-  </Modal>
-);
+  const API = useAPI();
 
-export default SpinnerModal;
+  const fetch = useMemo(() => async () => {
+    const { data } = await API.getSpaceAvailableTypes(space);
+    if (data.length) {
+      return data.map(type => ({
+        ...type,
+        isSupported: false//type.fields instanceof Object && !!Object.keys(type.fields).length
+      }));
+    }
+    throw new Error(`space "${space}" is currently empty, please add some instances or type specifications.`);
+  }, [API, space]);
+
+  return useGenericQuery<StructureOfType[]>(fetch, skip);
+};
+
+export default useListAvailableTypesQuery;

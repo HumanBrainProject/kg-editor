@@ -23,6 +23,7 @@
 
 package eu.ebrains.kg.service.services;
 
+import com.nimbusds.oauth2.sdk.util.CollectionUtils;
 import eu.ebrains.kg.service.models.KGCoreResult;
 import eu.ebrains.kg.service.models.user.Space;
 import eu.ebrains.kg.service.models.type.StructureOfType;
@@ -74,7 +75,14 @@ public class SpaceClient {
     public void setAssignType(String space, String type) {
         String relativeUrl = String.format("spaces/%s/types?type=%s", space, type);
         kg.client(false).put().uri(kg.url(relativeUrl))
-                .body(BodyInserters.fromValue(type))
+                .retrieve()
+                .bodyToMono(Void.class)
+                .block();
+    }
+
+    public void removeType(String space, String type) {
+        String relativeUrl = String.format("spaces/%s/types?type=%s", space, type);
+        kg.client(false).delete().uri(kg.url(relativeUrl))
                 .retrieve()
                 .bodyToMono(Void.class)
                 .block();
@@ -104,9 +112,22 @@ public class SpaceClient {
                 .block();
         if (response != null) {
             List<StructureOfType> all = response.getData();
-            List<StructureOfType> current = getSpaceTypes(space, false, false);
-            if (current != null) {
-                all.removeAll(current);
+            if (CollectionUtils.isEmpty(all)) {
+                return Collections.emptyList();
+            }
+            all.removeIf(t -> t.getEmbeddedOnly() != null && t.getEmbeddedOnly());
+            if (CollectionUtils.isEmpty(all)) {
+                return Collections.emptyList();
+            }
+            all.sort((o1, o2) -> o1.getLabel().compareToIgnoreCase(o2.getLabel()));
+            List<StructureOfType> typesToExclude = getSpaceTypes(space, false, false);
+            if (!CollectionUtils.isEmpty(typesToExclude)) {
+                typesToExclude.removeIf(t -> t.getEmbeddedOnly() != null && t.getEmbeddedOnly());
+            }
+            if (CollectionUtils.isNotEmpty(typesToExclude)) {
+                typesToExclude.sort((o1, o2) -> o1.getLabel().compareToIgnoreCase(o2.getLabel()));
+                List<String> list = typesToExclude.stream().map(StructureOfType::getName).toList();
+                all.removeIf(t -> list.contains(t.getName()));
             }
             return all;
         }
@@ -119,6 +140,16 @@ public class SpaceClient {
 
     public Map<String, KGCoreResult<StructureOfType>> getTypesByName(List<String> types, boolean withProperties) {
         String relativeUrl = String.format("typesByName?stage=IN_PROGRESS&withProperties=%s", withProperties);
+        StructureOfTypeByNameFromKG response = kg.client(true).post().uri(kg.url(relativeUrl))
+                .body(BodyInserters.fromValue(types))
+                .retrieve()
+                .bodyToMono(StructureOfTypeByNameFromKG.class)
+                .block();
+        return response != null ? response.getData() : null;
+    }
+
+    public Map<String, KGCoreResult<StructureOfType>> getTypesByName(List<String> types, boolean withProperties, boolean withIncomingLinks, String space) {
+        String relativeUrl = String.format("typesByName?stage=IN_PROGRESS&withProperties=%s&withIncomingLinks=%s&space=%s", withProperties, withIncomingLinks, space);
         StructureOfTypeByNameFromKG response = kg.client(true).post().uri(kg.url(relativeUrl))
                 .body(BodyInserters.fromValue(types))
                 .retrieve()

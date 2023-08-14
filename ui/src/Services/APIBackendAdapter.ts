@@ -90,7 +90,9 @@ const endpoints = {
   releaseStatusTopInstance: () => `${RELATIVE_ROOT_PATH}/releases/status?releaseTreeScope=TOP_INSTANCE_ONLY`,
   releaseStatusChildren: () => `${RELATIVE_ROOT_PATH}/releases/status?releaseTreeScope=CHILDREN_ONLY`,
   neighbors: (instanceId: UUID) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}/neighbors`,
-  workspaceTypes: (space: string) => `${RELATIVE_ROOT_PATH}/spaces/${space}/types`,
+  spaceTypes: (space: string) => `${RELATIVE_ROOT_PATH}/spaces/${space}/types`,
+  removeTypeFromSpace: (type: string, space: string) => `${RELATIVE_ROOT_PATH}/spaces/${space}/types?type=${encodeURIComponent(type)}`,
+  types: (space: string) => `${RELATIVE_ROOT_PATH}/types?space=${space}`,
   incomingLinks: (instanceId: UUID, property: string, type: string, from: number, size: number) => `${RELATIVE_ROOT_PATH}/instances/${instanceId}/incomingLinks?property=${encodeURIComponent(property)}&type=${encodeURIComponent(type)}&from=${from}&size=${size}`
 };
 
@@ -112,7 +114,21 @@ class APIBackendAdapter implements API {
   }
 
   async getSpaceTypes(space: string): Promise<KGCoreResult<StructureOfType[]>> {
-    const { data } = await this._axios.get(endpoints.workspaceTypes(space));
+    const { data } = await this._axios.get(endpoints.spaceTypes(space));
+    return data;
+  }
+
+  async addTypesToSpace(types: string[], space: string): Promise<KGCoreResult<StructureOfType[]>> {
+    const { data } = await this._axios.post(endpoints.spaceTypes(space), types);
+    return data;
+  }
+
+  async removeTypeFromSpace(type: string, space: string): Promise<void> {
+    await this._axios.delete(endpoints.removeTypeFromSpace(type, space));
+  }
+
+  async getSpaceAvailableTypes(space: string): Promise<KGCoreResult<StructureOfType[]>> {
+    const { data } = await this._axios.get(endpoints.types(space));
     return data;
   }
 

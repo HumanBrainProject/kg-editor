@@ -27,6 +27,8 @@ import type { StructureOfType } from '../types';
 export class TypeStore {
   space?: string;
   types: StructureOfType[] = [];
+  isAvailableTypesEnabled = false;
+  availableTypes: StructureOfType[] = [];
 
   constructor() {
     makeObservable(this, {
@@ -36,7 +38,12 @@ export class TypeStore {
       canCreateTypes: computed,
       hasCanCreateTypes: computed,
       typesMap: computed,
+      isAvailableTypesEnabled: observable,
+      availableTypes: observable,
       setTypes: action,
+      addTypes: action,
+      removeType: action,
+      setAvailableTypes: action,
       clear: action
     });
   }
@@ -85,9 +92,42 @@ export class TypeStore {
     this.types = types;
   }
 
+  addTypes(space: string, types: string[], relatedTypes: StructureOfType[]) {
+    if (this.space === space) {
+      const typesMap = this.typesMap;
+      relatedTypes.forEach(type => {
+        if (!typesMap.has(type.name)) {
+          this.types.push(type);
+        }
+      });
+      this.types.sort((a, b) => a.label.localeCompare(b.label));
+      this.availableTypes = this.availableTypes.filter(type => !types.includes(type.name));
+    }
+  }
+
+  removeType(space: string, type: StructureOfType) {
+    if (this.space === space) {
+      this.types = this.types.filter(t => t.name !== type.name);
+      this.types.sort((a, b) => a.label.localeCompare(b.label));
+      this.availableTypes.push(type);
+      this.availableTypes.sort((a, b) => a.label.localeCompare(b.label));
+    }
+  }
+
+  setAvailableTypes(space: string, types: StructureOfType[]) {
+    if (this.space === space) {
+      this.isAvailableTypesEnabled = true;
+      this.availableTypes = types;
+    } else {
+      this.availableTypes = [];
+    }
+  }
+
   clear() {
     this.space = undefined;
     this.types = [];
+    this.isAvailableTypesEnabled = false;
+    this.availableTypes = [];
   }
 }
 

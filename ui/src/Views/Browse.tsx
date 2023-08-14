@@ -29,7 +29,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import useStores from '../Hooks/useStores';
 import Matomo from '../Services/Matomo';
 import Instances from './Browse/Instances';
-import NavigationPanel from './Browse/NavigationPanel';
+import Types from './Browse/Types';
 
 const useStyles = createUseStyles({
   container: {
@@ -70,7 +70,7 @@ const Browse = observer(() => {
 
   return(
     <div className={classes.container}>
-      <NavigationPanel />
+      <Types />
       <Instances/>
     </div>
   );

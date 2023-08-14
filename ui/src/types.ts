@@ -73,6 +73,7 @@ export interface Permissions {
   canSuggest: boolean;
   canWrite: boolean;
   canRelease: boolean;
+  canManageSpace: boolean;
 }
 
 export interface Space {

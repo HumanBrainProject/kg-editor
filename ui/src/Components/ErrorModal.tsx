@@ -21,51 +21,39 @@
  *
  */
 
+import { faBan } from '@fortawesome/free-solid-svg-icons';
+import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt';
+import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
 import React from 'react';
-import Modal from 'react-bootstrap/Modal';
-import { createUseStyles } from 'react-jss';
-import type { ReactNode } from 'react';
-
-const useStyles = createUseStyles({
-  modal: {
-    position: 'absolute',
-    width: '100%',
-    height: '100%',
-    top: 0,
-    left: 0,
-    background: 'rgba(0, 0, 0, 0.3)',
-    '& .modal-dialog': {
-      top: '35%',
-      width: 'max-content',
-      maxWidth: '800px',
-      '& .modal-body': {
-        padding: '30px',
-        border: '1px solid var(--ft-color-loud)',
-        borderRadius: '4px',
-        color: 'var(--ft-color-loud)',
-        background: 'var(--bg-color-ui-contrast6)'
-      }
-    }
-  }
-});
+import Button from 'react-bootstrap/Button';
+import BGMessage from './BGMessage';
+import Modal from './Modal';
 
 interface ErrorModalProps {
-  children: ReactNode;
+  show?: boolean;
+  text: string;
+  onCancel: () => void;
+  onRetry?: () => void;
 }
 
-const ErrorModal = ({children}:ErrorModalProps) => {
-
-  const classes = useStyles();
-
-  return (
-    <div className={classes.modal}>
-      <Modal.Dialog>
-        <Modal.Body>
-          {children}
-        </Modal.Body>
-      </Modal.Dialog>
-    </div>
-  );
-};
+const ErrorModal = ({show=true, text, onCancel, onRetry}: ErrorModalProps) => (
+  <Modal show={show} size={Modal.size.FIT} backdrop="static" keyboard={false}>
+    <Modal.Body>
+      <BGMessage icon={faBan} centered={false} >
+        {text}
+      </BGMessage>
+    </Modal.Body>
+    <Modal.Footer>
+      <Button variant={onRetry?'primary':'secondary'} onClick={onCancel}>
+        {onRetry?'Cancel':'Close'}
+      </Button>
+      {onRetry && (
+        <Button variant={'primary'} onClick={onRetry}>
+          <FontAwesomeIcon icon={faRedoAlt} />&nbsp;Retry
+        </Button>
+      )}
+    </Modal.Footer>
+  </Modal>
+);
 
 export default ErrorModal;

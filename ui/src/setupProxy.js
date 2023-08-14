@@ -28,13 +28,13 @@ module.exports = function(app) {
   app.use(
     '/editor/api/**',
     createProxyMiddleware({
-      // target:"http://localhost:8080",
-      target:'https://editor.kg-int.ebrains.eu',
+      target:'http://localhost:8080',
+      //target:'https://editor.kg-int.ebrains.eu',
       secure:false,
-      changeOrigin: true
-      // pathRewrite: function(path: string) {
-      //   return path.replace('/editor/api/', '/');
-      // }
+      changeOrigin: true,
+      pathRewrite: function(path) {
+        return path.replace('/editor/api/', '/');
+      }
     })
   );
 };

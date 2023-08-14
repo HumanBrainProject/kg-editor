@@ -53,6 +53,12 @@ interface API {
 
   getSpaceTypes(space: string): Promise<KGCoreResult<StructureOfType[]>>;
 
+  getSpaceAvailableTypes(space: string): Promise<KGCoreResult<StructureOfType[]>>;
+
+  addTypesToSpace(types: string[], space: string): Promise<KGCoreResult<StructureOfType[]>>;
+
+  removeTypeFromSpace(type: string, space: string): Promise<void>;
+
   getInstance(instanceId: UUID): Promise<KGCoreResult<InstanceFull>>;
 
   getRawInstance(instanceId: UUID): Promise<InstanceRawStructure>;

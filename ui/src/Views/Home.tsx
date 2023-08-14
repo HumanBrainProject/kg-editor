@@ -178,7 +178,7 @@ const useStyles = createUseStyles({
       transform: 'scale(0.3) rotateY(180deg)'
     }
   },
-  workspacesSelection: {
+  spacesSelection: {
     fontSize: '1.5em',
     padding: '0 0 30px 0',
     '& h1': {
@@ -218,7 +218,7 @@ const useStyles = createUseStyles({
       background: '#f3f3f3'
     }
   },
-  workspaceSelectionModal: {
+  spaceSelectionModal: {
     overflow: 'hidden',
     width: '90%',
     margin: 'auto',

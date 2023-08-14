@@ -27,7 +27,7 @@ import java.util.List;
 
 public class Permissions {
 
-    private Permissions(boolean canCreate, boolean canInviteForReview, boolean canDelete, boolean canInviteForSuggestion, boolean canRead, boolean canSuggest, boolean canWrite, boolean canRelease) { // NOSONAR
+    private Permissions(boolean canCreate, boolean canInviteForReview, boolean canDelete, boolean canInviteForSuggestion, boolean canRead, boolean canSuggest, boolean canWrite, boolean canRelease, boolean canManageSpace) { // NOSONAR
         this.canCreate = canCreate;
         this.canInviteForReview = canInviteForReview;
         this.canDelete = canDelete;
@@ -36,6 +36,7 @@ public class Permissions {
         this.canSuggest = canSuggest;
         this.canWrite = canWrite;
         this.canRelease = canRelease;
+        this.canManageSpace = canManageSpace;
     }
 
     public static Permissions fromPermissionList(List<String> permissions){
@@ -47,7 +48,8 @@ public class Permissions {
                 permissions.contains("READ"),
                 permissions.contains("SUGGEST"),
                 permissions.contains("WRITE"),
-                permissions.contains("RELEASE")
+                permissions.contains("RELEASE"),
+                permissions.contains("DEFINE_TYPES_AND_PROPERTIES")
         );
     }
 
@@ -59,6 +61,7 @@ public class Permissions {
     private final boolean canSuggest;
     private final boolean canWrite;
     private final boolean canRelease;
+    private final boolean canManageSpace;
 
     public boolean isCanCreate() {
         return canCreate;
@@ -90,5 +93,9 @@ public class Permissions {
 
     public boolean isCanRelease() {
         return canRelease;
+    }
+
+    public boolean isCanManageSpace() {
+        return canManageSpace;
     }
 }

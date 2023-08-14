@@ -24,18 +24,13 @@
 import React from 'react';
 import ModalComponent from 'react-bootstrap/Modal';
 import { createUseStyles } from 'react-jss';
-import type { JSX } from 'react';
+import type { ReactNode } from 'react';
 
 const useStyles = createUseStyles({
   modal: {
     overflow: 'hidden',
-    width: '90%',
     margin: 'auto',
-    '@media screen and (min-width:1024px)': {
-      width: '900px'
-    },
     '&.modal-dialog': {
-      marginTop: '5vh',
       maxWidth: 'unset',
       '& .modal-content': {
         background: 'var(--bg-color-ui-contrast2)',
@@ -47,37 +42,101 @@ const useStyles = createUseStyles({
         '& .modal-body': {
           borderRadius: 'var(--bs-modal-border-radius)',
           padding: '0',
-          height: '80vh',
           overflowY: 'hidden'
+        },
+        '& .modal-footer': {
+          borderTop: '1px solid var(--border-color-ui-contrast5)',
         }
+      }
+    }
+  },
+  smallModal: {
+    width: 'fit-content',
+    '&.modal-dialog': {
+      marginTop: 'min(25vh, 25%)'
+    }
+
+  },
+  largeModal: {
+    width: '90%',
+    '@media screen and (min-width:1024px)': {
+      width: '900px'
+    },
+    '&.modal-dialog': {
+      marginTop: '5vh',
+      '& .modal-body': {
+        height: '80vh'
       }
     }
   }
 });
 
-interface ModalProps {
+//margin-top: min(25vh, 25%);
+
+interface HeaderProps {
   title: string;
-  show?: boolean;
   closeButton?: boolean;
-  onHide?: () => void;
-  children: JSX.Element | JSX.Element[];
 }
 
-const Modal = ({ title, show, closeButton, onHide, children }: ModalProps) => {
+const Header = ({ title, closeButton }: HeaderProps) => {
+
+  const hasCloseButton = closeButton === undefined?true:closeButton;
+
+  return (
+    <ModalComponent.Header closeButton={hasCloseButton} closeVariant="white">
+      <ModalComponent.Title>{title}</ModalComponent.Title>
+    </ModalComponent.Header>
+  );
+};
+
+interface BodyProps {
+  children: ReactNode;
+}
+
+const Body = ({ children }: BodyProps) => (
+  <ModalComponent.Body>
+    {children}
+  </ModalComponent.Body>
+);
+
+interface FooterProps {
+  children: ReactNode;
+}
+
+const Footer = ({ children }: FooterProps) => (
+  <ModalComponent.Footer>
+    {children}
+  </ModalComponent.Footer>
+);
+
+enum ModalSize {
+  FIT = 'fit',
+  LARGE = 'large'
+}
+
+interface ModalProps {
+  size?: ModalSize;
+  show?: boolean;
+  backdrop?: boolean | 'static';
+  keyboard?: boolean;
+  onHide?: () => void;
+  children: ReactNode;
+}
+
+const Modal = ({ show, size=ModalSize.LARGE, backdrop=undefined, keyboard=true, onHide, children }: ModalProps) => {
 
   const classes = useStyles();
 
   return (
-    <ModalComponent dialogClassName={classes.modal} show={show === undefined?true:show} onHide={onHide}>
-      <ModalComponent.Header closeButton={closeButton === undefined?true:closeButton} closeVariant="white">
-        <ModalComponent.Title>{title}</ModalComponent.Title>
-      </ModalComponent.Header>
-      <ModalComponent.Body>
-        {children}
-      </ModalComponent.Body>
+    <ModalComponent dialogClassName={`${classes.modal} ${size===ModalSize.FIT?classes.smallModal:classes.largeModal}`} backdrop={backdrop} keyboard={keyboard} show={show === undefined?true:show} onHide={onHide}>
+      {children}
     </ModalComponent>
   );
 };
+Modal.Header = Header;
+Modal.Body = Body;
+Modal.Footer = Footer;
+Modal.size = ModalSize;
 
 export default Modal;
 

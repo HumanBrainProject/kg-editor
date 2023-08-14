@@ -88,20 +88,6 @@ const useStyles = createUseStyles({
     '&[disabled]': {
       cursor: 'not-allowed'
     }
-  },
-  moveErrorMessage: {
-    margin: '20px 0',
-    color: 'var(--ft-color-error)'
-  },
-  moveErrorActions: {
-    marginBottom: '10px',
-    width: '100%',
-    textAlign: 'center',
-    wordBreak: 'keep-all',
-    whiteSpace: 'nowrap',
-    '& button + button': {
-      marginLeft: '20px'
-    }
   }
 });
 
@@ -258,20 +244,8 @@ const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
           />
         </div>
       )}
-      {appStore.instanceMovingError && (
-        <ErrorModal>
-          <div className={classes.moveErrorMessage}>{appStore.instanceMovingError}</div>
-          <div className={classes.moveErrorActions}>
-            <Button onClick={handleCancelMoveInstance}>Cancel</Button>
-            <Button variant="primary" onClick={handleRetryMoveInstance}><FontAwesomeIcon icon={faRedoAlt} />&nbsp;Retry</Button>
-          </div>
-        </ErrorModal>
-      )}
-      {!appStore.instanceMovingError && appStore.isMovingInstance && (
-        <SpinnerModal
-          text={`Moving instance "${appStore.instanceToMove?.id}" to space "${appStore.instanceToMove?.space}" ...`}
-        />
-      )}
+      <ErrorModal show={!!appStore.instanceMovingError} text={appStore.instanceMovingError as string} onCancel={handleCancelMoveInstance} onRetry={handleRetryMoveInstance} />
+      <SpinnerModal show={!appStore.instanceMovingError && appStore.isMovingInstance} text={`Moving instance "${appStore.instanceToMove?.id}" to space "${appStore.instanceToMove?.space}" ...`} />
     </>
   );
 });

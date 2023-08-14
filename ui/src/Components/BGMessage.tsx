@@ -29,10 +29,6 @@ import type { ReactNode } from 'react';
 
 const useStyles = createUseStyles({
   container:{
-    position:'absolute !important',
-    top:'50%',
-    left:'50%',
-    transform:'translate(-50%,-200px)',
     textAlign:'center'
   },
   icon:{
@@ -46,20 +42,29 @@ const useStyles = createUseStyles({
   text:{
     fontWeight:'300',
     fontSize:'1.2em'
+  },
+  centered:{
+    position:'absolute !important',
+    top:'50%',
+    left:'50%',
+    transform:'translate(-50%,-200px)',
+  },
+  withMargin: {
+    margin: '0 30px 30px 30px'
   }
 });
 
 interface BGMessageProps {
   icon?: IconProp;
-  children: ReactNode;
   transform?: string;
-  className?: string;
+  centered?: boolean;
+  children: ReactNode;
 }
 
-const BGMessage = ({ icon, transform, children, className }: BGMessageProps) => {
+const BGMessage = ({ icon, transform, centered=true, children }: BGMessageProps) => {
   const classes = useStyles();
   return(
-    <div className={`${classes.container} ${className?className:''}`}>
+    <div className={`${classes.container} ${centered?classes.centered:classes.withMargin}`}>
       {icon && (
         <div className={classes.icon}>
           <FontAwesomeIcon icon={icon} transform={transform}/>

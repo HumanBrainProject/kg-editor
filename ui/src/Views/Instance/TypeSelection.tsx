@@ -27,11 +27,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import { createUseStyles } from 'react-jss';
-
 import GridSelector from '../../Components/GridSelector';
-import useStores from '../../Hooks/useStores';
 import type { StructureOfType } from '../../types';
-
 
 const useStyles = createUseStyles({
   type: {
@@ -71,21 +68,18 @@ const TypeComponent = ({ item: type }: { item: StructureOfType }) => {
 };
 
 interface TypeSelectionProps {
+  types: StructureOfType[];
   onSelect: (type: StructureOfType) => void;
 }
 
-const TypeSelection = observer(({ onSelect }: TypeSelectionProps) => {
-
-  const { typeStore, appStore } = useStores();
-
-  const list = appStore.currentSpacePermissions.canCreate?typeStore.canCreateTypes:[] as StructureOfType[];
+const TypeSelection = observer(({ types, onSelect }: TypeSelectionProps) => {
 
   const handleFilter = (list: StructureOfType[], term: string) => list.filter(type => type.label.toLowerCase().includes(term));
 
   const Component = GridSelector<StructureOfType>;
 
   return (
-    <Component list={list} itemComponent={TypeComponent} getKey={type => type.name} onSelect={onSelect} onFilter={handleFilter} filterPlaceholder="Filter types" />
+    <Component list={types} itemComponent={TypeComponent} getKey={type => type.name} onSelect={onSelect} onFilter={handleFilter} filterPlaceholder="Filter types" />
   );
 });
 TypeSelection.displayName = 'TypeSelection';

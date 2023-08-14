@@ -49,20 +49,6 @@ const useStyles = createUseStyles({
     '&[disabled]': {
       cursor: 'not-allowed'
     }
-  },
-  deleteErrorMessage: {
-    margin: '20px 0',
-    color: 'var(--ft-color-error)'
-  },
-  deleteErrorActions: {
-    marginBottom: '10px',
-    width: '100%',
-    textAlign: 'center',
-    wordBreak: 'keep-all',
-    whiteSpace: 'nowrap',
-    '& button + button': {
-      marginLeft: '20px'
-    }
   }
 });
 
@@ -176,22 +162,8 @@ const DeleteInstance = observer(({ instance, className }: DeleteInstanceProps) =
           />
         </div>
       )}
-      {appStore.deleteInstanceError && (
-        <ErrorModal>
-          <div className={classes.deleteErrorMessage}>{appStore.deleteInstanceError}</div>
-          <div className={classes.deleteErrorActions}>
-            <Button onClick={handleCancelDeleteInstance}>Cancel</Button>
-            <Button variant="primary" onClick={handleRetryDeleteInstance}><FontAwesomeIcon icon={faRedoAlt} />&nbsp;Retry</Button>
-          </div>
-        </ErrorModal>
-      )}
-      {!appStore.deleteInstanceError &&
-        appStore.isDeletingInstance &&
-        !!appStore.instanceToDelete && (
-        <SpinnerModal
-          text={`Deleting instance ${appStore.instanceToDelete}...`}
-        />
-      )}
+      <ErrorModal show={!!appStore.deleteInstanceError} text={appStore.deleteInstanceError as string} onCancel={handleCancelDeleteInstance} onRetry={handleRetryDeleteInstance} />
+      <SpinnerModal show={!appStore.deleteInstanceError && appStore.isDeletingInstance && !!appStore.instanceToDelete} text={`Deleting instance ${appStore.instanceToDelete}...`} />
     </>
   );
 });

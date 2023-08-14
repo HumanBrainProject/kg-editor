@@ -30,25 +30,19 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RequestMapping("/spaces")
+@RequestMapping("/types")
 @RestController
-public class Space {
+public class Types {
 
     private final SpaceController spaceController;
 
-    public Space(SpaceController spaceController) {
+    public Types(SpaceController spaceController) {
         this.spaceController = spaceController;
     }
 
-    @GetMapping("/{space}/types")
-    public KGCoreResult<List<StructureOfType>> getSpaceTypes(@PathVariable("space") String space) {
-        List<StructureOfType> spaceTypes = spaceController.getTypes(space);
+    @GetMapping
+    public KGCoreResult<List<StructureOfType>> getSpaceAvailableTypes(@RequestParam("space") String space) {
+        List<StructureOfType> spaceTypes = spaceController.getSpaceAvailableTypes(space);
         return new KGCoreResult<List<StructureOfType>>().setData(spaceTypes);
     }
-
-    @PostMapping("/{space}/initialize")
-    public void initializeSpace(@PathVariable("space") String space, @RequestBody(required = false) List<String> types) {
-        spaceController.initialize(space, types);
-    }
-
 }

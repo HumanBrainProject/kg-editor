@@ -60,11 +60,16 @@ const NewInstanceTab = observer(() => {
     return null;
   }
 
+  const types: StructureOfType[] = appStore.currentSpacePermissions.canCreate?typeStore.canCreateTypes:[];
+
   return (
     <>
       <Tab icon={faFile} onClick={handleCreateInstance} hideLabel label="New instance" />
-      <Modal title="Create a new instance" show={showTypeSelection} onHide={handleClose}>
-        <TypeSelection onSelect={handleTypeSelection} />
+      <Modal show={showTypeSelection} onHide={handleClose}>
+        <Modal.Header title="Create a new instance" />
+        <Modal.Body>
+          <TypeSelection types={types} onSelect={handleTypeSelection} />
+        </Modal.Body>
       </Modal>
     </>
   );

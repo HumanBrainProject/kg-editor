@@ -90,9 +90,6 @@ export class AppStore{
   historySettings?: HistorySettings;
   showSaveBar = false;
   externalCreateModal?: ExternalCreateModal;
-  instanceToDelete?: string;
-  isDeletingInstance = false;
-  deleteInstanceError?: string;
   isCreatingNewInstance = false;
   instanceCreationError?: string;
   isMovingInstance = false;
@@ -116,9 +113,6 @@ export class AppStore{
       currentTheme: computed,
       historySettings: observable,
       showSaveBar: observable,
-      instanceToDelete: observable,
-      isDeletingInstance: observable,
-      deleteInstanceError: observable,
       isCreatingNewInstance: observable,
       instanceCreationError: observable,
       isMovingInstance: observable,
@@ -127,7 +121,6 @@ export class AppStore{
       pathsToResolve: observable,
       currentSpaceName: computed,
       currentSpacePermissions: computed,
-      delete: action,
       flush: action,
       setGlobalError: action,
       dismissGlobalError: action,
@@ -137,10 +130,7 @@ export class AppStore{
       closeAllInstances: action,
       closeInstance: action,
       saveInstance: action,
-      deleteInstance: action,
       duplicateInstance: action,
-      retryDeleteInstance: action,
-      cancelDeleteInstance: action,
       setSizeHistorySetting: action,
       toggleViewedFlagHistorySetting: action,
       toggleEditedFlagHistorySetting: action,
@@ -225,9 +215,6 @@ export class AppStore{
     this.instanceToMove = undefined;
     this.isMovingInstance = false;
     this.instanceMovingError = undefined;
-    this.instanceToDelete = undefined;
-    this.isDeletingInstance = false;
-    this.deleteInstanceError = undefined;
     this.pathsToResolve.clear();
   }
 
@@ -464,48 +451,6 @@ export class AppStore{
     }
   }
 
-  async delete(instanceId: string, location: Location, navigate: NavigateFunction) {
-    if (instanceId) {
-      this.instanceToDelete = instanceId;
-      this.isDeletingInstance = true;
-      this.deleteInstanceError = undefined;
-      try{
-        await this.api.deleteInstance(instanceId);
-        runInAction(() => {
-          this.instanceToDelete = undefined;
-          this.isDeletingInstance = false;
-          let nextLocation = null;
-          if(this.matchInstancePath(location.pathname, instanceId)){
-            const ids = this.rootStore.viewStore.instancesIds;
-            if(ids && ids.length > 1){
-              const currentInstanceIndex = ids.indexOf(instanceId);
-              const newInstanceId = currentInstanceIndex >= ids.length - 1 ? ids[currentInstanceIndex-1]: ids[currentInstanceIndex+1];
-              const view = this.rootStore.viewStore.views.get(newInstanceId);
-              if(view) {
-                nextLocation = `/instances/${newInstanceId}/${view.mode}`;
-              }
-            } else {
-              nextLocation = '/browse';
-            }
-          }
-          this.rootStore.browseStore.refreshFilter();
-          this.rootStore.viewStore.unregisterViewByInstanceId(instanceId);
-          this.flush();
-          if (nextLocation) {
-            navigate(nextLocation);
-          }
-        });
-      } catch(e){
-        const err = e as APIError;
-        runInAction(() => {
-          const errorMessage = err.response && err.response.status !== 500 ? err.response.data:'';
-          this.deleteInstanceError = `Failed to delete instance "${instanceId}" (${err?.message}) ${errorMessage}`;
-          this.isDeletingInstance = false;
-        });
-      }
-    }
-  }
-
   async duplicateInstance(fromInstanceId: string, navigate: NavigateFunction) {
     if (!this.currentSpace?.id) {
       this.instanceCreationError = `instance "${fromInstanceId}" cannot be dupplicated because space has not been set!`;;
@@ -583,24 +528,6 @@ export class AppStore{
   cancelMoveInstance() {
     this.instanceToMove = undefined;
     this.instanceMovingError = undefined;
-  }
-
-  async retryDeleteInstance(location: Location, navigate: NavigateFunction) {
-    if (this.instanceToDelete) {
-      return this.deleteInstance(this.instanceToDelete, location, navigate);
-    } else {
-      console.error('retryDeleteInstance function has been called but instanceToDelete is undefined!');
-      this.deleteInstanceError = undefined;
-    }
-  }
-
-  async deleteInstance(instanceId: string, location: Location, navigate: NavigateFunction) {
-    return this.delete(instanceId, location, navigate);
-  }
-
-  cancelDeleteInstance() {
-    this.instanceToDelete = undefined;
-    this.deleteInstanceError = undefined;
   }
 
   replaceInstanceResolvedIdPath(path: string, navigate: NavigateFunction) {

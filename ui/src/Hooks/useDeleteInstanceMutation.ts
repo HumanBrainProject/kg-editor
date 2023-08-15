@@ -26,23 +26,23 @@ import useAPI from './useAPI';
 import useGenericMutation from './useGenericMutation';
 import type { UseMutationTrigger, UseMutationResult } from './useGenericMutation';
 import type { APIError } from '../Services/API';
+import type { UUID } from '../types';
 
-export interface UseRemoveTypeFromSpaceTriggerParams {
-  type: string;
-  space: string;
+export interface UseDeleteInstanceTriggerParams {
+  instanceId: UUID;
 }
 
-export interface UseRemoveTypeFromSpaceTrigger extends UseMutationTrigger<UseRemoveTypeFromSpaceTriggerParams,undefined> {}
+export interface UseDeleteInstanceTrigger extends UseMutationTrigger<UseDeleteInstanceTriggerParams,undefined> {}
 
-export interface UseRemoveTypeFromSpaceResult extends UseMutationResult<undefined> {}
+export interface UseDeleteInstanceResult extends UseMutationResult<undefined> {}
 
-const useRemoveTypeFromSpaceMutation = (): [UseRemoveTypeFromSpaceTrigger, UseRemoveTypeFromSpaceResult] => {
+const useDeleteInstanceMutation = (): [UseDeleteInstanceTrigger, UseDeleteInstanceResult] => {
 
   const API = useAPI();
 
-  const trigger = useMemo(() => async ({type, space}: UseRemoveTypeFromSpaceTriggerParams) => {
+  const trigger = useMemo(() => async ({instanceId}: UseDeleteInstanceTriggerParams) => {
     try {
-      await API.removeTypeFromSpace(type, space);
+      await API.deleteInstance(instanceId);
       return undefined;
     } catch (e) {
       const error = e as APIError;
@@ -52,17 +52,17 @@ const useRemoveTypeFromSpaceMutation = (): [UseRemoveTypeFromSpaceTrigger, UseRe
       switch (status) {
       case 401: // Unauthorized
       case 403: { // Forbidden
-        throw new Error(`You do not have permission to remove type "${type}" from space "${space}".`);
+        throw new Error(`You do not have permission to delete instance "${instanceId}".`);
       }
       default: {
         const errorMessage = error.response && error.response.status !== 500 ? error.response.data:'';
-        throw new Error(`Failed to remove type "${type}" from space "${space}" (${message}) ${errorMessage}`);
+        throw new Error(`Failed to delete instance "${instanceId}"(${message}) ${errorMessage}`);
       }
       }
     }
   }, [API]);
 
-  return useGenericMutation<UseRemoveTypeFromSpaceTriggerParams, undefined>(trigger);
+  return useGenericMutation<UseDeleteInstanceTriggerParams, undefined>(trigger);
 };
 
-export default useRemoveTypeFromSpaceMutation;
+export default useDeleteInstanceMutation;

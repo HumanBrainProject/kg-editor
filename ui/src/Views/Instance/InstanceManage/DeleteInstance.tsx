@@ -30,12 +30,11 @@ import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import { createUseStyles } from 'react-jss';
-
 import { useLocation, useNavigate } from 'react-router-dom';
 import ErrorModal from '../../../Components/ErrorModal';
 import SpinnerModal from '../../../Components/SpinnerModal';
+import useDeleteInstanceMutation from '../../../Hooks/useDeleteInstanceMutation';
 import useStores from '../../../Hooks/useStores';
-
 import Matomo from '../../../Services/Matomo';
 import { ReleaseStatus } from '../../../types';
 import type Instance from '../../../Stores/Instance';
@@ -55,11 +54,13 @@ const useStyles = createUseStyles({
 interface DeleteProps {
   status?: Status;
   onClick: () => void;
-  classes: any;
   fetchStatus: () => void;
 }
 
-const Delete = observer(({ status, onClick, classes, fetchStatus }: DeleteProps) => {
+const Delete = observer(({ status, onClick, fetchStatus }: DeleteProps) => {
+
+  const classes = useStyles();
+
   if (status?.hasFetchError) {
     return (
       <div className={classes.error}>
@@ -116,13 +117,14 @@ interface DeleteInstanceProps {
 }
 
 const DeleteInstance = observer(({ instance, className }: DeleteInstanceProps) => {
-  const classes = useStyles();
 
-  const { appStore, statusStore } = useStores();
+  const { appStore, statusStore, viewStore, browseStore } = useStores();
 
   const navigate = useNavigate();
 
   const location = useLocation();
+
+  const [deleteInstanceTrigger, deleteInstanceResult] = useDeleteInstanceMutation();
 
   useEffect(() => {
     fetchStatus();
@@ -136,15 +138,37 @@ const DeleteInstance = observer(({ instance, className }: DeleteInstanceProps) =
   };
 
   const handleDeleteInstance = () => {
-    if(instance.id) {
-      Matomo.trackEvent('Instance', 'Delete', instance.id);
-      appStore.deleteInstance(instance.id, location, navigate);
-    }
+    Matomo.trackEvent('Instance', 'Delete', instance.id);
+    deleteInstance();
   };
 
-  const handleRetryDeleteInstance = () => appStore.retryDeleteInstance(location, navigate);
-
-  const handleCancelDeleteInstance = () => appStore.cancelDeleteInstance();
+  const deleteInstance = async () => {
+    const { error } = await deleteInstanceTrigger({
+      instanceId: instance.id
+    });
+    if (!error) {
+      let nextLocation = null;
+      if(appStore.matchInstancePath(location.pathname, instance.id)){
+        const ids = viewStore.instancesIds;
+        if(ids && ids.length > 1){
+          const currentInstanceIndex = ids.indexOf(instance.id);
+          const newInstanceId = currentInstanceIndex >= ids.length - 1 ? ids[currentInstanceIndex-1]: ids[currentInstanceIndex+1];
+          const view = viewStore.views.get(newInstanceId);
+          if(view) {
+            nextLocation = `/instances/${newInstanceId}/${view.mode}`;
+          }
+        } else {
+          nextLocation = '/browse';
+        }
+      }
+      browseStore.refreshFilter();
+      viewStore.unregisterViewByInstanceId(instance.id);
+      appStore.flush();
+      if (nextLocation) {
+        navigate(nextLocation);
+      }
+    }
+  };
 
   const permissions = instance.permissions;
   const status = instance.id ? statusStore.getInstance(instance.id): undefined;
@@ -157,13 +181,12 @@ const DeleteInstance = observer(({ instance, className }: DeleteInstanceProps) =
           <Delete
             status={status}
             onClick={handleDeleteInstance}
-            classes={classes}
             fetchStatus={fetchStatus}
           />
         </div>
       )}
-      <ErrorModal show={!!appStore.deleteInstanceError} text={appStore.deleteInstanceError as string} onCancel={handleCancelDeleteInstance} onRetry={handleRetryDeleteInstance} />
-      <SpinnerModal show={!appStore.deleteInstanceError && appStore.isDeletingInstance && !!appStore.instanceToDelete} text={`Deleting instance ${appStore.instanceToDelete}...`} />
+      <ErrorModal show={deleteInstanceResult.isError} text={deleteInstanceResult.error as string} onCancel={deleteInstanceResult.reset} onRetry={deleteInstance} />
+      <SpinnerModal show={deleteInstanceResult.isTriggering} text={`Deleting instance ${instance.id}...`} />
     </>
   );
 });

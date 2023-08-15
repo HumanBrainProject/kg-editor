@@ -55,7 +55,7 @@ function useGenericMutation<P,T>(triggerT: (params: P) => Promise<T>): [UseMutat
     setError(undefined);
     setIsError(false);
     setTriggering(false);
-    setSuccess(false);
+    setSuccess(undefined);
     setData(undefined);
   };
 

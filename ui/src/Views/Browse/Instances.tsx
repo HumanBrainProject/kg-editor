@@ -21,19 +21,15 @@
  *
  */
 
-import {faCode} from '@fortawesome/free-solid-svg-icons/faCode';
-import {faMoneyCheck} from '@fortawesome/free-solid-svg-icons/faMoneyCheck';
 import { observer } from 'mobx-react-lite';
 import React, { useEffect } from 'react';
 import { Scrollbars } from 'react-custom-scrollbars-2';
 import { createUseStyles } from 'react-jss';
-
-import BGMessage from '../../Components/BGMessage';
 import Filter from '../../Components/Filter';
 import useStores from '../../Hooks/useStores';
 import Matomo from '../../Services/Matomo';
-import Preview from '../Preview';
 import InstancesResult from './Instances/InstancesResult';
+import PreviewPanel from './Instances/PreviewPanel';
 
 const useStyles = createUseStyles({
   container: {
@@ -73,7 +69,7 @@ const Instances = observer(() => {
 
   const classes = useStyles();
 
-  const { browseStore, typeStore } = useStores();
+  const { browseStore } = useStores();
 
   useEffect(() => {
     if (browseStore.selectedType && browseStore.instancesFilter) {
@@ -86,10 +82,6 @@ const Instances = observer(() => {
     Matomo.trackEvent('Browse', 'FilterInstance', value);
     browseStore.setInstancesFilter(value);
   };
-
-  const isTypeOfSelectedInstanceSupported = browseStore.selectedInstance
-    ? typeStore.isTypesSupported(browseStore.selectedInstance.typeNames)
-    : false;
 
   return (
     <div className={classes.container}>
@@ -115,22 +107,7 @@ const Instances = observer(() => {
         <InstancesResult />
       </Scrollbars>
       <div className={classes.preview}>
-        {browseStore.selectedInstance ? (
-          isTypeOfSelectedInstanceSupported && browseStore.selectedInstance.id ? (
-            <Preview
-              instanceId={browseStore.selectedInstance.id}
-              instanceName={browseStore.selectedInstance.name}
-            />
-          ) : (
-            <BGMessage icon={faCode}>
-              This instance doesn&apos;t support preview.
-            </BGMessage>
-          )
-        ) : (
-          <BGMessage icon={faMoneyCheck}>
-            Select an instance to display its preview here.
-          </BGMessage>
-        )}
+        <PreviewPanel />
       </div>
     </div>
   );

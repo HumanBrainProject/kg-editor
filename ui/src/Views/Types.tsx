@@ -70,8 +70,17 @@ const Types = observer(({ children }: TypesProps) => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [space, isFetching, isSuccess, types]);
 
+  const canManageSpace = !!appStore.currentSpace?.permissions.canManageSpace;
 
   if (isReady) {
+    if (types && types.length === 0 && !canManageSpace) {
+      return (
+        <ErrorPanel>
+          <p>space &quot;{space}&quot; does not currently have any types in its specifications.<br />Your are not entitled to add types to space &quot;{space}&quot;.</p>
+          <p>Please contact our team by email at : <a href={'mailto:kg@ebrains.eu'}>kg@ebrains.eu</a></p>
+        </ErrorPanel>
+      );
+    }
     return (
       <>
         {children}

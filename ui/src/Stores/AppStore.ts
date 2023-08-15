@@ -438,6 +438,7 @@ export class AppStore{
     const newId = instance.id;
     if (!instance.hasSaveError) {
       if (isNew) {
+        this.rootStore.browseStore.refreshFilter();
         runInAction(() => {
           const view = this.rootStore.viewStore.views.get(id);
           if(view) {

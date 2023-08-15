@@ -39,7 +39,7 @@ const useListAvailableTypesQuery = (space: string, skip: boolean): ListTypesQuer
         isSupported: false//type.fields instanceof Object && !!Object.keys(type.fields).length
       }));
     }
-    throw new Error(`space "${space}" is currently empty, please add some instances or type specifications.`);
+    throw new Error(`space "${space}" already contains the full list of available types.`);
   }, [API, space]);
 
   return useGenericQuery<StructureOfType[]>(fetch, skip);

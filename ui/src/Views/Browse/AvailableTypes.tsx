@@ -37,8 +37,7 @@ import useListAvailableTypesQuery from '../../Hooks/useListAvailableTypesQuery';
 import useStores from '../../Hooks/useStores';
 import Matomo from '../../Services/Matomo';
 import TypeSelection from '../Instance/TypeSelection';
-import type { Space as SpaceType } from '../../types';
-import type { StructureOfType } from '../../types';
+import type { Space as SpaceType, StructureOfType } from '../../types';
 
 const useStyles = createUseStyles({
   errorPnl: {
@@ -200,7 +199,7 @@ const AvaiableTypes = observer(() => {
     );
   }
 
-  if (canManageSpace && space && (listAvailableTypes.isUninitialized || listAvailableTypes.isFetching)) {
+  if (canManageSpace && space && listAvailableTypes.isFetching) {
     return (
       <span className={classes.spinner} title={`Retrieving types that could be added for space "${space}"...`}>
         <FontAwesomeIcon icon={faCircleNotch} spin />

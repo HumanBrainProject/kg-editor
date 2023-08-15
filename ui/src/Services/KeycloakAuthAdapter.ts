@@ -44,7 +44,7 @@ class KeycloakAuthAdapter implements AuthAdapter {
   private _initOptions: KeycloakInitOptions | undefined;
   private _redirectUri: string | undefined;
   private _config: KeycloakConfig | undefined = undefined;
-  private _keycloak: Keycloak | undefined = undefined;
+  private _keycloak: Keycloak | undefined = undefined; //NOSONAR, Keycloak is used as a type
 
   constructor(initOptions?: KeycloakInitOptions, redirectUri?: string) {
     this._tokenProvider = new KeyCloakTokenProvider();
@@ -88,11 +88,11 @@ class KeycloakAuthAdapter implements AuthAdapter {
     this._config = config;
   }
 
-  get keycloak(): Keycloak | undefined {
+  get keycloak(): Keycloak | undefined { //NOSONAR, Keycloak is used as a type
     return this._keycloak;
   }
 
-  setKeycloak(keycloak: Keycloak) {
+  setKeycloak(keycloak: Keycloak) { //NOSONAR, Keycloak is used as a type
     this._tokenProvider.setKeycloak(keycloak);
     this._keycloak = keycloak;
   }

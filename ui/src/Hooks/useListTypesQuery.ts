@@ -35,13 +35,10 @@ const useListTypesQuery = (space: string, skip: boolean): ListTypesQuery => {
 
   const fetch = useMemo(() => async () => {
     const { data } = await API.getSpaceTypes(space);
-    if (data.length) {
-      return data.map(type => ({
-        ...type,
-        isSupported:  type.fields instanceof Object && !!Object.keys(type.fields).length
-      }));
-    }
-    throw new Error(`space "${space}" is currently empty, please add some instances or type specifications.`);
+    return data.map(type => ({
+      ...type,
+      isSupported:  type.fields instanceof Object && !!Object.keys(type.fields).length
+    }));
   }, [API, space]);
 
   return useGenericQuery<StructureOfType[]>(fetch, skip);

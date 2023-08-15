@@ -44,8 +44,7 @@ const useStyles = createUseStyles({
     textTransform: 'uppercase',
     fontWeight: 'bold',
     fontSize: '0.9em',
-    padding: '10px 10px 0 10px',
-    cursor: 'pointer'
+    padding: '10px 10px 0 10px'
   },
   filter: {
     position: 'relative'

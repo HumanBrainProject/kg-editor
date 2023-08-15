@@ -23,6 +23,7 @@
 
 import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
 import {faExclamationTriangle} from '@fortawesome/free-solid-svg-icons/faExclamationTriangle';
+import {faInfoCircle} from '@fortawesome/free-solid-svg-icons/faInfoCircle';
 import {faPlus} from '@fortawesome/free-solid-svg-icons/faPlus';
 import {faRedoAlt} from '@fortawesome/free-solid-svg-icons/faRedoAlt';
 import {FontAwesomeIcon} from '@fortawesome/react-fontawesome';
@@ -82,6 +83,10 @@ const useStyles = createUseStyles({
     display: 'inline-block',
     marginLeft: '4px'
   },
+  info: {
+    display: 'inline-block',
+    marginLeft: '4px'
+  },
   addTypeButton: {
     display: 'inline-block',
     fontSize: '0.9em',
@@ -94,6 +99,7 @@ const useStyles = createUseStyles({
     color: 'var(--ft-color-normal)',
     border: '1px solid var(--border-color-ui-contrast1)',
     transition: 'border 0.25s ease',
+    cursor: 'pointer',
     '&:hover': {
       background: 'var(--list-bg-hover)',
       borderColor: 'transparent',
@@ -207,7 +213,15 @@ const AvaiableTypes = observer(() => {
     );
   }
 
-  if (isAvailableTypesEnabled && typeStore.availableTypes?.length > 0) {
+  if (typeStore.availableTypes.length === 0) {
+    return (
+      <span className={classes.info} title={`space "${space}" contains the full list of available types.`}>
+        <FontAwesomeIcon icon={faInfoCircle} />
+      </span>
+    );
+  }
+
+  if (isAvailableTypesEnabled) {
     return (
       <>
         <div className={classes.addTypeButton} onClick={handleAddType} title={`add a type to space "${appStore.currentSpaceName}"`}>

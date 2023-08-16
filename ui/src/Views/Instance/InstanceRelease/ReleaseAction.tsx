@@ -23,19 +23,17 @@
 
 import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
 import {faCloudUploadAlt} from '@fortawesome/free-solid-svg-icons/faCloudUploadAlt';
-import {faEye} from '@fortawesome/free-solid-svg-icons/faEye';
+import {faExternalLink} from '@fortawesome/free-solid-svg-icons/faExternalLink';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
-import React, { useState}  from 'react';
+import React from 'react';
 import Button from 'react-bootstrap/Button';
 import { createUseStyles } from 'react-jss';
-
 import useStores from '../../../Hooks/useStores';
-
 import Matomo from '../../../Services/Matomo';
-import ClientPreviewModal from './ClientPreviewModal';
 import ReleaseStats from './ReleaseStats';
 import Reviewers from './Reviewers';
+import type { UUID } from '../../../types';
 
 const useStyles = createUseStyles({
   container: {
@@ -100,32 +98,48 @@ const useStyles = createUseStyles({
     '& h5': {
       fontSize: '0.8em',
       fontWeight: 'bold'
-    },
-    '& .content': {
-      display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      '&.previewContent': {
-        gridTemplateColumns: '2fr 1fr',
-        '& .previewIcon': {
-          fontSize: '1em',
-          fontWeight: 'bold',
-          textAlign: 'right',
-          paddingRight: '4px',
-          cursor: 'pointer',
-          '& :hover': {
-            color: 'lightgrey'
-          }
-        }
-      },
-      '& .type': {
-        fontSize: '0.8em',
-        paddingLeft: '4px',
-        lineHeight: '16px'
-      }
     }
+  },
+  previewLink: {
+    display: 'grid',
+    gridTemplateColumns: '2fr 1fr',
+    color: 'var(--ft-color-normal)',
+    textDecoration: 'unset',
+    '&:visited': {
+      color: 'var(--ft-color-normal)'
+    },
+    '&:hover, &:hover:visited': {
+      color: 'lightgrey'
+    }
+  },
+  previewIcon: {
+    fontSize: '1em',
+    fontWeight: 'bold',
+    textAlign: 'right',
+    paddingRight: '4px',
+    cursor: 'pointer'
+  },
+  previewType: {
+    fontSize: '0.8em',
+    paddingLeft: '4px',
+    lineHeight: '16px'
   }
 });
 
+const getSearchPreviewUrl = (instanceId: UUID) => {
+  switch(window.location.hostname) {
+  case 'localhost':
+  case 'editor.kg-dev.ebrains.eu':
+    return `https://search.kg-dev.ebrains.eu/live/${instanceId}`;
+  case 'editor.kg-int.ebrains.eu':
+    return `https://search.kg-int.ebrains.eu/live/${instanceId}`;
+  case 'editor.kg-ppd.ebrains.eu':
+    return `https://search.kg-ppd.ebrains.eu/live/${instanceId}`;
+  case 'editor.kg.ebrains.eu':
+  default:
+    return `https://kg.ebrains.eu/search/live/${instanceId}`;
+  }
+};
 
 const ReleaseAction = observer(() => {
 
@@ -133,18 +147,12 @@ const ReleaseAction = observer(() => {
 
   const { releaseStore, instanceStore } = useStores();
 
-  const [showModal, setShowModal] = useState(false);
-
   const handleProceed = () => {
     if (!releaseStore.isSaving) {
       Matomo.trackEvent('Instance', 'Release', releaseStore.topInstanceId);
       releaseStore.commitStatusChanges();
     }
   };
-
-  const handleOpenModal = () => setShowModal(true);
-
-  const handleCloseModal = () => setShowModal(false);
 
   if (!releaseStore.treeStats) {
     return null;
@@ -163,22 +171,19 @@ const ReleaseAction = observer(() => {
   const instance = releaseStore.topInstanceId ? instanceStore.instances.get(releaseStore.topInstanceId): undefined;
   const permissions = instance?.permissions;
   const title = getTitle();
+  const searchPreviewUrl = getSearchPreviewUrl(releaseStore.topInstanceId as UUID);
   return (
     <div className={classes.container}>
       <ReleaseStats />
       <div className={classes.preview}>
         <div className={classes.section}>
           <h5>Preview:</h5>
-          <div className={'content previewContent'}>
-            <div className={'type'}>Search</div>
-            <div
-              onClick={handleOpenModal}
-              className={'previewIcon'}
-              title="Preview in KG Search"
-            >
-              <FontAwesomeIcon style={{ verticalAlign: 'top' }} icon={faEye} />
+          <a href={searchPreviewUrl} className={classes.previewLink} target="_blank" rel="noopener noreferrer">
+            <div className={classes.previewType}>Search</div>
+            <div className={classes.previewIcon} title="Preview in KG Search" >
+              <FontAwesomeIcon style={{ verticalAlign: 'top' }} icon={faExternalLink} />
             </div>
-          </div>
+          </a>
         </div>
       </div>
       <div className={classes.invite}>
@@ -205,11 +210,6 @@ const ReleaseAction = observer(() => {
           <div>{releaseStore.isSaving ? 'Saving...' : 'Proceed'}</div>
         </Button>
       </div>
-      <ClientPreviewModal
-        instanceId={releaseStore.topInstanceId}
-        show={showModal}
-        handleClose={handleCloseModal}
-      />
     </div>
   );
 });

@@ -33,7 +33,6 @@ import type { Instance } from './InstanceStore';
 import type InstanceStore from './InstanceStore';
 import type RootStore from './RootStore';
 import type { View } from './ViewStore';
-import type API from '../Services/API';
 import type { SimpleType } from '../types';
 import type { Location, NavigateFunction} from 'react-router-dom';
 
@@ -86,10 +85,9 @@ export class AppStore{
   externalCreateModal?: ExternalCreateModal;
   pathsToResolve = new Map();
 
-  api: API;
   rootStore: RootStore;
 
-  constructor(api: API, rootStore: RootStore) {
+  constructor(rootStore: RootStore) {
     makeObservable(this, {
       commit: observable,
       externalCreateModal: observable,
@@ -126,7 +124,6 @@ export class AppStore{
       setCommit: action
     });
 
-    this.api = api;
     this.rootStore = rootStore;
 
     this.setTheme(localStorage.getItem('theme') as string);

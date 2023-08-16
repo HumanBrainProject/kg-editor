@@ -66,7 +66,7 @@ const DuplicateInstance = observer(({ instance, className }: DuplicateInstancePr
     if (data && !error) {
       const newId = data.id;
       const newInstance = instanceStore.createInstanceOrGet(newId);
-      newInstance.initializeData(appStore.api, rootStore, data);
+      newInstance.initializeData(instanceStore.api, rootStore, data);
       navigate(`/instances/${newId}/edit`);
     }
   };

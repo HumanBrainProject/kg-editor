@@ -69,7 +69,7 @@ class RootStore {
     this.invitedUsersStore = new InvitedUsersStore(api);
 
     // UI stores
-    this.appStore = new AppStore(api, this);
+    this.appStore = new AppStore(this);
   }
 }
 

@@ -26,8 +26,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
 import Button from 'react-bootstrap/Button';
-
 import { useNavigate } from 'react-router-dom';
+import ErrorModal from '../../../Components/ErrorModal';
+import SpinnerModal from '../../../Components/SpinnerModal';
+import useCreateInstanceMutation from '../../../Hooks/useCreateInstanceMutation';
 import useStores from '../../../Hooks/useStores';
 import Matomo from '../../../Services/Matomo';
 import type Instance from '../../../Stores/Instance';
@@ -39,18 +41,37 @@ interface DuplicateInstanceProps {
 
 const DuplicateInstance = observer(({ instance, className }: DuplicateInstanceProps) => {
 
-  const { appStore, typeStore } = useStores();
+  const rootStore = useStores();
+  const { appStore, typeStore, instanceStore } = rootStore;
+
   const navigate = useNavigate();
 
+  const [createInstanceTrigger, createInstanceResult] = useCreateInstanceMutation();
+
   const handleDuplicateInstance = () => {
-    if(instance.id) {
-      Matomo.trackEvent('Instance', 'Duplicate', instance.id);
-      appStore.duplicateInstance(instance.id, navigate);
+    Matomo.trackEvent('Instance', 'Duplicate', instance.id);
+    duplicateInstance();
+  };
+
+  const duplicateInstance = async () => {
+    const payload = instance.payload;
+    const labelField = instance.labelField;
+    if(labelField) {
+      payload[labelField] = `${payload[labelField]} (Copy)`;
+    }
+    const { data, error } = await createInstanceTrigger({
+      space: appStore.currentSpace?.id as string,
+      payload: payload,
+    });
+    if (data && !error) {
+      const newId = data.id;
+      const newInstance = instanceStore.createInstanceOrGet(newId);
+      newInstance.initializeData(appStore.api, rootStore, data);
+      navigate(`/instances/${newId}/edit`);
     }
   };
 
   const permissions = instance.permissions;
-
 
   const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
 
@@ -59,16 +80,20 @@ const DuplicateInstance = observer(({ instance, className }: DuplicateInstancePr
   }
 
   return (
-    <div className={className}>
-      <h4>Duplicate this instance</h4>
-      <ul>
-        <li>Be careful. After duplication both instances will look the same.</li>
-        <li>After duplication you should update the name &amp; description fields.</li>
-      </ul>
-      <Button variant={'primary'} onClick={handleDuplicateInstance}>
-        <FontAwesomeIcon icon={faCopy} /> &nbsp; Duplicate this instance
-      </Button>
-    </div>
+    <>
+      <div className={className}>
+        <h4>Duplicate this instance</h4>
+        <ul>
+          <li>Be careful. After duplication both instances will look the same.</li>
+          <li>After duplication you should update the name &amp; description fields.</li>
+        </ul>
+        <Button variant={'primary'} onClick={handleDuplicateInstance}>
+          <FontAwesomeIcon icon={faCopy} /> &nbsp; Duplicate this instance
+        </Button>
+      </div>
+      <ErrorModal show={createInstanceResult.isError} text={createInstanceResult.error as string} onCancel={createInstanceResult.reset} onRetry={duplicateInstance} />
+      <SpinnerModal show={createInstanceResult.isTriggering} text={`Dupplicating instance ${instance.id}...`} />
+    </>
   );
 });
 DuplicateInstance.displayName = 'DuplicateInstance';

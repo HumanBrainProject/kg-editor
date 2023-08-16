@@ -22,7 +22,6 @@
  */
 
 import {faCircle} from '@fortawesome/free-solid-svg-icons/faCircle';
-import {faCircleNotch} from '@fortawesome/free-solid-svg-icons/faCircleNotch';
 import {faCodeBranch} from '@fortawesome/free-solid-svg-icons/faCodeBranch';
 import {faInfoCircle} from '@fortawesome/free-solid-svg-icons/faInfoCircle';
 import {faPlus} from '@fortawesome/free-solid-svg-icons/faPlus';
@@ -36,7 +35,6 @@ import Tooltip from 'react-bootstrap/Tooltip';
 import { createUseStyles } from 'react-jss';
 import { useNavigate } from 'react-router-dom';
 import { v4 as uuidv4 } from 'uuid';
-
 import useStores from '../../Hooks/useStores';
 import Matomo from '../../Services/Matomo';
 import type { StructureOfType } from '../../types';
@@ -166,7 +164,6 @@ const useStyles = createUseStyles({
 
 interface CreateInstanceProps {
   canCreate: boolean;
-  isCreatingNewInstance: boolean;
   classes: any;
   onClick: () => void;
   cannotCreateTooltip?: string;
@@ -175,20 +172,12 @@ interface CreateInstanceProps {
 
 const CreateInstance = observer(({
   canCreate,
-  isCreatingNewInstance,
   classes,
   onClick,
   cannotCreateTooltip,
   label
 }: CreateInstanceProps) => {
   if (canCreate) {
-    if (isCreatingNewInstance) {
-      return (
-        <div className={classes.createInstance}>
-          <FontAwesomeIcon icon={faCircleNotch} spin />
-        </div>
-      );
-    }
     return (
       <div className={classes.actions}>
         <div
@@ -278,7 +267,6 @@ const TypesItem = observer(({ type }: TypesItemProps) => {
       </span>
       <CreateInstance
         canCreate={!!canCreate}
-        isCreatingNewInstance={appStore.isCreatingNewInstance}
         classes={classes}
         onClick={handleCreateInstance}
         cannotCreateTooltip={cannotCreateTooltip}

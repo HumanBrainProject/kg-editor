@@ -34,7 +34,6 @@ import useStores from '../../Hooks/useStores';
 
 import BodyPanel from './InstanceForm/BodyPanel';
 import ConfirmCancelEditPanel from './InstanceForm/ConfirmCancelEditPanel';
-import CreatingChildInstancePanel from './InstanceForm/CreatingChildInstancePanel';
 import FetchErrorPanel from './InstanceForm/FetchErrorPanel';
 import FetchingPanel from './InstanceForm/FetchingPanel';
 import FooterPanel from './InstanceForm/FooterPanel';
@@ -266,7 +265,6 @@ const InstanceForm = observer(({ id, view, pane, provenance }: InstanceFormProps
             onCancel={handleContinueEditing}
             inline={!isMainInstance} />
           <SavingPanel id={id} show={instance.isSaving} inline={!isMainInstance} />
-          <CreatingChildInstancePanel show={appStore.isCreatingNewInstance} />
           <SaveErrorPanel show={instance.hasSaveError} error={instance.saveError} onCancel={handleCancelSave} onRetry={handleSave} inline={!isMainInstance} />
         </div>
         <FontAwesomeIcon className="highlightArrow" icon={faArrowRight} />

@@ -90,8 +90,6 @@ export class AppStore{
   historySettings?: HistorySettings;
   showSaveBar = false;
   externalCreateModal?: ExternalCreateModal;
-  isCreatingNewInstance = false;
-  instanceCreationError?: string;
   isMovingInstance = false;
   instanceMovingError?: string;
   instanceToMove?: InstanceToMove;
@@ -113,8 +111,6 @@ export class AppStore{
       currentTheme: computed,
       historySettings: observable,
       showSaveBar: observable,
-      isCreatingNewInstance: observable,
-      instanceCreationError: observable,
       isMovingInstance: observable,
       instanceMovingError: observable,
       instanceToMove: observable,
@@ -130,7 +126,6 @@ export class AppStore{
       closeAllInstances: action,
       closeInstance: action,
       saveInstance: action,
-      duplicateInstance: action,
       setSizeHistorySetting: action,
       toggleViewedFlagHistorySetting: action,
       toggleEditedFlagHistorySetting: action,
@@ -210,8 +205,6 @@ export class AppStore{
     this.rootStore.instanceStore.flush();
     this.rootStore.statusStore.flush();
     this.showSaveBar = false;
-    this.isCreatingNewInstance = false;
-    this.instanceCreationError = undefined;
     this.instanceToMove = undefined;
     this.isMovingInstance = false;
     this.instanceMovingError = undefined;
@@ -448,42 +441,6 @@ export class AppStore{
   syncInstancesHistory(instance: Instance, mode: ViewMode) {
     if(instance && this.rootStore.viewStore.views.has(instance.id)){
       this.rootStore.historyStore.updateInstanceHistory(instance.id, mode);
-    }
-  }
-
-  async duplicateInstance(fromInstanceId: string, navigate: NavigateFunction) {
-    if (!this.currentSpace?.id) {
-      this.instanceCreationError = `instance "${fromInstanceId}" cannot be dupplicated because space has not been set!`;;
-      return;
-    }
-    const instanceToCopy = this.rootStore.instanceStore.instances.get(fromInstanceId);
-    if (!instanceToCopy) {
-      this.instanceCreationError = `instance "${fromInstanceId}" cannot be dupplicated because it is not available in memory!`;
-      return;
-    }
-    const payload = instanceToCopy.payload;
-    const labelField = instanceToCopy?.labelField;
-    if(labelField && payload) {
-      payload[labelField] = `${payload[labelField]} (Copy)`;
-    }
-    this.isCreatingNewInstance = true;
-    try{
-      const { data } = await this.api.createInstance(this.currentSpace.id, undefined, payload);
-      runInAction(() => {
-        this.isCreatingNewInstance = false;
-      });
-      const newId = data?.id;
-      if(newId) {
-        const newInstance = this.rootStore.instanceStore.createInstanceOrGet(newId);
-        newInstance.initializeData(this.api, this.rootStore, data);
-        navigate(`/instances/${newId}/edit`);
-      }
-    } catch(e){
-      const err = e as APIError;
-      runInAction(() => {
-        this.isCreatingNewInstance = false;
-        this.instanceCreationError = err?.message;
-      });
     }
   }
 

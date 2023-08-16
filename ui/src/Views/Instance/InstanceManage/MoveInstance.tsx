@@ -30,12 +30,11 @@ import { observer } from 'mobx-react-lite';
 import React, { useState, useEffect } from 'react';
 import Button from 'react-bootstrap/Button';
 import { createUseStyles } from 'react-jss';
-
 import { useNavigate, useLocation } from 'react-router-dom';
 import ErrorModal from '../../../Components/ErrorModal';
 import SpinnerModal from '../../../Components/SpinnerModal';
+import useMoveInstanceMutation from '../../../Hooks/useMoveInstanceMutation';
 import useStores from '../../../Hooks/useStores';
-
 import Matomo from '../../../Services/Matomo';
 import { ReleaseStatus } from '../../../types';
 import type Instance from '../../../Stores/Instance';
@@ -157,12 +156,15 @@ interface MoveInstanceProps {
 }
 
 const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
+
   const classes = useStyles();
 
-  const { appStore, statusStore, userProfileStore } = useStores();
+  const { appStore, statusStore, browseStore, viewStore, userProfileStore } = useStores();
+
   const navigate = useNavigate();
   const location = useLocation();
 
+  const [moveInstanceTrigger, moveInstanceResult] = useMoveInstanceMutation();
 
   useEffect(() => {
     fetchStatus();
@@ -175,10 +177,10 @@ const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
     }
   };
 
-  const [spaceId, setSpaceId] = useState(appStore.currentSpace?.id);
+  const [spaceId, setSpaceId] = useState(appStore.currentSpace?.id as string);
 
   const permissions = instance.permissions;
-  const status = instance.id ? statusStore.getInstance(instance.id): undefined;
+  const status = statusStore.getInstance(instance.id);
 
   if (!status) {
     return null;
@@ -201,15 +203,29 @@ const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
   const handleSetSpaceId = (e: ChangeEvent<HTMLSelectElement>) => setSpaceId(e.target.value);
 
   const handleMoveInstance = () => {
-    if(instance.id && spaceId) {
-      Matomo.trackEvent('Instance', 'Move', instance.id);
-      appStore.moveInstance(instance.id, spaceId, location, navigate);
+    Matomo.trackEvent('Instance', 'Move', instance.id);
+    moveInstance();
+  };
+
+  const moveInstance = async () => {
+    const payload = instance.payload;
+    const labelField = instance.labelField;
+    if(labelField) {
+      payload[labelField] = `${payload[labelField]} (Copy)`;
+    }
+    const { error } = await moveInstanceTrigger({
+      instanceId: instance.id,
+      space: spaceId
+    });
+    if (!error) {
+      browseStore.refreshFilter();
+      viewStore.unregisterViewByInstanceId(instance.id);
+      appStore.flush();
+      await appStore.switchSpace(location, navigate, spaceId);
+      navigate(`/instances/${instance.id}`);
     }
   };
 
-  const handleCancelMoveInstance = () => appStore.retryMoveInstance(location, navigate);
-
-  const handleRetryMoveInstance = () => appStore.cancelMoveInstance();
   const variant = spaceId === appStore.currentSpace?.id ? 'secondary' : 'warning';
   const isDisabled = status.data !== ReleaseStatus.UNRELEASED || spaceId === appStore.currentSpace?.id;
 
@@ -244,8 +260,8 @@ const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
           />
         </div>
       )}
-      <ErrorModal show={!!appStore.instanceMovingError} text={appStore.instanceMovingError as string} onCancel={handleCancelMoveInstance} onRetry={handleRetryMoveInstance} />
-      <SpinnerModal show={!appStore.instanceMovingError && appStore.isMovingInstance} text={`Moving instance "${appStore.instanceToMove?.id}" to space "${appStore.instanceToMove?.space}" ...`} />
+      <ErrorModal show={moveInstanceResult.isError} text={moveInstanceResult.error as string} onCancel={moveInstanceResult.reset} onRetry={moveInstance} />
+      <SpinnerModal show={moveInstanceResult.isTriggering} text={`Moving instance "${instance.id}" to space "${spaceId}" ...`} />
     </>
   );
 });

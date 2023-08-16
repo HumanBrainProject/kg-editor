@@ -34,7 +34,6 @@ import type InstanceStore from './InstanceStore';
 import type RootStore from './RootStore';
 import type { View } from './ViewStore';
 import type API from '../Services/API';
-import type { APIError } from '../Services/API';
 import type { SimpleType } from '../types';
 import type { Location, NavigateFunction} from 'react-router-dom';
 
@@ -66,11 +65,6 @@ interface ExternalCreateModal {
   saved?: number;
 }
 
-interface InstanceToMove {
-  id: string;
-  space: string;
-}
-
 export interface EventType {
   [ViewMode.VIEW]: boolean,
   [ViewMode.EDIT]: boolean,
@@ -90,9 +84,6 @@ export class AppStore{
   historySettings?: HistorySettings;
   showSaveBar = false;
   externalCreateModal?: ExternalCreateModal;
-  isMovingInstance = false;
-  instanceMovingError?: string;
-  instanceToMove?: InstanceToMove;
   pathsToResolve = new Map();
 
   api: API;
@@ -111,9 +102,6 @@ export class AppStore{
       currentTheme: computed,
       historySettings: observable,
       showSaveBar: observable,
-      isMovingInstance: observable,
-      instanceMovingError: observable,
-      instanceToMove: observable,
       pathsToResolve: observable,
       currentSpaceName: computed,
       currentSpacePermissions: computed,
@@ -135,8 +123,6 @@ export class AppStore{
       createExternalInstance: action,
       updateExternalInstanceModal: action,
       clearExternalCreateModal: action,
-      moveInstance: action,
-      cancelMoveInstance: action,
       setCommit: action
     });
 
@@ -205,9 +191,6 @@ export class AppStore{
     this.rootStore.instanceStore.flush();
     this.rootStore.statusStore.flush();
     this.showSaveBar = false;
-    this.instanceToMove = undefined;
-    this.isMovingInstance = false;
-    this.instanceMovingError = undefined;
     this.pathsToResolve.clear();
   }
 
@@ -442,49 +425,6 @@ export class AppStore{
     if(instance && this.rootStore.viewStore.views.has(instance.id)){
       this.rootStore.historyStore.updateInstanceHistory(instance.id, mode);
     }
-  }
-
-  async moveInstance(instanceId: string, space: string, location: Location, navigate: NavigateFunction): Promise<void> {
-    this.instanceToMove = {
-      id: instanceId,
-      space: space
-    };
-    this.instanceMovingError = undefined;
-    this.isMovingInstance = true;
-    try{
-      await this.api.moveInstance(instanceId, space);
-      runInAction(() => {
-        this.isMovingInstance = false;
-        this.instanceToMove = undefined;
-      });
-      this.rootStore.browseStore.refreshFilter();
-      this.rootStore.viewStore.unregisterViewByInstanceId(instanceId);
-      this.flush();
-      await this.switchSpace(location, navigate, space);
-      navigate(`/instances/${instanceId}`);
-    } catch(e){
-      const err = e as APIError;
-      runInAction(() => {
-        const message = err.message?err.message:err;
-        const errorMessage = err.response && err.response.status !== 500 ? err.response.data:'';
-        this.instanceMovingError = `Failed to move instance "${instanceId}" to space "${space}" (${message}) ${errorMessage}`;
-        this.isMovingInstance = false;
-      });
-    }
-  }
-
-  async retryMoveInstance(location: Location, navigate: NavigateFunction): Promise<void>  {
-    if (this.instanceToMove) {
-      await this.moveInstance(this.instanceToMove.id, this.instanceToMove.space, location, navigate);
-    } else {
-      console.error('retryMoveInstance function has been called but instanceToMove is undefined!');
-      this.instanceMovingError = undefined;
-    }
-  }
-
-  cancelMoveInstance() {
-    this.instanceToMove = undefined;
-    this.instanceMovingError = undefined;
   }
 
   replaceInstanceResolvedIdPath(path: string, navigate: NavigateFunction) {

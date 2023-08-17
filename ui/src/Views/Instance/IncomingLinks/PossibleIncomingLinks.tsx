@@ -23,25 +23,10 @@
 
 import { observer } from 'mobx-react-lite';
 import React from 'react';
-import { createUseStyles } from 'react-jss';
+import Accordion from 'react-bootstrap/Accordion';
 import Label from '../../../Fields/Label';
 import PossibleIncomingLink from './PossibleIncomingLink';
 import type {  SourceType } from '../../../types';
-
-const useStyles = createUseStyles({
-  container: {
-    '& > ul': {
-      listStyle: 'none',
-      paddingLeft: '20px',
-      '& > li': {
-        display: 'inline',
-        '& + li:before': {
-          content: '\' \''
-        }
-      }
-    }
-  }
-});
 
 interface PossibleIncomingLinksProps {
   links?: SourceType[];
@@ -50,22 +35,18 @@ interface PossibleIncomingLinksProps {
 
 const PossibleIncomingLinks = observer(({ links, type }: PossibleIncomingLinksProps) => {
 
-  const classes = useStyles();
-
-  if(!links || !links.length) {
+  if(!links?.length) {
     return null;
   }
 
   return(
-    <div className={classes.container}>
+    <div>
       <Label label={`${type} can be linked from`}/>
-      <ul>
+      <Accordion>
         {links.map((l, index) => (
-          <li key={index}>
-            <PossibleIncomingLink type={l.type} spaces={l.spaces} />
-          </li>
+          <PossibleIncomingLink key={l.type.name} eventKey={index.toString()} type={l.type} spaces={l.spaces} />
         ))}
-      </ul>
+      </Accordion>
     </div>
   );
 });

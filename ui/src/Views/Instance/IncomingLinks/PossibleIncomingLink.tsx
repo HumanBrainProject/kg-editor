@@ -25,6 +25,7 @@ import {faCircle} from '@fortawesome/free-solid-svg-icons/faCircle';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { observer } from 'mobx-react-lite';
 import React from 'react';
+import Accordion from 'react-bootstrap/Accordion';
 import Button from 'react-bootstrap/Button';
 import { createUseStyles } from 'react-jss';
 
@@ -47,11 +48,12 @@ const useStyles = createUseStyles({
 });
 
 interface PossibleIncomingLinkProps {
+  eventKey: string;
   type: StructureOfType;
   spaces: string[];
 }
 
-const PossibleIncomingLink = observer(({ type, spaces }: PossibleIncomingLinkProps) => {
+const PossibleIncomingLink = observer(({ eventKey, type, spaces }: PossibleIncomingLinkProps) => {
 
   const classes = useStyles();
   const { appStore, browseStore } = useStores();
@@ -59,9 +61,9 @@ const PossibleIncomingLink = observer(({ type, spaces }: PossibleIncomingLinkPro
   const location = useLocation();
   const navigate = useNavigate();
 
-  const handleLinkFrom = (space: string) => {
+  const handleLinkFrom = async (space: string) => {
     if(appStore.currentSpace?.id !== space) {
-      const changeSpace = appStore.switchSpace(location, navigate, space);
+      const changeSpace = await appStore.switchSpace(location, navigate, space);
       if(!changeSpace) {
         return;
       }
@@ -71,13 +73,16 @@ const PossibleIncomingLink = observer(({ type, spaces }: PossibleIncomingLinkPro
   };
 
   return(
-    <>
-      {spaces.map(space => (
-        <Button key={`${space}-${type.label}`} className={classes.btn} onClick={() => handleLinkFrom(space)} variant="outline-secondary">
-          <FontAwesomeIcon icon={faCircle} color={type.color}/>&nbsp;&nbsp;<span>{type.label} <strong title="space"><i>({space})</i></strong></span>
-        </Button>
-      ))}
-    </>
+    <Accordion.Item eventKey={eventKey}>
+      <Accordion.Header>
+        <FontAwesomeIcon icon={faCircle} color={type.color}/>&nbsp;&nbsp;{type.label}
+      </Accordion.Header>
+      <Accordion.Body>
+        {spaces.map(space => (
+          <Button key={`${space}-${type.label}`} className={classes.btn} onClick={() => handleLinkFrom(space)} variant="outline-secondary">{space}</Button>
+        ))}
+      </Accordion.Body>
+    </Accordion.Item>
   );
 });
 PossibleIncomingLink.displayName = 'PossibleIncomingLink';

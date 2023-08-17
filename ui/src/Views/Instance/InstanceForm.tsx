@@ -127,7 +127,7 @@ const useStyles = createUseStyles({
     padding: '10px 0 0 0'
   },
   panelFooter: {
-    padding: '0'
+    padding: '8px 0 0 0'
   },
   hasChangedIndicator: {
     height: '9px',

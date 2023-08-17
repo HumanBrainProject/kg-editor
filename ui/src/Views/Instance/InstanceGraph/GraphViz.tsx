@@ -82,14 +82,14 @@ const GraphViz = observer(() => {
       }
     }, 250);
     updateDimensions();
-    graphRef.current && graphRef.current.zoom(Math.round(Math.min(window.innerWidth / 365, window.innerHeight / 205)));
+    graphRef.current?.zoom(Math.round(Math.min(window.innerWidth / 365, window.innerHeight / 205)));
     window.addEventListener('resize', updateDimensions);
     return () => {
       window.removeEventListener('resize', updateDimensions);
     };
   }, []);
 
-  const handleNodeClick = (node: NodeObject) => {
+  const handleNodeClick = async (node: NodeObject) => {
     const graphNode = node as GraphNode;
     if (graphNode.isGroup) {
       graphStore.setGrouping(graphNode as GraphGroup, false);
@@ -98,8 +98,10 @@ const GraphViz = observer(() => {
       if(graphNode.space && graphNode.space !== appStore.currentSpace?.id) {
         const space = userProfileStore.getSpaceInfo(graphNode.space);
         if(space.permissions.canRead) {
-          appStore.switchSpace(location, navigate, graphNode.space);
-          navigate(`/instances/${node.id}/graph`);
+          const changeSpace = await appStore.switchSpace(location, navigate, graphNode.space);
+          if (changeSpace) {
+            navigate(`/instances/${node.id}/graph`);
+          }
         }
       } else {
         navigate(`/instances/${node.id}/graph`);
@@ -114,7 +116,7 @@ const GraphViz = observer(() => {
       const group = node as GraphGroup;
       return `Group of ${group.types.length > 1?('(' + group.name + ')'):group.name} (${group.nodes.length})`;
     }
-    return `(${graphStore.groups[node.groupId] && graphStore.groups[node.groupId].name}) ${node.name}`;
+    return `(${graphStore.groups[node.groupId]?.name}) ${node.name}`;
   };
 
   const getNodeLabel = (node: NodeObject) =>  {

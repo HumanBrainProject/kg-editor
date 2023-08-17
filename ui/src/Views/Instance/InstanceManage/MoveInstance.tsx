@@ -79,7 +79,10 @@ const useStyles = createUseStyles({
       cursor: 'pointer',
       pointerEvents: 'none'
     }
-  },
+  }
+});
+
+const useStatusStyles = createUseStyles({
   error: {
     color: 'var(--ft-color-error)'
   },
@@ -94,19 +97,20 @@ interface StatusProps {
   status?: StatusProp;
   fetchStatus: () => void;
   onClick: () => void;
-  classes: any;
-  variant: string;
   isDisabled: boolean;
+  hasUnsavedChanges: boolean;
 }
 
 const Status = observer(({
   status,
   fetchStatus,
   onClick,
-  classes,
-  variant,
-  isDisabled
+  isDisabled,
+  hasUnsavedChanges
 }: StatusProps) => {
+
+  const classes = useStatusStyles();
+
   if (status?.hasFetchError) {
     return (
       <div className={classes.error}>
@@ -129,16 +133,25 @@ const Status = observer(({
   }
   return (
     <>
-      {status.data !== ReleaseStatus.UNRELEASED && (
+      {(hasUnsavedChanges || status.data !== ReleaseStatus.UNRELEASED) && (
         <ul>
-          <li>
-            This instance has been released and therefore cannot be moved.
-          </li>
-          <li>If you still want to move it you first have to unrelease it.</li>
+          {hasUnsavedChanges && (
+            <li>
+              There are some unsaved changes. You have first to do a save or undo your changes.
+            </li>
+          )}
+          {status.data !== ReleaseStatus.UNRELEASED && (
+            <>
+              <li>
+                This instance has been released and therefore cannot be moved.
+              </li>
+              <li>If you still want to move it you first have to unrelease it.</li>
+            </>
+          )}
         </ul>
       )}
       <Button
-        variant={variant}
+        variant={isDisabled?'secondary' : 'warning'}
         disabled={isDisabled}
         className={classes.btn}
         onClick={onClick}
@@ -159,7 +172,7 @@ const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
 
   const classes = useStyles();
 
-  const { appStore, statusStore, browseStore, viewStore, userProfileStore } = useStores();
+  const { appStore, statusStore, browseStore, viewStore, userProfileStore, instanceStore } = useStores();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -226,8 +239,7 @@ const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
     }
   };
 
-  const variant = spaceId === appStore.currentSpace?.id ? 'secondary' : 'warning';
-  const isDisabled = status.data !== ReleaseStatus.UNRELEASED || spaceId === appStore.currentSpace?.id;
+  const isDisabled = status.data !== ReleaseStatus.UNRELEASED || spaceId === appStore.currentSpace?.id || instanceStore.hasUnsavedChanges;
 
   return (
     <>
@@ -254,9 +266,8 @@ const MoveInstance = observer(({ instance, className }: MoveInstanceProps) => {
             status={status}
             fetchStatus={fetchStatus}
             onClick={handleMoveInstance}
-            classes={classes}
-            variant={variant}
             isDisabled={isDisabled}
+            hasUnsavedChanges={instanceStore.hasUnsavedChanges}
           />
         </div>
       )}

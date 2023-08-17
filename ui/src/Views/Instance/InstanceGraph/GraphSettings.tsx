@@ -151,14 +151,16 @@ const Node = ({ node, isGrouped }:NodeProps) => {
 
   const handelMouseOut = () => graphStore.setHighlightNodeConnections(node, false);
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (node.id !== graphStore.mainId) {
       graphStore.reset();
       if(node.space !== appStore.currentSpace?.id) {
         const space = userProfileStore.getSpaceInfo(node.space);
         if(space.permissions.canRead) {
-          appStore.switchSpace(location, navigate, node.space);
-          navigate(`/instances/${node.id}/graph`);
+          const changeSpace = await appStore.switchSpace(location, navigate, node.space);
+          if (changeSpace) {
+            navigate(`/instances/${node.id}/graph`);
+          }
         }
       } else {
         navigate(`/instances/${node.id}/graph`);

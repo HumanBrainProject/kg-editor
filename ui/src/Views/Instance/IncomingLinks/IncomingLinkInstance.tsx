@@ -75,9 +75,12 @@ const IncomingLinkInstance = observer(({instance, readMode }: IncomingLinkInstan
     );
   }
 
-  const handleOpenInstance = () => {
+  const handleOpenInstance = async () => {
     if(appStore.currentSpace?.id !== instance.space) {
-      appStore.switchSpace(location, navigate, instance.space);
+      const changeSpace = await appStore.switchSpace(location, navigate, instance.space);
+      if (!changeSpace) {
+        return;
+      }
     }
     navigate(`/instances/${instance.id}`);
   };

@@ -110,7 +110,10 @@ const FooterPanel = observer(({ className, instance, showOpenActions }: FooterPa
   const handleOpenInstance = async (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
     if(appStore.currentSpace?.id !== instance.space) {
-      await appStore.switchSpace(location, navigate, instance.space);
+      const changeSpace = await appStore.switchSpace(location, navigate, instance.space);
+      if (!changeSpace) {
+        return;
+      }
     }
     if(e.metaKey || e.ctrlKey){
       if(instance.id) {

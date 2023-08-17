@@ -133,7 +133,7 @@ interface NodeProps{
 }
 
 interface ActionFunctions {
-  onClick: () => void;
+  onClick: () => Promise<void>;
   onMouseOver?: () => void;
   onMouseOut?: () => void;
 }

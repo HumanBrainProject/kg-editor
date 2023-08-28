@@ -57,6 +57,7 @@ public class StructureOfField implements Serializable {
             @JsonProperty(EditorConstants.VOCAB_SEARCHABLE) Boolean kgSearchable,
             @JsonProperty(EditorConstants.VOCAB_REQUIRED) Boolean required,
             @JsonProperty(EditorConstants.VOCAB_READONLY) Boolean readOnly,
+            @JsonProperty(EditorConstants.VOCAB_MARKDOWN) Boolean markdown,
             @JsonProperty(EditorConstants.VOCAB_TARGET_TYPES) List<Map<String, Object>> kgTargetTypes,
             @JsonProperty(EditorConstants.VOCAB_DEFAULT_TARGET_TYPE) String kgDefaultTargetType,
             @JsonProperty(EditorConstants.VOCAB_VALIDATION) List<ValidationRule> kgValidation,
@@ -78,6 +79,7 @@ public class StructureOfField implements Serializable {
         this.searchable = kgSearchable;
         this.required = required;
         this.readOnly = readOnly;
+        this.markdown = markdown;
         this.targetTypes = !CollectionUtils.isEmpty(kgTargetTypes) ? kgTargetTypes.stream()
                 .map(t -> (String) t.get(EditorConstants.VOCAB_TYPE))
                 .filter(Objects::nonNull)
@@ -105,6 +107,7 @@ public class StructureOfField implements Serializable {
     private final Boolean searchable;
     private final Boolean required;
     private final Boolean readOnly;
+    private final Boolean markdown;
     private Map<String, StructureOfField> fields;
     private transient Object value;
     private String defaultTargetType;
@@ -193,6 +196,8 @@ public class StructureOfField implements Serializable {
 
     @JsonProperty("isReadOnly")
     public Boolean getReadonly() { return readOnly; }
+
+    public Boolean getMarkdown() { return markdown; }
 
     public List<ValidationRule> getValidation() {
         return validation;

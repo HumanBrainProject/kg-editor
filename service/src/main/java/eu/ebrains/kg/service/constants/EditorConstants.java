@@ -53,6 +53,7 @@ public class EditorConstants {
     public static final String VOCAB_MAX_VALUE = CORE_META + "maxValue";
     public static final String VOCAB_SELECTED = CORE_META + "selected";
     public static final String VOCAB_REQUIRED = CORE_META + "required";
+    public static final String VOCAB_MARKDOWN = CORE_META + "markdown";
     public static final String VOCAB_USER = CORE_META + "user";
     public static final String VOCAB_VALUE = CORE_META + "value";
     public static final String VOCAB_PERMISSIONS = CORE_META + "permissions";

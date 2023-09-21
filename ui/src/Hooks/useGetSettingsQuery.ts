@@ -21,7 +21,7 @@
  *
  */
 
-import { useMemo } from 'react';
+import { useCallback } from 'react';
 import useAPI from './useAPI';
 import useGenericQuery from './useGenericQuery';
 import type { GenericQuery } from './useGenericQuery';
@@ -33,7 +33,7 @@ const useGetSettingsQuery = (): GetSettingsQuery => {
 
   const API = useAPI();
 
-  const fetch = useMemo(() => () => API.getSettings(), [API]);
+  const fetch = useCallback(() => API.getSettings(), [API]);
 
   return useGenericQuery<Settings>(fetch);
 };

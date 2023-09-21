@@ -65,7 +65,7 @@ const Logout = React.lazy(() => import('./Views/Logout'));
 interface AppProps {
   stores: RootStore;
   api: API;
-  authAdapter?: AuthAdapter;
+  authAdapter: AuthAdapter;
 }
 
 const App = observer(({ stores, api, authAdapter } : AppProps) => {

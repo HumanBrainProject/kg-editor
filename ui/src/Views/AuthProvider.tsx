@@ -34,23 +34,20 @@
  */
 
 import React, { useEffect } from 'react';
-import AuthContext from '../Contexts/AuthContext';
 import useAuth from '../Hooks/useAuth';
-import KeycloakAuthAdapter from '../Services/KeycloakAuthAdapter';
-import KeycloakAuthProvider from './KeycloakAuthProvider';
-import type Auth from '../Services/Auth';
+import DefaultMockAuthProvider from './DefaultMockAuthProvider';
 import type AuthAdapter from '../Services/AuthAdapter';
+import type { AuthProviderProps } from '../Services/AuthProvider';
 import type { JSX } from 'react';
 
 /* For debugging purpose only, when running the ui app locally but connecting to
  * backend prod (where keycloak is not allowing localhost),
  * if the authentication is not required, you can bypass the keycloak authentication
- * by setting the following variable to true
+ * by setting the env variable REACT_APP_BYPASSS_AUTH to true
 */
-const BYPASSS_KEYCLOAK_FOR_LOCAL_DEBUGGING = false;
 
 interface AuthSetupProps {
-  adapter?: AuthAdapter;
+  adapter: AuthAdapter;
   children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
 }
 const AuthSetup = ({ adapter, children }: AuthSetupProps) => {
@@ -58,7 +55,7 @@ const AuthSetup = ({ adapter, children }: AuthSetupProps) => {
   const { isAuthenticated, logout } = useAuth();
 
   useEffect(() => {
-    if (adapter?.unauthorizedRequestResponseHandlerProvider) {
+    if (adapter.unauthorizedRequestResponseHandlerProvider) {
       adapter.unauthorizedRequestResponseHandlerProvider.unauthorizedRequestResponseHandler = () => {
         if (isAuthenticated) {
           logout();
@@ -75,64 +72,21 @@ const AuthSetup = ({ adapter, children }: AuthSetupProps) => {
   );
 };
 
-const bypassAuth = {
-  tokenProvider: undefined,
-  isTokenExpired: false,
-  error: undefined,
-  isError: false,
-  isUninitialized: false,
-  isInitialized: true,
-  isInitializing: false,
-  isAuthenticated: false,
-  isAuthenticating: false,
-  isLogingOut: false,
-  loginRequired: false,
-  userId: undefined,
-  authenticate: async () => Promise.resolve(undefined),
-  login: async () => Promise.resolve(undefined),
-  logout: async () => Promise.resolve(undefined)
-} as Auth;
-
-interface AuthProviderProps {
-  adapter?: AuthAdapter;
-  loginRequired?: boolean;
-  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
-}
-
 // loginRequired allow to overrule the onLoad option of the keycloak adapter when the authentidation should differ depenging on the route
 const AuthProvider = ({ adapter, loginRequired, children }:AuthProviderProps) => {
-
-  useEffect(() => {
-    if (!(adapter instanceof KeycloakAuthAdapter) && adapter?.unauthorizedRequestResponseHandlerProvider) {
-      adapter.unauthorizedRequestResponseHandlerProvider.unauthorizedRequestResponseHandler = () => {
-        bypassAuth.logout();
-      };
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  if (adapter instanceof KeycloakAuthAdapter) {
-    const isLoginRequired = loginRequired !== undefined ? loginRequired : adapter.initOptions?.onLoad === 'login-required';
-    const canBypassKeyCloak = BYPASSS_KEYCLOAK_FOR_LOCAL_DEBUGGING && window.location.host.startsWith('localhost') && !isLoginRequired;
-    if (canBypassKeyCloak) {
-      console.info('%cAuth: Keycloak authentication is disabled for local development', 'color: #f88900;');
-    } else {
-      return (
-        <KeycloakAuthProvider adapter={adapter} loginRequired={loginRequired} >
-          <AuthSetup adapter={adapter}>
-            {children}
-          </AuthSetup>
-        </KeycloakAuthProvider>
-      );
-    }
+  const isLoginRequired = loginRequired !== undefined ? loginRequired : adapter.initOptions?.onLoad === 'login-required'; // !BE CAREFULL: when loginRequired is false return also false
+  const canBypassAuth = process.env.REACT_APP_BYPASSS_AUTH === 'true' && window.location.host.startsWith('localhost') && !isLoginRequired;
+  if (canBypassAuth) {
+    console.info('%cAuth: Authentication is disabled for local development', 'color: #f88900;');
   }
+  const Provider = canBypassAuth?DefaultMockAuthProvider:adapter.authProvider;
 
   return (
-    <AuthContext.Provider value={bypassAuth} >
+    <Provider adapter={adapter} loginRequired={loginRequired} >
       <AuthSetup adapter={adapter}>
         {children}
       </AuthSetup>
-    </AuthContext.Provider>
+    </Provider>
   );
 };
 

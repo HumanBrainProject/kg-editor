@@ -32,16 +32,11 @@
  *   limitations under the License.
  *
  */
-import type { AuthProviderProps } from './AuthProvider';
-import type TokenProvider from './TokenProvider';
-import type UnauthorizedRequestResponseHandlerProvider from './UnauthorizedRequestResponseHandlerProvider';
 
-interface AuthAdapter {
-    get tokenProvider(): TokenProvider|undefined;
-    get unauthorizedRequestResponseHandlerProvider(): UnauthorizedRequestResponseHandlerProvider|undefined;
-    get authProvider(): (props: AuthProviderProps) => string|JSX.Element|(null|undefined|string|JSX.Element)[];
-    get initOptions(): Record<string, unknown> | undefined;
-    setConfig(config: Record<string, unknown> | undefined): void;
+import type AuthAdapter from './AuthAdapter';
+
+export interface AuthProviderProps {
+  adapter: AuthAdapter;
+  loginRequired?: boolean;
+  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
 }
-
-export default AuthAdapter;

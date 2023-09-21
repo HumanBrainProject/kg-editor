@@ -73,6 +73,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "startBypassAuth": "REACT_APP_BYPASSS_AUTH=true react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "testCI": "react-scripts test --coverage --passWithNoTests",

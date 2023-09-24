@@ -140,7 +140,7 @@ const Action = ({ icon, title, single, onClick }: ActionProps) => {
     if (!e.currentTarget.contains(e.target as Node)) {
       return;
     }
-    typeof onClick === 'function' && onClick();
+    onClick();
   };
 
   return (

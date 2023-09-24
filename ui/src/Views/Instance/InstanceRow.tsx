@@ -178,9 +178,9 @@ const Action = ({
       return;
     }
     if (e.metaKey || e.ctrlKey) {
-      typeof onCtrlClick === 'function' && onCtrlClick(mode);
+      onCtrlClick(mode);
     } else {
-      typeof onClick === 'function' && onClick(mode);
+      onClick(mode);
     }
   };
 
@@ -223,21 +223,16 @@ const InstanceRow = observer(
         return;
       }
       if (timeout.current === undefined) {
-        let action = typeof onClick === 'function' ? onClick : null;
-        if (e.metaKey || e.ctrlKey) {
-          action = typeof onCtrlClick === 'function' ? onCtrlClick : null;
-        }
-        if (action) {
-          timeout.current = setTimeout(
-            (i, act) => {
-              timeout.current = undefined;
-              act(i);
-            },
-            300,
-            instance,
-            action
-          );
-        }
+        const action = (e.metaKey || e.ctrlKey)?onCtrlClick:onClick;
+        timeout.current = setTimeout(
+          (i, act) => {
+            timeout.current = undefined;
+            act(i);
+          },
+          300,
+          instance,
+          action
+        );
       }
     };
 
@@ -248,21 +243,21 @@ const InstanceRow = observer(
       if (!e.currentTarget.contains(e.target as Node)) {
         return;
       }
-      if ((e.metaKey || e.ctrlKey) && typeof onCtrlClick === 'function') {
+      if (e.metaKey || e.ctrlKey) {
         onCtrlClick(instance);
       } else {
         const isTypesSupported = typeStore.isTypesSupported(instance.typeNames);
         const mode = isTypesSupported ? ViewMode.VIEW : ViewMode.RAW;
-        typeof onActionClick === 'function' && onActionClick(instance, mode);
+        onActionClick(instance, mode);
       }
     };
 
     const handleActionCtrlClick = () => {
-      typeof onCtrlClick === 'function' && onCtrlClick(instance);
+      onCtrlClick(instance);
     };
 
     const handleActionClick = (mode: ViewMode) => {
-      typeof onActionClick === 'function' && onActionClick(instance, mode);
+      onActionClick(instance, mode);
     };
 
     return (

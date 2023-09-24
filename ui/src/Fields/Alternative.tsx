@@ -92,7 +92,7 @@ const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect
   });
 
   const handleSelect = () => {
-    typeof onSelect === 'function' && onSelect(alternative.value);
+    onSelect(alternative.value);
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -126,7 +126,7 @@ const Alternative = ({ alternative, ValueRenderer, className, hasFocus, onSelect
 
   const handleRemoveClick = (e: MouseEvent<SVGSVGElement>) => {
     e.stopPropagation();
-    typeof onRemove === 'function' && onRemove(e);
+    onRemove(e);
   };
 
   const users = (!alternative || !alternative.users)?[]:alternative.users;

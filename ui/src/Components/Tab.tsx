@@ -119,7 +119,7 @@ const Tab = ({label, description, disabled, active, icon, iconColor, iconSpin, h
   const  navigate = useNavigate();
 
   const classes = useStyles();
-  const closeable = typeof onClose === 'function';
+  const closeable =  !!onClose;
 
   const handleClick = (e: MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -127,12 +127,12 @@ const Tab = ({label, description, disabled, active, icon, iconColor, iconSpin, h
       Matomo.trackEvent('Tab', 'Select', path);
       navigate(path);
     }
-    typeof onClick === 'function' && onClick(e);
+    !!onClick && onClick(e);
   };
 
   const handleClose = (e: MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    typeof onClose === 'function' && onClose(e);
+    !!onClose && onClose(e);
   };
 
   return (

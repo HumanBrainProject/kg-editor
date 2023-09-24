@@ -78,6 +78,7 @@
     "test": "react-scripts test",
     "testCI": "react-scripts test --coverage --passWithNoTests",
     "eject": "react-scripts eject",
+    "type-check": "tsc",
     "lint": "eslint src/",
     "fix_lint": "eslint --fix src/"
   },

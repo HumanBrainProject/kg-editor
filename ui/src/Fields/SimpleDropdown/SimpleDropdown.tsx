@@ -87,7 +87,7 @@ const ReadOnlyValue = observer(({ id, instanceId, fetchLabel, onClick }: ReadOnl
   if (!id) {
     return null;
   }
-  const isClickable = typeof onClick === 'function';
+  const isClickable = !!onClick;
   if (isClickable) {
     return (
       <ListItem

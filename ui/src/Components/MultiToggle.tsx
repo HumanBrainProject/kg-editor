@@ -47,13 +47,7 @@ const MultiToggle = ({ selectedValue, children, onChange}: MultiToggleProps) => 
 
   const classes = useStyles();
 
-  const handleSelect = (value: string | boolean) => {
-    if(typeof onChange === 'function'){
-      onChange(value);
-    }
-  };
-
-  const childrenWithProps = React.Children.map(children, child => child && React.cloneElement(child as ReactElement<any> , { selectedValue: selectedValue, onSelect: handleSelect }));
+  const childrenWithProps = React.Children.map(children, child => child && React.cloneElement(child as ReactElement<any> , { selectedValue: selectedValue, onSelect: onChange }));
 
   return(
     <div className={classes.container} style={{gridTemplateColumns:`repeat(${childrenWithProps?.length}, 24px)`}}>
@@ -101,9 +95,7 @@ const Toggle = ({onSelect, value, selectedValue, noscale, icon, color}: TogglePr
   const classes = useToggleStyles();
 
   const handleClick = () => {
-    if(typeof onSelect === 'function') {
-      onSelect(value);
-    }
+    !!onSelect && onSelect(value);
   };
 
   return(

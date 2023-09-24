@@ -60,9 +60,9 @@ const Action = ({
 }: ActionProps) => {
   const handleClick = (event: MouseEvent<HTMLDivElement>) => {
     if (event.metaKey || event.ctrlKey) {
-      typeof onCtrlClick === 'function' && onCtrlClick(mode);
+      onCtrlClick(mode);
     } else {
-      typeof onClick === 'function' && onClick(mode);
+      onClick(mode);
     }
   };
 

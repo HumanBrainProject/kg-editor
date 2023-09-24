@@ -109,7 +109,7 @@ const Tab = ({
       : {
         className: className,
         title: label,
-        onClick: () => typeof onClick === 'function' && onClick(mode)
+        onClick: () => onClick(mode)
       };
 
   return (

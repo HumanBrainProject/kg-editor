@@ -53,7 +53,7 @@ export class UserProfileStore {
   }
 
   get hasSpaces() {
-    return this.user && this.user.spaces instanceof Array && !!this.user.spaces.length;
+    return this.user && Array.isArray(this.user.spaces) && !!this.user.spaces.length;
   }
 
   get spaces() {

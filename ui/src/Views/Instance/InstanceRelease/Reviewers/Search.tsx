@@ -216,7 +216,7 @@ const Search = observer(({ excludedUsers, onSelect }: SearchProps) => {
     } else if (user && (!event || (e &&  (!e.key || e.key === 'Enter')))) { // enter
       event.preventDefault();
       inputRef.current?.focus();
-      typeof onSelect === 'function' && onSelect(user.id);
+      onSelect(user.id);
     }
   };
 

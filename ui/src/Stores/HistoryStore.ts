@@ -67,7 +67,7 @@ export class HistoryStore {
     if (localStorageInstancesHistory) {
       try {
         this.instancesHistory = JSON.parse(localStorageInstancesHistory);
-        if (!(this.instancesHistory instanceof Array)) {
+        if (!Array.isArray(this.instancesHistory)) {
           this.instancesHistory  = [];
         }
       } catch (e) {

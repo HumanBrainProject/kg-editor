@@ -93,7 +93,7 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
   };
 
   const handleSelect = (value: any) => {
-    typeof onSelect === 'function' && onSelect(value);
+    onSelect(value);
     close();
   };
 
@@ -136,7 +136,7 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
 
   const handleRemove = (e: MouseEvent<SVGSVGElement>) => {
     e && e.preventDefault();
-    typeof onRemove === 'function' && onRemove();
+    onRemove();
     setOpen(false);
   };
 
@@ -157,7 +157,7 @@ const Alternatives = ({ className, list, disabled, parentContainerRef, ValueRend
       e.preventDefault();
       if (open) {
         if (current) {
-          typeof onSelect === 'function' && onSelect(current);
+          onSelect(current);
         }
         close();
       } else {

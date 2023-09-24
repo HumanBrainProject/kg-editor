@@ -32,11 +32,11 @@ import SpinnerPanel from '../Components/SpinnerPanel';
 import useListTypesQuery from '../Hooks/useListTypesQuery';
 import useStores from '../Hooks/useStores';
 import type { Space as SpaceType } from '../types';
-import type { JSX } from 'react';
+import type { ReactNode } from 'react';
 
 
 interface TypesProps {
-  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
+  children?: ReactNode;
 }
 
 const Types = observer(({ children }: TypesProps) => {

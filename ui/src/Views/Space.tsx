@@ -32,7 +32,7 @@ import Modal from '../Components/Modal';
 import useAuth from '../Hooks/useAuth';
 import useStores from '../Hooks/useStores';
 import type { Space as SpaceType } from '../types';
-import type { JSX } from 'react';
+import type { ReactNode } from 'react';
 
 
 const hasSpace = (spaces: SpaceType[], name?: string|null) => !!name && spaces.find(s => s.id === name);
@@ -56,7 +56,7 @@ const SpaceItem = ({ item: space }: { item: SpaceType }) => <>{space.name??space
 interface SpaceProps {
   space?: string|null;
   skipHistory?: boolean;
-  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
+  children?: ReactNode;
 }
 
 const Space = observer(({ space, skipHistory, children }: SpaceProps) => {

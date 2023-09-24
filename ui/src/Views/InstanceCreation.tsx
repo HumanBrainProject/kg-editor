@@ -31,10 +31,10 @@ import SpinnerPanel from '../Components/SpinnerPanel';
 import useAPI from '../Hooks/useAPI';
 import useCheckInstanceQuery from '../Hooks/useCheckInstanceQuery';
 import useStores from '../Hooks/useStores';
-import type { JSX } from 'react';
+import type { ReactNode } from 'react';
 
 interface InstanceCreationProps {
-  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
+  children?: ReactNode;
 }
 
 const InstanceCreation = observer(({ children }: InstanceCreationProps) => {

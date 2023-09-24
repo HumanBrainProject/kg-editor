@@ -32,10 +32,10 @@ import SpinnerPanel from '../Components/SpinnerPanel';
 import useAuth from '../Hooks/useAuth';
 import useGetUserProfileQuery from '../Hooks/useGetUserProfileQuery';
 import useStores from '../Hooks/useStores';
-import type { JSX } from 'react';
+import type { ReactNode } from 'react';
 
 interface UserProfileProps {
-  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
+  children?: ReactNode;
 }
 
 const UserProfile = observer(({ children }: UserProfileProps) => {

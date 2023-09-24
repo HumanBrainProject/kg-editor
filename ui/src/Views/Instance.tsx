@@ -32,7 +32,7 @@ import ErrorPanel from '../Components/ErrorPanel';
 import SpinnerPanel from '../Components/SpinnerPanel';
 import useStores from '../Hooks/useStores';
 import type { UUID } from '../types';
-import type { JSX } from 'react';
+import type { ReactNode } from 'react';
 
 
 interface InstanceProps {
@@ -43,8 +43,8 @@ interface InstanceProps {
     | null
     | undefined
     | string
-    | JSX.Element
-    | (null | undefined | string | JSX.Element)[];
+    | ReactNode
+    | (null | undefined | string | ReactNode)[];
 }
 
 const Instance = observer(({ children }: InstanceProps) => {

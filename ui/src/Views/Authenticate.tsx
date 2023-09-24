@@ -31,10 +31,10 @@ import ErrorPanel from '../Components/ErrorPanel';
 import SpinnerPanel from '../Components/SpinnerPanel';
 import useAuth from '../Hooks/useAuth';
 import Matomo from '../Services/Matomo';
-import type { JSX } from 'react';
+import type { ReactNode } from 'react';
 
 interface AuthenticateProps {
-  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
+  children?: ReactNode;
 }
 
 const Authenticate = observer(({children}: AuthenticateProps) => {

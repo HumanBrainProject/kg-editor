@@ -34,9 +34,10 @@
  */
 
 import type AuthAdapter from './AuthAdapter';
+import type { ReactNode } from 'react';
 
 export interface AuthProviderProps {
   adapter: AuthAdapter;
   loginRequired?: boolean;
-  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
+  children?: ReactNode;
 }

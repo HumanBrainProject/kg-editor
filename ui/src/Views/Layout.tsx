@@ -29,7 +29,7 @@ import Copyright from './Copyright';
 import Logo from './Logo';
 import Nav from './Nav';
 import type { Theme } from '../Themes/Theme';
-import type { JSX } from 'react';
+import type { ReactNode } from 'react';
 import type { DefaultTheme} from 'react-jss';
 
 const getBackgroundSize = (theme: Jss.Theme) => {
@@ -89,7 +89,7 @@ const useStyles = createUseStyles((theme: Jss.Theme) => {
 });
 
 interface LayoutProps {
-  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
+  children?: ReactNode;
 }
 
 const Layout = ({ children }: LayoutProps) => {

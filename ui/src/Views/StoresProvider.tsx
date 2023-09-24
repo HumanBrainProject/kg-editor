@@ -36,18 +36,16 @@
 import React from 'react';
 import StoresContext from '../Contexts/StoresContext';
 import type RootStore from '../Stores/RootStore';
-import type { JSX } from 'react';
+import type { ReactNode } from 'react';
 
 interface StoresProviderProps {
   stores: RootStore;
-  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
+  children?: ReactNode;
 }
 
-const StoresProvider = ({ stores, children }: StoresProviderProps): JSX.Element => (
+const StoresProvider = ({ stores, children }: StoresProviderProps): ReactNode => (
   <StoresContext.Provider value={stores} >
-    <>
-      {children}
-    </>
+    {children}
   </StoresContext.Provider>
 );
 

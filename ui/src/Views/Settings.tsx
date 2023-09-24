@@ -35,11 +35,11 @@ import KeycloakAuthAdapter from '../Services/KeycloakAuthAdapter';
 import Matomo from '../Services/Matomo';
 import Sentry from '../Services/Sentry';
 import type AuthAdapter from '../Services/AuthAdapter';
-import type { JSX } from 'react';
+import type { ReactNode } from 'react';
 
 interface SettingsProps {
   authAdapter: AuthAdapter;
-  children?: string|JSX.Element|(null|undefined|string|JSX.Element)[];
+  children?: ReactNode;
 }
 
 const Settings = observer(({ authAdapter, children }: SettingsProps) => {

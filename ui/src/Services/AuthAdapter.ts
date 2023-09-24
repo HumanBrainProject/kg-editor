@@ -33,13 +33,14 @@
  *
  */
 import type { AuthProviderProps } from './AuthProvider';
+import type { ReactNode } from 'react';
 import type TokenProvider from './TokenProvider';
 import type UnauthorizedRequestResponseHandlerProvider from './UnauthorizedRequestResponseHandlerProvider';
 
 interface AuthAdapter {
     get tokenProvider(): TokenProvider|undefined;
     get unauthorizedRequestResponseHandlerProvider(): UnauthorizedRequestResponseHandlerProvider|undefined;
-    get authProvider(): (props: AuthProviderProps) => string|JSX.Element|(null|undefined|string|JSX.Element)[];
+    get authProvider(): (props: AuthProviderProps) => ReactNode;
     get initOptions(): Record<string, unknown> | undefined;
     setConfig(config: Record<string, unknown> | undefined): void;
 }

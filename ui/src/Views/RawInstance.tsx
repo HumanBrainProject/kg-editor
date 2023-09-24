@@ -32,11 +32,11 @@ import ErrorPanel from '../Components/ErrorPanel';
 import SpinnerPanel from '../Components/SpinnerPanel';
 import useStores from '../Hooks/useStores';
 import type { UUID } from '../types';
-import type { JSX } from 'react';
+import type { ReactNode } from 'react';
 
 
 interface RawInstanceProps {
-  children: (instanceId: UUID, space: string) => null|undefined|string|JSX.Element|(null|undefined|string|JSX.Element)[];
+  children: (instanceId: UUID, space: string) => null|undefined|ReactNode;
 }
 
 const RawInstance = observer(({ children }: RawInstanceProps) => {

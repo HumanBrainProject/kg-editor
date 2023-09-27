@@ -350,6 +350,7 @@ export class AppStore{
       if (path) {
         navigate(path);
       }
+      return true;
     }
   }
 

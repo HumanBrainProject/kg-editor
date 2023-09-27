@@ -690,9 +690,7 @@ export class Instance {
         ? this.fields[this.labelField]
         : undefined;
     if (field) {
-      return this.isNew && !field.value
-        ? `<New ${this.primaryType.label}>`
-        : field.value;
+      return (this.isNew && !field.value)?`<New ${this.primaryType.label}>`:field.value as string;
     }
     return this._name ? this._name : this.id;
   }

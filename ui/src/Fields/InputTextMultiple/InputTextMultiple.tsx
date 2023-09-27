@@ -75,6 +75,15 @@ const useStyles = createUseStyles({
   },
   warning: {
     borderColor: 'var(--ft-color-warn)'
+  },
+  inferred: {
+    color: 'var(--bs-gray-600)',
+    '& .btn': {
+      color: 'var(--bs-gray-600)',
+      '&:hover':{
+        color: 'var(--bs-body-color)'
+      }
+    }
   }
 });
 
@@ -209,7 +218,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
   const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.hasWarning;
   return (
     <Form.Group className={className} ref={formGroupRef}>
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isPublic={isPublic}/>
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isPublic={isPublic} isInferred={fieldStore.isInferred} />
       <Alternatives
         className={classes.alternatives}
         list={alternatives}
@@ -218,7 +227,7 @@ const InputTextMultiple = observer(({className, fieldStore, readMode, showIfNoVa
         parentContainerRef={formGroupRef}
         ValueRenderer={getAlternativeValue()}
       />
-      <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''} ${isDisabled?classes.disabledValues:''}`} >
+      <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''} ${isDisabled?classes.disabledValues:''} ${fieldStore.isInferred?classes.inferred:''}`} >
         <List
           list={list}
           readOnly={false}

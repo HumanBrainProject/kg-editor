@@ -402,4 +402,5 @@ export interface FieldStoreDefinition {
   targetTypes?: SimpleType[];
   fields: Fields;
   markdown?: boolean;
+  isInferred?: boolean;
 }

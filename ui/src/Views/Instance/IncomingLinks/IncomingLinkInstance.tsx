@@ -60,7 +60,7 @@ const IncomingLinkInstance = observer(({instance, readMode }: IncomingLinkInstan
   let label = instance.label?instance.label:instance.id;
 
   if (instance.space === appStore.currentSpace?.id && instanceStore.instances.has(instance.id)) {
-    label = instanceStore.instances.get(instance.id)?.name;
+    label = instanceStore.instances.get(instance.id)?.name??'';
   }
 
   const isForbidden = !userProfileStore.hasSpace(instance.space);

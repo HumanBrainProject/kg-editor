@@ -47,6 +47,9 @@ const useStyles = createUseStyles({
   },
   warning: {
     borderColor: 'var(--ft-color-warn)'
+  },
+  inferred: {
+    color: 'var(--bs-gray-600)'
   }
 });
 
@@ -158,7 +161,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
 
   return (
     <Form.Group className={className} ref={formGroupRef} >
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isPublic={isPublic}/>
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isPublic={isPublic} isInferred={fieldStore.isInferred} />
       <Alternatives
         className={classes.alternatives}
         list={alternatives}
@@ -175,7 +178,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
           as={as}
           onChange={handleChange}
           disabled={isDisabled}
-          className={hasValidationWarnings?classes.warning:''}
+          className={hasValidationWarnings?classes.warning:(fieldStore.isInferred?classes.inferred:'')}
         />:
         <Form.Control
           value={value}
@@ -183,7 +186,7 @@ const InputText = observer(({ fieldStore, className, as, readMode, showIfNoValue
           as={as}
           onChange={handleChange}
           disabled={isDisabled}
-          className={hasValidationWarnings?classes.warning:''}
+          className={hasValidationWarnings?classes.warning:(fieldStore.isInferred?classes.inferred:'')}
         />
       }
       <Invalid show={hasValidationWarnings} messages={fieldStore.validationWarnings} />

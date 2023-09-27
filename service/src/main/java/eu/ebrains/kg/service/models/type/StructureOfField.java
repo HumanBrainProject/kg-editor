@@ -110,6 +110,9 @@ public class StructureOfField implements Serializable {
     private final Boolean markdown;
     private Map<String, StructureOfField> fields;
     private transient Object value;
+
+    private transient Boolean inferred;
+
     private String defaultTargetType;
     private List<SimpleType> targetTypes;
     private final List<ValidationRule> validation;
@@ -151,6 +154,15 @@ public class StructureOfField implements Serializable {
 
     public void setValue(Object value) {
         this.value = value;
+    }
+
+    @JsonProperty("isInferred")
+    public Boolean getInferred() {
+        return this.inferred;
+    }
+
+    public void setInferred(Boolean inferred) {
+        this.inferred = inferred;
     }
 
     public String getFullyQualifiedName() {

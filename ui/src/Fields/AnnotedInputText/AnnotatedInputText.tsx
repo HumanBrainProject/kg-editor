@@ -76,6 +76,15 @@ const useStyles = createUseStyles({
   },
   warning: {
     borderColor: 'var(--ft-color-warn)'
+  },
+  inferred: {
+    color: 'var(--bs-gray-600)',
+    '& .btn': {
+      color: 'var(--bs-gray-600)',
+      '&:hover':{
+        color: 'var(--bs-body-color)'
+      }
+    }
   }
 });
 
@@ -223,6 +232,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
         labelTooltipIcon={labelTooltipIcon}
         isRequired={isRequired}
         isPublic={isPublic}
+        isInferred={fieldStore.isInferred}
       />
       <Alternatives
         className={classes.alternatives}
@@ -232,7 +242,7 @@ const AnnotatedInputText = observer(({className, fieldStore, readMode, showIfNoV
         parentContainerRef={formGroupRef}
         ValueRenderer={getAlternativeValue(fieldStore.mappingValue)}
       />
-      <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''} ${isDisabled?classes.valuesDisabled:''}`} >
+      <div className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''} ${isDisabled?classes.valuesDisabled:''} ${fieldStore.isInferred?classes.inferred:''}`} >
         <List
           list={resources}
           readOnly={false}

@@ -73,6 +73,15 @@ const useStyles = createUseStyles({
   },
   warning: {
     borderColor: 'var(--ft-color-warn)'
+  },
+  inferred: {
+    color: 'var(--bs-gray-600)',
+    '& .btn': {
+      color: 'var(--bs-gray-600)',
+      '&:hover':{
+        color: 'var(--bs-body-color)'
+      }
+    }
   }
 });
 
@@ -310,7 +319,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
     <Form.Group className={className} ref={formGroupRef}>
       <div className={classes.labelContainer}>
         <div className={classes.labelPanel}>
-          <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isPublic={isPublic}/>
+          <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isPublic={isPublic} isInferred={fieldStore.isInferred} />
           <LinksAlternatives
             className={classes.alternatives}
             list={alternatives}
@@ -322,7 +331,7 @@ const SimpleDropdown = observer(({ className, fieldStore, readMode, showIfNoValu
         </div>
         {hasMultipleTypes && <TargetTypeSelection id={`targetType-${fullyQualifiedName}`} types={sortedTargetTypes} selectedType={targetType} onSelect={handleSelectTargetType} />}
       </div>
-      <div ref={formControlRef} className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''} ${isDisabled?classes.disabledValues:''}`} onClick={handleDropDownFocus} >
+      <div ref={formControlRef} className={`form-control ${classes.values} ${hasValidationWarnings?classes.warning:''} ${isDisabled?classes.disabledValues:''} ${fieldStore.isInferred?classes.inferred:''}`} onClick={handleDropDownFocus} >
         {value &&
         <ListItem
           isCircular={instance?.id===id}

@@ -47,6 +47,9 @@ const useStyles = createUseStyles({
   },
   warning: {
     borderColor: 'var(--ft-color-warn)'
+  },
+  inferred: {
+    color: 'var(--bs-gray-600)'
   }
 });
 
@@ -106,7 +109,7 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
   const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.hasWarning;
   return (
     <Form.Group className={className} ref={formGroupRef} >
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isPublic={isPublic}/>
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isPublic={isPublic} isInferred={fieldStore.isInferred} />
       <Alternatives
         className={classes.alternatives}
         list={alternatives}
@@ -120,7 +123,7 @@ const InputNumber = observer(({ fieldStore, className, readMode, showIfNoValue }
         type={inputType}
         onChange={handleChange}
         disabled={isDisabled}
-        className={hasValidationWarnings?classes.warning:''}
+        className={hasValidationWarnings?classes.warning:(fieldStore.isInferred?classes.inferred:'')}
       />
       <Invalid show={hasValidationWarnings} messages={fieldStore.validationWarnings} />
       <Warning show={hasWarning} message={fieldStore.warning} />

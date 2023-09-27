@@ -72,6 +72,9 @@ const useStyles = createUseStyles({
   },
   warning: {
     borderColor: 'var(--ft-color-warn)'
+  },
+  inferred: {
+    color: 'var(--bs-gray-600)'
   }
 });
 
@@ -140,7 +143,7 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
   const checkValidationWarnings = !isDisabled && fieldStore.requiredValidationWarning && fieldStore.hasChanged;
   return (
     <Form.Group className={`${className} ${classes.containerDatepicker}`} ref={formGroupRef} >
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isPublic={isPublic}/>
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isPublic={isPublic} isInferred={fieldStore.isInferred} />
       <Alternatives
         className={classes.alternatives}
         list={alternatives}
@@ -150,7 +153,7 @@ const InputDateTime = observer(({ fieldStore, className, readMode, showIfNoValue
         ValueRenderer={AlternativeValue}
       />
       <DatePicker
-        className={`${classes.datePicker} ${checkValidationWarnings?classes.warning:''}`}
+        className={`${classes.datePicker} ${checkValidationWarnings?classes.warning:(fieldStore.isInferred?classes.inferred:'')}`}
         selected={dateValue}
         disabled={isDisabled}
         onChange={handleChange}

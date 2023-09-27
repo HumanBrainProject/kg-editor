@@ -38,7 +38,8 @@ export interface NestedInstanceStores {
 }
 
 class FieldStore {
-  value: any;
+  value: unknown;
+  isInitialValueInferred: boolean;
   label?:string;
   labelTooltip?: string;
   labelTooltipIcon?: IconProp;
@@ -75,7 +76,9 @@ class FieldStore {
       setAlternatives: action,
       setWarning: action,
       clearWarning: action,
-      hasWarning: computed
+      hasWarning: computed,
+      isInitialValueInferred: observable,
+      isInferred: computed
     });
 
     this.widget = definition.widget;
@@ -84,6 +87,7 @@ class FieldStore {
     this.labelTooltipIcon = definition.labelTooltipIcon;
     this.isPublic = !!definition.isPublic;
     this.fullyQualifiedName = definition.fullyQualifiedName;
+    this.isInitialValueInferred = !!definition.isInferred;
     this.instance = instance;
     this.order = definition.order;
     this.isRequired = definition.isRequired;
@@ -158,6 +162,10 @@ class FieldStore {
 
   get hasError() {
     return this.errorMessage??this.errorInfo;
+  }
+
+  get isInferred() {
+    return this.isInitialValueInferred && !this.hasChanged;
   }
 
   setAlternatives(alternatives: Alternative[]) {

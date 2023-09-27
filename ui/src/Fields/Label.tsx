@@ -24,6 +24,7 @@
 import {faCogs} from '@fortawesome/free-solid-svg-icons/faCogs';
 import {faGlobe} from '@fortawesome/free-solid-svg-icons/faGlobe';
 import {faInfoCircle} from '@fortawesome/free-solid-svg-icons/faInfoCircle';
+import {faLongArrowAltLeft} from '@fortawesome/free-solid-svg-icons/faLongArrowAltLeft';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import uniqueId from 'lodash/uniqueId';
 import React from 'react';
@@ -62,9 +63,10 @@ interface LabelProps {
   isReadOnly?: boolean;
   isRequired?: boolean;
   isPublic?: boolean;
+  isInferred?: boolean;
 }
 
-const Label = ({ className, label, labelTooltip, labelTooltipIcon, isReadOnly, isRequired, isPublic }: LabelProps) => {
+const Label = ({ className, label, labelTooltip, labelTooltipIcon, isReadOnly, isRequired, isPublic, isInferred }: LabelProps) => {
   const classes = useStyles();
   return (
     <Form.Label className={`${classes.label} ${className??''}`}>
@@ -72,6 +74,7 @@ const Label = ({ className, label, labelTooltip, labelTooltipIcon, isReadOnly, i
       {isReadOnly && <LabelTooltip tooltip="This value is populated automatically by the automation system" icon={faCogs} />}
       {isPublic && <LabelTooltip tooltip="This field will be publicly accessible for every user. (Even for users without read access)" icon={faGlobe} />}
       {labelTooltip && <LabelTooltip tooltip={labelTooltip} icon={labelTooltipIcon} />}
+      {isInferred && <LabelTooltip tooltip="This value is currently inferred" icon={faLongArrowAltLeft} />}
     </Form.Label>
   );
 };

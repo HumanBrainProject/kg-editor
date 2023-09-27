@@ -60,6 +60,9 @@ const useStyles = createUseStyles({
   warning: {
     borderColor: 'var(--ft-color-warn)'
   },
+  inferred: {
+    color: 'var(--bs-gray-600)'
+  },
   addColorBtn: {
     fontSize: 'x-small',
     marginLeft: '4px'
@@ -141,7 +144,7 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue }:
   const hasWarning = !isDisabled && fieldStore.hasChanged && fieldStore.hasWarning;
   return (
     <Form.Group className={className} ref={formGroupRef} >
-      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isReadOnly={isReadOnly} isPublic={isPublic}/>
+      <Label className={classes.label} label={label} labelTooltip={labelTooltip} labelTooltipIcon={labelTooltipIcon} isRequired={isRequired} isReadOnly={isReadOnly} isPublic={isPublic}  isInferred={fieldStore.isInferred}/>
       <div>
         <Form.Control
           value={value}
@@ -149,7 +152,7 @@ const InputColor = observer(({ fieldStore, className, readMode, showIfNoValue }:
           as="input"
           onChange={handleChange}
           disabled={isDisabled}
-          className={`${classes.inputColor} ${hasValidationWarnings?classes.warning:''}`}
+          className={`${classes.inputColor} ${hasValidationWarnings?classes.warning:(fieldStore.isInferred?classes.inferred:'')}`}
         />
         <Button className={classes.removeColorBtn} size="sm" variant="secondary" onClick={handleRemoveColor} title="Remove color" >
           <FontAwesomeIcon icon={faTimes}/>

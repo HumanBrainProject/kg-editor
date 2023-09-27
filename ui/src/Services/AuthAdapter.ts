@@ -33,9 +33,9 @@
  *
  */
 import type { AuthProviderProps } from './AuthProvider';
-import type { ReactNode } from 'react';
 import type TokenProvider from './TokenProvider';
 import type UnauthorizedRequestResponseHandlerProvider from './UnauthorizedRequestResponseHandlerProvider';
+import type { ReactNode } from 'react';
 
 interface AuthAdapter {
     get tokenProvider(): TokenProvider|undefined;

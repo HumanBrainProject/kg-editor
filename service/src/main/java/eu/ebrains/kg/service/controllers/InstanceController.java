@@ -529,10 +529,8 @@ public class InstanceController {
     }
 
     private void enrichInference(StructureOfField field, Alternative alternative) {
-        if (field != null && field.getValue() != null) {
-            if (field.getValue().equals(alternative.getValue()) && containsInferenceUser(alternative.getUsers())) {
-                field.setInferred(true);
-            }
+        if (field != null && alternative.getSelected() && containsInferenceUser(alternative.getUsers())) {
+            field.setInferred(true);
         }
     }
 
@@ -545,11 +543,11 @@ public class InstanceController {
                 String fieldName = e.getKey();
                 StructureOfField field = instance.getFields().get(fieldName);
                 e.getValue().forEach(alternative -> {
-                    enrichInference(field, alternative);
                     alternative.getUsers().forEach(u -> {
                         u.setId(idController.simplifyFullyQualifiedId(u.getId()).toString());
                     });
                     idController.simplifyIdIfObjectIsAMap(alternative.getValue());
+                    enrichInference(field, alternative);
                 });
             });
         }

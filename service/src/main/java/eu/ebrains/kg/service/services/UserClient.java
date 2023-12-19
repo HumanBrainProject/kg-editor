@@ -23,23 +23,33 @@
 
 package eu.ebrains.kg.service.services;
 
-import eu.ebrains.kg.service.controllers.keycloak.KeycloakUsers;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import eu.ebrains.kg.service.models.KGCoreResult;
 import eu.ebrains.kg.service.models.commons.UserSummary;
 import eu.ebrains.kg.service.models.user.UserProfile;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Component;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 @Component
 public class UserClient {
 
     private final ServiceCall kg;
-    private final KeycloakUsers keycloakUsers;
+    private final String searchEndpoint;
+    private final String detailEndpoint;
 
-    public UserClient(ServiceCall kg, KeycloakUsers keycloakUsers) {
+    public UserClient(ServiceCall kg, @Value("${kg.users.searchEndpoint}") String searchEndpoint, @Value("${kg.users.detailEndpoint}") String detailEndpoint) {
         this.kg = kg;
-        this.keycloakUsers = keycloakUsers;
+        this.searchEndpoint = searchEndpoint;
+        this.detailEndpoint = detailEndpoint;
+
     }
 
     private static class UserFromKG extends KGCoreResult<UserProfile> {
@@ -54,8 +64,38 @@ public class UserClient {
         return response != null ? response.getData() : null;
     }
 
+    public static class UserRepresentation {
+        private final String id;
+        private final String username;
+        private final String lastName;
+        private final String firstName;
+
+        @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+        public UserRepresentation(@JsonProperty("id") String id,
+                                  @JsonProperty("username") String username,
+                                  @JsonProperty("lastName") String lastName, @JsonProperty("firstName") String firstName
+        ) {
+            this.id = id;
+            this.username = username;
+            this.lastName = lastName;
+            this.firstName = firstName;
+        }
+    }
+
     public List<UserSummary> getUsers(String search) {
-        return keycloakUsers.findUser(search);
+        final List<UserRepresentation> result = this.kg.client(false).get().uri(String.format(this.searchEndpoint, URLEncoder.encode(search, StandardCharsets.UTF_8))).retrieve().bodyToMono(new ParameterizedTypeReference<List<UserRepresentation>>() {
+        }).block();
+        return result == null ? null : result.stream().map(this::fromUserRepresentation).toList();
+
+    }
+
+    private UserSummary fromUserRepresentation(UserRepresentation userRepresentation) {
+        return new UserSummary(userRepresentation.id, userRepresentation.username, userRepresentation.firstName + " " + userRepresentation.lastName);
+    }
+
+    public UserSummary getUserById(String userId) {
+        final UserRepresentation user = this.kg.client(false).get().uri(String.format(this.detailEndpoint, URLEncoder.encode(userId, StandardCharsets.UTF_8))).retrieve().bodyToMono(UserRepresentation.class).block();
+        return user!=null ? fromUserRepresentation(user) : null;
     }
 
 }

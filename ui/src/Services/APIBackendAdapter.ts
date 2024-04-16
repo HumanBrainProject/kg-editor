@@ -34,7 +34,7 @@
  *
  */
 import type API from './API';
-import type { UUID, Stage, Settings, UserProfile, KGCoreResult, StructureOfType, InstanceFull, InstanceSummary, SuggestionStructure, Neighbor, Scope, UserSummary, IncomingLink, InstanceRawStructure, InstanceSummaryData, InstanceLabelData, InstanceFullData } from '../types';
+import type { UUID, Stage, Settings, UserProfile, KGCoreResult, StructureOfType, InstanceFull, InstanceSummary, SuggestionStructure, Neighbor, Scope, UserSummary, IncomingLink, InstanceRawStructure, InstancesData, InstanceLabel } from '../types';
 import type { AxiosInstance } from 'axios';
 
 const RELATIVE_ROOT_PATH = '/editor/api';
@@ -180,17 +180,17 @@ class APIBackendAdapter implements API {
     return data;
   }
 
-  async getInstancesLabel(stage: Stage, instanceIds: UUID[]): Promise<KGCoreResult<InstanceLabelData>> {
+  async getInstancesLabel(stage: Stage, instanceIds: UUID[]): Promise<KGCoreResult<InstancesData<InstanceLabel>>> {
     const { data } = await this._axios.post(endpoints.instancesLabel(stage), instanceIds);
     return data;
   }
 
-  async getInstancesSummary(stage: Stage | undefined, instanceIds: UUID[]): Promise<KGCoreResult<InstanceSummaryData>> {
+  async getInstancesSummary(stage: Stage | undefined, instanceIds: UUID[]): Promise<KGCoreResult<InstancesData<InstanceSummary>>> {
     const { data } = await this._axios.post(endpoints.instancesSummary(stage), instanceIds);
     return data;
   }
 
-  async getInstancesList(stage: Stage, instanceIds: UUID[]): Promise<KGCoreResult<InstanceFullData>> {
+  async getInstancesList(stage: Stage, instanceIds: UUID[]): Promise<KGCoreResult<InstancesData<InstanceFull>>> {
     const { data } = await this._axios.post(endpoints.instancesList(stage), instanceIds);
     return data;
   }

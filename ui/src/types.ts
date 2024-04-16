@@ -279,11 +279,7 @@ export type InstanceRawData = {
   [fieldName:string]: unknown;
 }
 
-export type InstanceLabelData = Record<UUID,InstanceLabel>; // by instanceId
-
-export type InstanceSummaryData = Record<UUID,InstanceSummary>; // by instanceId
-
-export type InstanceFullData = Record<UUID,InstanceFull>; // by instanceId
+export type InstancesData<T extends InstanceLabel> = Record<UUID,T>; // by instanceId
 
 export interface InstanceRawStructure {
   data: InstanceRawData;

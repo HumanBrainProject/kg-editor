@@ -32,7 +32,7 @@
  *   limitations under the License.
  *
  */
-import type { Settings, UserProfile, KGCoreResult, UUID, Stage, StructureOfType, InstanceFull, InstanceSummary, SuggestionStructure, Neighbor, Scope, UserSummary, IncomingLink, InstanceRawStructure, InstanceLabelData, InstanceSummaryData, InstanceFullData } from '../types';
+import type { Settings, UserProfile, KGCoreResult, UUID, Stage, StructureOfType, InstanceFull, InstanceSummary, SuggestionStructure, Neighbor, Scope, UserSummary, IncomingLink, InstanceRawStructure, InstancesData, InstanceLabel } from '../types';
 
 interface APIErrorResponse {
   status: number;
@@ -79,11 +79,11 @@ interface API {
 
   getInstanceScope(instanceId: UUID): Promise<KGCoreResult<Scope>>;
 
-  getInstancesLabel(stage: Stage | undefined, instanceIds: UUID[]): Promise<KGCoreResult<InstanceLabelData>>;
+  getInstancesLabel(stage: Stage | undefined, instanceIds: UUID[]): Promise<KGCoreResult<InstancesData<InstanceLabel>>>;
 
-  getInstancesSummary(stage: Stage|undefined, instanceIds: UUID[]): Promise<KGCoreResult<InstanceSummaryData>>;
+  getInstancesSummary(stage: Stage|undefined, instanceIds: UUID[]): Promise<KGCoreResult<InstancesData<InstanceSummary>>>;
 
-  getInstancesList(stage: Stage | undefined, instanceIds: UUID[]): Promise<KGCoreResult<InstanceFullData>>;
+  getInstancesList(stage: Stage | undefined, instanceIds: UUID[]): Promise<KGCoreResult<InstancesData<InstanceFull>>>;
 
   getInvitedUsers(instanceId: UUID): Promise<KGCoreResult<UserSummary[]>>;
 

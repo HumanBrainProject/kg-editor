@@ -39,8 +39,8 @@ interface APIErrorResponse {
   data: unknown;
 }
 
-export interface APIError {
-  message?: string;
+export interface APIError extends Error {
+  message: string;
   code?: string;
   response?: APIErrorResponse;
 }

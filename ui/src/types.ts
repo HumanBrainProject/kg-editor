@@ -194,7 +194,7 @@ export interface InstanceLabel {
   types: SimpleType[];
   id: UUID;
   name: string;
-  error: Error;
+  error?: Error;
 }
 
 export type Fields = Record<string,StructureOfField>; // by fieldName

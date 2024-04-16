@@ -22,6 +22,10 @@
  */
 
 import {faArrowRight} from '@fortawesome/free-solid-svg-icons/faArrowRight';
+import {faCompress} from '@fortawesome/free-solid-svg-icons/faCompress';
+import {faExpandArrowsAlt} from '@fortawesome/free-solid-svg-icons/faExpandArrowsAlt';
+import {faEye} from '@fortawesome/free-solid-svg-icons/faEye';
+import {faEyeSlash} from '@fortawesome/free-solid-svg-icons/faEyeSlash';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import Color from 'color';
 import { observer } from 'mobx-react-lite';
@@ -281,15 +285,15 @@ const Actions = observer(({ className, group }:ActionsProps) => {
 
   let value = group.show?'show':'hide';
   let actions = [
-    {value: 'show', icon:'eye'},
-    {value: 'hide', icon:'eye-slash'}
+    {value: 'show', icon: faEye},
+    {value: 'hide', icon: faEyeSlash}
   ];
   if (group.show && group.nodes.length > 1) {
     value = group.grouped?'group':'ungroup';
     actions = [
-      {value: 'group',   icon: 'compress'},
-      {value: 'ungroup', icon: 'expand-arrows-alt'},
-      {value: 'hide',    icon: 'eye-slash'}
+      {value: 'group',   icon: faCompress},
+      {value: 'ungroup', icon: faExpandArrowsAlt},
+      {value: 'hide',    icon: faEyeSlash}
     ];
   }
 
